@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "yiannis",
+    "email": "yiannis@email.com",
+    "password": "secret",
+    "profileImg": "https://picsum.photos/id/237/200/300",
+    "backgroundImg": "https://picsum.photos/seed/picsum/400/300",
+    "info": "I am the admin",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "name": "leo",
+    "email": "leo@email.com",
+    "password": "secret",
+    "profileImg": "https://picsum.photos/id/237/200/300",
+    "backgroundImg": "https://picsum.photos/id/14/400/300",
+    "info": "Dr. Leo Patel: Bridging Electronics and Neuroscience - A Pioneer in Neuroengineering",
+    "role": "user"
+  },
+  {
+    "id": 3,
+    "name": "lena",
+    "email": "lena@email.com",
+    "password": "secret",
+    "profileImg": "https://picsum.photos/id/235/200/300",
+    "backgroundImg": "https://picsum.photos/id/10/400/300",
+    "info": "Dr. Lena Rivera: Green Innovations in Engineering - Building a Sustainable Future",
+    "role": "user"
+  },
+  {
+    "id": 4,
+    "name": "tanya",
+    "email": "tanya@email.com",
+    "password": "secret",
+    "profileImg": "https://picsum.photos/id/247/200/300",
+    "backgroundImg": "https://picsum.photos/id/11/400/300",
+    "info": "Trailblazing Junior Professor at the Intersection of AI and Language Sciences at Stanford University",
+    "role": "user"
+  }
+]
