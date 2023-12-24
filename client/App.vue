@@ -5,9 +5,8 @@
     </nav>
   </header>
 
-  <!--router -->
+
   <NuxtPage> </NuxtPage>
   
 </template>
 
-<script></script>

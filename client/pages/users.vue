@@ -119,10 +119,10 @@
               >
                 <div class="grid items-center">
                   <h1 class="text-lg font-semibold">
-                    <router-link
+                    <NuxtLink
                       class="underline decoration-[#388aef] capitalize"
                       :to="'/article/' + j.doi"
-                      >{{ j.title }}</router-link
+                      >{{ j.title }}</NuxtLink
                     >
                   </h1>
                   <h2>Author: {{ j.authors }}</h2>
@@ -165,10 +165,10 @@
                         >
                           <div class="grid items-center">
                             <h1 class="text-lg font-semibold">
-                              <router-link
+                              <NuxtLink
                                 class="underline decoration-[#388aef] capitalize"
                                 :to="'/article/' + j.doi"
-                                >{{ j.title }}</router-link
+                                >{{ j.title }}</NuxtLink
                               >
                             </h1>
                             <h2>Author: {{ j.authors }}</h2>

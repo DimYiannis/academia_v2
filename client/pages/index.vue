@@ -12,8 +12,8 @@
           in a space designed for collaboration and discovery. Academia:
           Connecting minds, advancing knowledge.
         </p>
-        <button><router-link to="/login">Login</router-link></button>
-        <button><router-link to="/register">Register</router-link></button>
+        <button><NuxtLink to="/login">Login</NuxtLink></button>
+        <button><NuxtLink to="/register">Register</NuxtLink></button>
       </div>
 
       <div>
@@ -28,7 +28,7 @@
 export default {
   data() {
     return {
-      image: "url(../assets/6963.jpg)" 
+     
     };
   }
 };

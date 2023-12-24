@@ -3,7 +3,7 @@
     <!--SideBar-->
     <aside class="mobile:grid gap-2 mt-12 border-r-2 hidden">
       <div class="grid gap-1 mr-12">
-        <router-link to="/profile" class="flex gap-2 items-center">
+        <NuxtLink to="/profile" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -20,9 +20,9 @@
             />
           </svg>
           <h1 class="hidden tablet:contents">Profile</h1>
-        </router-link>
+        </NuxtLink>
 
-        <router-link
+        <NuxtLink
           to="/posts"
           class="flex gap-2 items-center"
           @click="getposts"
@@ -43,9 +43,9 @@
             />
           </svg>
           <h1 class="hidden tablet:contents">Explore</h1>
-        </router-link>
+        </NuxtLink>
 
-        <router-link to="/messages" class="flex gap-2 items-center">
+        <NuxtLink to="/messages" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -62,9 +62,9 @@
             />
           </svg>
           <h1 class="hidden tablet:contents">Messages</h1>
-        </router-link>
+        </NuxtLink>
 
-        <router-link to="/bookmarks" class="flex gap-2 items-center">
+        <NuxtLink to="/bookmarks" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -81,9 +81,9 @@
             />
           </svg>
           <h1 class="hidden tablet:contents">Bookmarks</h1>
-        </router-link>
+        </NuxtLink>
 
-        <router-link to="/sharedposts" class="flex gap-2 items-center">
+        <NuxtLink to="/sharedposts" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -100,7 +100,7 @@
             />
           </svg>
           <h1 class="hidden tablet:contents">Shared Posts</h1>
-        </router-link>
+        </NuxtLink>
       </div>
 
       <button class="m-0" @click="logout()">logout</button>
@@ -125,7 +125,7 @@
     bg-white gap-2 mobile:hidden p-1 overflow-y"
   >
     <div class="flex w-full h-full justify-evenly">
-      <router-link to="/profile" class="block">
+      <NuxtLink to="/profile" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -142,9 +142,9 @@
             d="M15.75 6a3.75 3.75 0 1 1-7.5 0a3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
           />
         </svg>
-      </router-link>
+      </NuxtLink>
 
-      <router-link
+      <NuxtLink
         to="/posts"
         class="block"
         @click="getposts"
@@ -166,9 +166,9 @@
           />
         </svg>
         <h1 class="hidden tablet:contents">Explore</h1>
-      </router-link>
+      </NuxtLink>
 
-      <router-link to="/messages" class="block">
+      <NuxtLink to="/messages" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -185,9 +185,9 @@
             d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
           />
         </svg>
-      </router-link>
+      </NuxtLink>
 
-      <router-link to="/bookmarks" class="block">
+      <NuxtLink to="/bookmarks" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -204,9 +204,9 @@
             d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25L4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
           />
         </svg>
-      </router-link>
+      </NuxtLink>
 
-      <router-link to="/sharedposts" class="block">
+      <NuxtLink to="/sharedposts" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -223,7 +223,7 @@
             d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"
           />
         </svg>
-      </router-link>
+      </NuxtLink>
 
       <button class="m-0 text-xs smallscreen:text-lg" @click="logout()">logout</button>
     </div>

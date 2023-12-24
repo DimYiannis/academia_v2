@@ -33,8 +33,8 @@
       
       <div v-else class="border p-4 mb-4 rounded-3xl" v-for="i of sharedposts">
         Post made by:
-        <router-link class="underline decoration-sky-500 capitalize"
-        :to="'/profile/' + i.user._id"> {{ i.user.name }}</router-link>
+        <NuxtLink class="underline decoration-sky-500 capitalize"
+        :to="'/profile/' + i.user._id"> {{ i.user.name }}</NuxtLink>
         <p>{{ i.title }}</p>
 
 
@@ -42,10 +42,10 @@
         <div v-for="j in i.sharedpostdetails" class="p-2 mx-6 my-4 border border-[#388aef] rounded-3xl">
           <div class="grid items-center">
             <h1 class="text-lg font-semibold">
-              <router-link
+              <NuxtLink
                 class="underline decoration-[#388aef] capitalize"
                 :to="'/article/' + j.doi"
-                >{{ j.title }}</router-link
+                >{{ j.title }}</NuxtLink
               >
             </h1>
             <h2>Author: {{ j.authors }}</h2>
