@@ -269,6 +269,7 @@ export default {
       userr: '',
       showSharedPosts: true,
       showfavorites: false,
+      
     };
   },
   props: {
@@ -281,6 +282,7 @@ export default {
       required: true,
     },
   },
+  
   mounted() {
     // Invoke when the component is mounted
     this.getsharedposts();

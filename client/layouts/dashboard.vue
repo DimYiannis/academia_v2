@@ -1,5 +1,7 @@
 <template>
   <div class="flex gap-10">
+    <!-- loading state -->
+    <LoadSpinner v-if="showHideSpinner" />
     <!--SideBar-->
     <aside class="mobile:grid gap-2 mt-12 border-r-2 hidden">
       <div class="grid gap-1 mr-12">
@@ -272,6 +274,7 @@ export default {
       user: "",
       postId: "",
       loading: false,
+      showHideSpinner: true,
       posts: [
         {
           liked: false,
@@ -281,10 +284,16 @@ export default {
       shownotif: false,
     };
   },
+  beforeCreate() {
+    this.showHideSpinner = true;
+  },
   beforeMount() {
     // Invoke getuser method when the component is mounted
     this.getuser();
     this.getposts();
+  },
+  mounted() {
+    this.showHideSpinner = false;
   },
   methods: {
     async getuser() {
