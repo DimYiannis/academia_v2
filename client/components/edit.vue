@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="userr"
-    class="w-full h-full bg-black/30 left-0 top-0 fixed grid justify-items-center z-20"
+    class="w-full h-full bg-black/30 left-0 top-0 fixed grid justify-items-center z-30"
     @click.self="closemodal"
   >
     <div
