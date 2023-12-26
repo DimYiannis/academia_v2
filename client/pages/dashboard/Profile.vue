@@ -249,7 +249,7 @@
   </main>
 
   <Teleport to="body">
-    <Edit :userr="userr" v-show="showedit" @close-modal="edit" @update="getshareposts"/>
+    <Edit :userr="userr" v-show="showedit" @close-modal="edit" />
   </Teleport>
 </template>
 
