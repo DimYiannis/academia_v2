@@ -1,4 +1,7 @@
 <template>
+  <!-- loading state -->
+  <LoadSpinner v-if="showHideSpinner" />
+  
   <header class="">
     <nav class="text-3xl text-sky-600 font-bold border-b-2">
       <a href="/" class="">Academia</a>
@@ -6,9 +9,6 @@
   </header>
 
   <div class="flex gap-10">
-    <!-- loading state -->
-    <LoadSpinner v-if="showHideSpinner" />
-    
     <!--SideBar-->
     <aside class="mobile:grid gap-2 mt-12 border-r-2 hidden">
       <div class="grid gap-1 mr-12">
