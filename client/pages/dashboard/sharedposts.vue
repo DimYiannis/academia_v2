@@ -34,7 +34,7 @@
       <div v-else class="border p-4 mb-4 rounded-3xl" v-for="i of sharedposts">
         Post made by:
         <NuxtLink class="underline decoration-sky-500 capitalize"
-        :to="'/profile/' + i.user._id"> {{ i.user.name }}</NuxtLink>
+        :to="'/user/' + i.user._id"> {{ i.user.name }}</NuxtLink>
         <p>{{ i.title }}</p>
 
 
@@ -67,6 +67,9 @@
 
 <script>
 import axios from "axios";
+definePageMeta({
+  layout: 'dashboard'
+})
 
 export default {
   data() {
@@ -84,7 +87,7 @@ export default {
       try {
         this.loading = true;
         const response = await axios.get(
-          "https://academia-backend-5d0w.onrender.com/api/v1/sharedposts",
+          "http://localhost:5000/api/v1/sharedposts",
           {
             withCredentials: true,
           }

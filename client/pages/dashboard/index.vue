@@ -170,7 +170,7 @@
     </main>
   </div>
 
-  <Teleport to="#modal">
+  <Teleport to="body">
     <sharepostmodal
       v-show="showmodal"
       @close-modal="modal"
@@ -183,7 +183,9 @@
 
 <script>
 import axios from "axios";
-import sharepostmodal from "../components/sharepostmodal.vue";
+definePageMeta({
+  layout: 'dashboard'
+})
 export default {
   data() {
     return {
@@ -210,9 +212,6 @@ export default {
       required: true,
     },
   },
-  components: {
-    sharepostmodal,
-  },
 
   methods: {
     async addBookmark(postId) {
@@ -220,7 +219,7 @@ export default {
         this.bookmarkLoading = true;
 
         const response = await axios.post(
-          `https://academia-backend-5d0w.onrender.com/api/v1/bookmarks`,
+          `http://localhost:5000/api/v1/bookmarks`,
           { post: postId },
           { withCredentials: true }
         );
@@ -242,7 +241,7 @@ export default {
         this.likeLoading = true;
 
         const response = await axios.post(
-          `https://academia-backend-5d0w.onrender.com/api/v1/likes`,
+          `http://localhost:5000/api/v1/likes`,
           { post: postId },
           { withCredentials: true }
         );
@@ -267,7 +266,7 @@ export default {
         // console.log(postId);
         //console.log(content);
         await axios.post(
-          `https://academia-backend-5d0w.onrender.com/api/v1/sharedposts`,
+          `http://localhost:5000/api/v1/sharedposts`,
           { post: postId, title: content },
           { withCredentials: true }
         );
@@ -278,7 +277,7 @@ export default {
     async getsinglepost(input) {
       try {
         const response = await axios.get(
-          `https://academia-backend-5d0w.onrender.com/api/v1/posts/${input}`,
+          `http://localhost:5000/api/v1/posts/${input}`,
           { withCredentials: true }
         );
         //console.log(response.data.post);

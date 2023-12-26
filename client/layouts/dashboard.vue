@@ -3,7 +3,7 @@
     <!--SideBar-->
     <aside class="mobile:grid gap-2 mt-12 border-r-2 hidden">
       <div class="grid gap-1 mr-12">
-        <NuxtLink to="/profile" class="flex gap-2 items-center">
+        <NuxtLink to="/dashboard/Profile" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -23,7 +23,7 @@
         </NuxtLink>
 
         <NuxtLink
-          to="/posts"
+          to="/dashboard/"
           class="flex gap-2 items-center"
           @click="getposts"
         >
@@ -45,7 +45,7 @@
           <h1 class="hidden tablet:contents">Explore</h1>
         </NuxtLink>
 
-        <NuxtLink to="/messages" class="flex gap-2 items-center">
+        <NuxtLink to="/dashboard/messages" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -64,7 +64,7 @@
           <h1 class="hidden tablet:contents">Messages</h1>
         </NuxtLink>
 
-        <NuxtLink to="/bookmarks" class="flex gap-2 items-center">
+        <NuxtLink to="/dashboard/bookmarks" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -83,7 +83,7 @@
           <h1 class="hidden tablet:contents">Bookmarks</h1>
         </NuxtLink>
 
-        <NuxtLink to="/sharedposts" class="flex gap-2 items-center">
+        <NuxtLink to="/dashboard/sharedposts" class="flex gap-2 items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -105,17 +105,17 @@
 
       <button class="m-0" @click="logout()">logout</button>
     </aside>
-    <!--Main content-->
+    <!-- Main content -->
     <main class="w-full">
       <div class="h-screen overflow-auto no-scrollbar">
-        <router-view
+        <NuxtPage
           :posts="posts"
           :loading="loading"
           @update-posts="getsinglepost"
           :user="user"
           @show-notif="notif"
           :shownotif="shownotif"
-        ></router-view>
+        />
       </div>
     </main>
   </div>
@@ -125,7 +125,7 @@
     bg-white gap-2 mobile:hidden p-1 overflow-y"
   >
     <div class="flex w-full h-full justify-evenly">
-      <NuxtLink to="/profile" class="block">
+      <NuxtLink to="/dashboard/profile" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -145,7 +145,7 @@
       </NuxtLink>
 
       <NuxtLink
-        to="/posts"
+        to="/dashboard/"
         class="block"
         @click="getposts"
       >
@@ -168,7 +168,7 @@
         <h1 class="hidden tablet:contents">Explore</h1>
       </NuxtLink>
 
-      <NuxtLink to="/messages" class="block">
+      <NuxtLink to="/dashboard/messages" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -187,7 +187,7 @@
         </svg>
       </NuxtLink>
 
-      <NuxtLink to="/bookmarks" class="block">
+      <NuxtLink to="/dashboard/bookmarks" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +206,7 @@
         </svg>
       </NuxtLink>
 
-      <NuxtLink to="/sharedposts" class="block">
+      <NuxtLink to="/dashboard/sharedposts" class="block">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -234,6 +234,36 @@
 import axios from "axios";
 
 export default {
+  async asyncData({ $axios }) {
+    try {
+      const userResponse = await $axios.get(
+        "http://localhost:5000/api/v1/users/showUser",
+        {
+          withCredentials: true,
+        }
+      );
+
+      const postsResponse = await $axios.get(
+        "http://localhost:5000/api/v1/posts",
+        {
+          withCredentials: true,
+        }
+      );
+
+      return {
+        user: userResponse.data.user,
+        posts: postsResponse.data.posts,
+      };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      console.error("Error response data:", error.response.data);
+      console.log("Response headers:", error.response.headers);
+      return {
+        user: null,
+        posts: [],
+      };
+    }
+  },
   data() {
     return {
       name: "",
@@ -260,7 +290,7 @@ export default {
     async getuser() {
       try {
         const response = await axios.get(
-          "https://academia-backend-5d0w.onrender.com/api/v1/users/showUser",
+          "http://localhost:5000/api/v1/users/showUser",
           {
             withCredentials: true,
           }
@@ -277,13 +307,13 @@ export default {
     logout() {
       try {
         axios
-          .get("https://academia-backend-5d0w.onrender.com/api/v1/auth/logout", {
+          .get("http://localhost:5000/api/v1/auth/logout", {
             withCredentials: true,
           })
           .then((response) => {
             console.log(response);
           });
-        this.$router.push({ name: "home" });
+        this.$router.push({ name: "index" });
       } catch (error) {
         console.error("Error:", error);
       }
@@ -291,7 +321,7 @@ export default {
     async getposts() {
       this.loading = true;
       try {
-        const response = await axios.get("https://academia-backend-5d0w.onrender.com/api/v1/posts", {
+        const response = await axios.get("http://localhost:5000/api/v1/posts", {
           withCredentials: true,
         });
 

@@ -23,31 +23,35 @@
       </div>
     </div>
   </div>
-  <main v-else class="flex mt-8 h-fit ml-20 w-5/6">
-    <section class="h-full max-w-[600px] border-r-2">
-      <div class="grid gap-2 w-full">
+  <main v-else class="flex mt-8 h-fit max-w-[800px]" >
+    <section class=" laptop:border-r-2 h-full">
+      <div class="grid gap-2 ">
         <div>
-          <h1 class="text-xl font-semibold mt-4 capitalize border-b-2"></h1>
+          <h1 class="text-xl font-semibold mt-4 capitalize border-b-2">
+            Hello there: {{ user.name }}
+          </h1>
         </div>
-
+        <!-- Background -->
         <div
-          class="mt-2 h-[250px] bg-cover bg-center mr-1"
+          class="h-[250px] grid place-items-center mr-3"
           :style="{
             backgroundImage: user.backgroundImg
-              ? 'url(https://academia-backend-5d0w.onrender.com' + user.backgroundImg + ')'
+              ? 'url(http://localhost:5000'  + user.backgroundImg + ')'
               : 'none',
             backgroundColor: user.backgroundImage ? '' : '#B0A8B9',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
           }"
         ></div>
+
+        <!--prof image-->
         <div class="relative">
           <div class="flex justify-between items-start">
             <div
-              class="rounded-full ml-4 w-20 h-32 absolute -top-16 left-2"
+              class="rounded-full ml-4 w-20 h-32 absolute -top-16 left-2 border-2"
               :style="{
                 backgroundImage: user.profileImg
-                  ? 'url(https://academia-backend-5d0w.onrender.com' + user.profileImg + ')'
+                  ? 'url(http://localhost:5000' + user.profileImg + ')'
                   : 'none',
                 backgroundColor: user.backgroundImage ? '' : '#B0A8B9',
                 backgroundPosition: 'center',
@@ -56,8 +60,10 @@
             ></div>
             <div>
               <!--edit prof-->
-              <nav class="flex mt-6 text-lg font-semobold absolute right-0">
-                <button class="">Connect</button>
+              <nav
+                class="flex mt-6 mr-3 text-lg font-semobold absolute right-0"
+              >
+                <button @click="edit" class="mr-1">Edit Profile</button>
               </nav>
             </div>
           </div>
@@ -72,26 +78,33 @@
       <div>
         <!--content-->
         <div class="grid mt-12">
-          <div class="border-b-2 flex gap-5">
+          <div class="flex gap-4 border-b-2">
             <h1
-              @click="sharedPosts"
-              class="text-base font-semibold cursor-pointer mb-2"
-              :class="{
-                'underline decoration-4 decoration-sky-500 underline-offset-4':
-                  showSharedPosts,
-              }"
-            >
-              Shared Posts
-            </h1>
-            <h1
-              @click="likes"
+              @click="SharedPosts"
               class="text-base font-semibold cursor-pointer"
               :class="{
                 'underline decoration-4 decoration-sky-500 underline-offset-4':
-                  showlikes,
-              }"
-            >
+                  showSharedPosts,
+              }">
+              Shared Posts
+            </h1>
+            <h1
+              @click="favorites"
+              class="text-base font-semibold cursor-pointer"
+              :class="{
+                'underline decoration-4 decoration-sky-500 underline-offset-4':
+                  showfavorites,
+              }">
               Favorites
+            </h1>
+            <h1
+              @click="notif"
+              class="text-base font-semibold cursor-pointer"
+              :class="{
+                'underline decoration-4 decoration-sky-500 underline-offset-4':
+                  shownotif,
+              }">
+              Notifications
             </h1>
           </div>
 
@@ -99,12 +112,7 @@
             class="h-screen mt-5 mr-2 overflow-hidden overflow-y-auto overscroll-auto"
           >
             <div
-              :class="{
-                'transition-opacity ease-out duration-500 opacity-0 hidden':
-                  !showSharedPosts,
-                'transition-opacity ease-in duration-500 opacity-100':
-                  showSharedPosts,
-              }"
+              v-show="showSharedPosts"
               class="border p-4 mb-4 rounded-3xl"
               v-for="i of sharedposts"
             >
@@ -113,7 +121,6 @@
 
               <!--the inner v-for loop is based on i.sharedpostdetails-->
               <div
-                v-show="showSharedPosts"
                 v-for="j in i.sharedpostdetails"
                 class="p-2 mx-6 my-4 border border-[#388aef] rounded-3xl"
               >
@@ -135,30 +142,77 @@
                   <!-- You can add other multimedia content (images, videos) here -->
                 </div>
               </div>
+              <button @click="deletepost(i._id)">Delete Post</button>
             </div>
-
-            <section class="mt-5">
-              <!--Likes-->
-              <div class="mt-34">
+            <!--right bar in to the main for small screens-->
+            <section class="laptop:grid laptop:mt-5 ml-10 ">
+              <!--Notif-->
+              <div class="">
+              
                 <!--content-->
-                <div>
+                <div v-show="shownotif">
                   <div
                     :class="{
-                      'transition-opacity ease-out duration-500 opacity-0 hidden':
-                        !showlikes,
+                      ' border-[#388aef] transition-opacity ease-out duration-500 opacity-0':
+                        !shownotif,
                       'transition-opacity ease-in duration-500 opacity-100':
-                        showlikes,
+                        shownotif,
                     }"
                   >
+                    <div class="grid mt-5">
+                      <div class="grid justify-items-center">
+                        <h1
+                          class="font-semibold text-lg bg-[#388aef] text-white rounded-md p-2"
+                        >
+                          Not any notifications yet!
+                        </h1>
+                        <img
+                          src="/img/notif.jpg"
+                          class="w-[500px] h-[fit"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!--Likes-->
+              <div class="mt-34 w-full">
+                <!--content-->
+                <div class="w-full">
+                  <div
+                    :class="{
+                      'opacity-0':
+                        !showfavorites || this.shownotif,
+                      'transition-opacity ease-in duration-500 opacity-100 w-full':
+                        showfavorites,
+                    }">
                     <main
-                      class="h-screen mt-5 mr-2 overflow-hidden overflow-y-auto overscroll-auto"
+                      class="h-screen w-full mt-5 mr-2 overflow-hidden overflow-y-auto overscroll-auto"
                     >
                       <div
-                        v-show="showlikes"
-                        class="border p-4 mb-4 rounded-3xl grid"
+                        class="w-full border p-4 mb-4 rounded-3xl grid"
                         v-for="i of likedposts"
                       >
-                        
+                        <svg
+                          @click="unlike(i._id)"
+                          class="cursor-pointer justify-self-end"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="26"
+                          height="26"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fill="currentColor"
+                            fill-rule="evenodd"
+                            d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 
+                    0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 
+                    13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12L5.47 
+                    6.53a.75.75 0 0 1 0-1.06Z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+
                         <div
                           v-for="j in [i.postDetails]"
                           class="p-2 mx-6 my-4 border border-[#388aef] rounded-3xl"
@@ -193,22 +247,35 @@
       </div>
     </section>
   </main>
+
+  <Teleport to="body">
+    <Edit :userr="userr" v-show="showedit" @close-modal="edit" />
+  </Teleport>
 </template>
 
 <script>
 import axios from "axios";
+definePageMeta({
+  layout: 'dashboard'
+})
 export default {
   data() {
     return {
-      user: [],
       sharedposts: [],
       showlikes: false,
-      showSharedPosts: true,
       likedposts: [],
       loading: false,
+      showedit: false,
+      userr: '',
+      showSharedPosts: true,
+      showfavorites: false,
     };
   },
   props: {
+    user: {
+      type: Object,
+      required: true,
+    },
     shownotif: {
       type: Boolean,
       required: true,
@@ -216,39 +283,24 @@ export default {
   },
   mounted() {
     // Invoke when the component is mounted
-    this.getuser();
     this.getsharedposts();
     this.getlikedposts();
   },
   methods: {
-    async getuser() {
-      const userId = this.$route.params._id;
-      try {
-        const response = await axios.get(
-          `https://academia-backend-5d0w.onrender.com/api/v1/users/${userId}`,
-          {
-            withCredentials: true,
-          }
-        );
-        this.user = response.data.user;
-        //console.log(this.user);
-      } catch (error) {
-        console.error("Error fetching user's information:", error);
-      }
-    },
     async getsharedposts() {
       this.loading = true;
-      const userId = this.$route.params._id;
       try {
         const response = await axios.get(
-          `https://academia-backend-5d0w.onrender.com/api/v1/users/${userId}/posts`,
+          "http://localhost:5000/api/v1/sharedposts/mysharedposts",
           {
             withCredentials: true,
           }
         );
 
         this.sharedposts = response.data.sharedposts;
-        //console.log(this.sharedposts);
+        
+        console.log(this.userr);
+       // console.log(this.sharedposts);
       } catch (error) {
         console.error("Error fetching user information:", error);
         console.error("Error response data:", error.response.data);
@@ -256,16 +308,29 @@ export default {
       } finally {
         this.loading = false;
       }
+      this.userr = this.user 
+      console.log(this.userr);
     },
-    async getlikedposts() {
-      const userId = this.$route.params._id;
+    async deletepost(postId) {
       try {
-        const response = await axios.get(
-          `https://academia-backend-5d0w.onrender.com/api/v1/likes/${userId}/likes`,
+        await axios.delete(
+          `http://localhost:5000/api/v1/sharedposts/${postId}`,
           {
             withCredentials: true,
           }
         );
+
+        this.getsharedposts();
+      } catch (error) {
+        console.error("Error deleting shared post:", error);
+      }
+      this.user = userr;
+    },
+    async getlikedposts() {
+      try {
+        const response = await axios.get("http://localhost:5000/api/v1/likes", {
+          withCredentials: true,
+        });
 
         this.likedposts = response.data.likes;
         //console.log(this.likedposts);
@@ -275,13 +340,42 @@ export default {
         console.log("Response headers:", error.response.headers);
       }
     },
+    async unlike(postId) {
+      try {
+        await axios.delete(`http://localhost:5000/api/v1/likes/${postId}`, {
+          withCredentials: true,
+        });
+
+        this.getlikedposts();
+      } catch (error) {
+        console.error("Error deleting liked post from your likes:", error);
+      }
+    },
     likes() {
-      this.showlikes = true;
+      this.showlikes = !this.showlikes;
+    },
+    favorites() {
+      if (this.shownotif) {
+        this.$emit("show-notif");
+      }
+      
+      this.showfavorites = true;
       this.showSharedPosts = false;
     },
-    sharedPosts() {
-      this.showlikes = false;
+    notif() {
+      this.$emit("show-notif");
+      this.showSharedPosts = false;
+      this.showfavorites = false;
+    },
+    edit() {
+      this.showedit = !this.showedit;
+    },
+    SharedPosts() {
+      if (this.shownotif) {
+        this.$emit("show-notif");
+      }
       this.showSharedPosts = true;
+      this.showfavorites = false;
     },
   },
 };
