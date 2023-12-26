@@ -15,11 +15,13 @@ const attachCookiesToResponse = ({ res, user }) => {
   const oneDay = 1000 * 60 * 60 * 24;
 
   console.log("NODE_ENV:", process.env.NODE_ENV);
+  
 
   res.cookie("token", token, {
     httpOnly: true,
     expires:new Date(Date.now() + oneDay),
-    secure:process.env.NODE_ENV === 'production',
+    secure:process.env.NODE_ENV !== 'production' , // dev
+    //secure:process.env.NODE_ENV === 'production' , production
     signed:true,
     sameSite: 'None',
     
