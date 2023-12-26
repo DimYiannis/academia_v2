@@ -33,11 +33,11 @@
       <div v-else class="post border p-4 mb-4 rounded-3xl" v-for="j of bookmarks">
         <div class="grid post-header items-center mb-2">
           <h1 class="text-lg font-semibold">
-            <router-link
+            <NuxtLink
               class="underline decoration-sky-500 capitalize text-sm 
               smallscreen:text-base"
               :to="'/article/' + j.doi"
-              >{{ j.postDetails?.title }}</router-link
+              >{{ j.postDetails?.title }}</NuxtLink
             >
           </h1>
           <h2 class="text-sm smallscreen:text-base">Author: {{ j.postDetails?.authors }}</h2>
@@ -94,7 +94,7 @@ export default {
       try {
         this.loading = true;
         const response = await axios.get(
-          "localhost:5000/api/v1/bookmarks",
+          "http://localhost:5000/api/v1/bookmarks",
           {
             withCredentials: true,
           }
