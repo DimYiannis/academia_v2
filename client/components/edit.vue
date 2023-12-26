@@ -36,7 +36,7 @@
               class="w-full h-[250px] grid place-items-center border-2 mt-10 mobile:mt-0"
               :style="{
                 backgroundImage: this.userr.backgroundImg
-                  ? 'url(https://academia-backend-5d0w.onrender.com' + userr.backgroundImg + ')'
+                  ? 'url(http://localhost:5000' + userr.backgroundImg + ')'
                   : 'none',
                 backgroundColor: userr.backgroundImg ? '' : '#B0A8B9',
                 backgroundPosition: 'center',
@@ -77,7 +77,7 @@
                 class="absolute -top-24 left-2 rounded-full w-16 h-28 ml-3 border-2"
                 :style="{
                   backgroundImage: userr.profileImg
-                    ? 'url(https://academia-backend-5d0w.onrender.com' + userr.profileImg + ')'
+                    ? 'url(http://localhost:5000' + userr.profileImg + ')'
                     : 'none',
                   backgroundColor: userr.profileImg ? '' : '#B0A8B9',
                   backgroundPosition: 'center',
@@ -216,7 +216,7 @@ export default {
     async updatedetails() {
       try {
         await axios.patch(
-          `https://academia-backend-5d0w.onrender.com/api/v1/users/updateUser`,
+          `http://localhost:5000/api/v1/users/updateUser`,
           { name: this.userName, info: this.userInfo },
           { withCredentials: true }
         );
@@ -259,7 +259,7 @@ export default {
         this.loading = true;
 
         const response = await axios.post(
-          "https://academia-backend-5d0w.onrender.com/api/v1/users/uploadbackimage",
+          "http://localhost:5000/api/v1/users/uploadbackimage",
           { image: this.backgroundPic },
           {
             withCredentials: true,
@@ -292,7 +292,7 @@ export default {
         console.log(this.profilePic);
 
         const response = await axios.post(
-          "https://academia-backend-5d0w.onrender.com/api/v1/users/uploadprofimage",
+          "http://localhost:5000/api/v1/users/uploadprofimage",
           { image: this.profilePic },
           {
             withCredentials: true,

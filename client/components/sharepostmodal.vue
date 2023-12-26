@@ -32,7 +32,7 @@
             class="rounded-full w-10 h-10 mt-2"
             :style="{
               backgroundImage: user.profileImg
-                ? `url(https://academia-backend-5d0w.onrender.com${user.profileImg})`
+                ? `url(http://localhost:5000${user.profileImg})`
                 : 'none',
               backgroundColor: user.backgroundImage ? '' : '#B0A8B9',
               backgroundPosition: 'center',

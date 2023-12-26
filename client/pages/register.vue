@@ -66,7 +66,7 @@ export default {
     register() {
       axios
         .post(
-          "https://academia-backend-5d0w.onrender.com/api/v1/auth/register",
+          "http://localhost:5000/api/v1/auth/register",
           {
             name: this.name,
             email: this.email,

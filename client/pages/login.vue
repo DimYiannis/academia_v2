@@ -57,7 +57,7 @@ export default {
   methods: {
     login() {
       axios
-        .post("https://academia-backend-5d0w.onrender.com/api/v1/auth/login", {
+        .post("http://localhost:5000/api/v1/auth/login", {
           email: this.email,
           password: this.password,
         },
@@ -69,10 +69,10 @@ export default {
           alert("Welcome back!");
 
           //redirect to dashboard page.
-          this.$router.push({ name: "post" });
+          this.$router.push({ name: "dashboard" });
         })
         .catch((error) => {
-          console.error("Registration error:", error.response.data);
+          console.error("Registration error:", error);
           // Handle the error and provide feedback to the user.
           this.errormsg = error.response.data.msg;
 
