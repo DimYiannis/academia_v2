@@ -34,7 +34,7 @@
       <div v-else class="border p-4 mb-4 rounded-3xl" v-for="i of sharedposts">
         Post made by:
         <NuxtLink class="underline decoration-sky-500 capitalize"
-        :to="'/user/' + i.user._id"> {{ i.user.name }}</NuxtLink>
+        :to="'/dashboard/user/' + i.user._id"> {{ i.user.name }}</NuxtLink>
         <p>{{ i.title }}</p>
 
 
