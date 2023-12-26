@@ -1,7 +1,14 @@
 <template>
+  <header class="">
+    <nav class="text-3xl text-sky-600 font-bold border-b-2">
+      <a href="/" class="">Academia</a>
+    </nav>
+  </header>
+
   <div class="flex gap-10">
     <!-- loading state -->
     <LoadSpinner v-if="showHideSpinner" />
+    
     <!--SideBar-->
     <aside class="mobile:grid gap-2 mt-12 border-r-2 hidden">
       <div class="grid gap-1 mr-12">
@@ -123,8 +130,7 @@
   </div>
   <!--mobile sidebar -->
   <footer
-    class="fixed bottom-0 left-0 z-20 w-full h-fit 
-    bg-white gap-2 mobile:hidden p-1 overflow-y"
+    class="fixed bottom-0 left-0 z-20 w-full h-fit bg-white gap-2 mobile:hidden p-1 overflow-y"
   >
     <div class="flex w-full h-full justify-evenly">
       <NuxtLink to="/dashboard/profile" class="block">
@@ -146,11 +152,7 @@
         </svg>
       </NuxtLink>
 
-      <NuxtLink
-        to="/dashboard/"
-        class="block"
-        @click="getposts"
-      >
+      <NuxtLink to="/dashboard/" class="block" @click="getposts">
         <svg
           class="h-5 w-5 smallscreen:h-8 smallscreen:w-8"
           xmlns="http://www.w3.org/2000/svg"
@@ -227,7 +229,9 @@
         </svg>
       </NuxtLink>
 
-      <button class="m-0 text-xs smallscreen:text-lg" @click="logout()">logout</button>
+      <button class="m-0 text-xs smallscreen:text-lg" @click="logout()">
+        logout
+      </button>
     </div>
   </footer>
 </template>
