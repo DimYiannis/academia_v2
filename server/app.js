@@ -10,13 +10,6 @@ const path = require("path");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
-// v2 is a must
-// const cloudinary = require('cloudinary').v2
-// cloudinary.config({
-//   cloud_name: process.env.CLOUD_NAME,
-//   api_key: process.env.CLOUD_API_KEY,
-//   api_secret: process.env.CLOUD_API_SECRET,
-// })
 
 const rateLimiter = require("express-rate-limit");
 const helmet = require("helmet");
@@ -49,13 +42,13 @@ app.use(
 
 app.use(morgan("tiny"));
 
-app.use(express.static(path.join(__dirname, "dist"))); 
+app.use(express.static(path.join(__dirname, "./public"))); 
 app.use(express.json());
 app.use(fileUpload());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(
   cors({
-    origin: ['https://academiaa.netlify.app', 'https://academia-frontend.onrender.com', 'http://localhost:5173'],
+    origin: ['http://localhost:3000'],
     credentials: true,
   })
 );
@@ -67,11 +60,13 @@ app.use(mongoSanitize());
 // Serve the 'public/uploads' directory as static files
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
   
+app.options('*', cors());
+
 app.get("/api/v1", (req, res) => {
   console.log(req.signedCookies);
   res.cookie('token', 'someToken', {
     path: '/',
-    expires: new Date('2023-12-24T17:20:31.000Z'),
+    expires: new Date('2024-12-24T17:20:31.000Z'),
     httpOnly: true,
     secure: true, // Set to true for HTTPS connections
     sameSite: 'None', // Set to 'None' for cross-origin requests
