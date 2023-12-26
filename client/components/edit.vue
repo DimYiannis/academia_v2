@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="userr"
     class="w-full h-full bg-black/30 left-0 top-0 fixed grid justify-items-center z-20"
     @click.self="closemodal"
   >
@@ -155,8 +156,7 @@
       <div
         id="loader"
         v-show="loading"
-        class="relative transform -translate-x-1/2 -translate-y-1/2
-         bg-[#388aef] p-4 rounded shadow"
+        class="relative transform -translate-x-1/2 -translate-y-1/2 bg-[#388aef] p-4 rounded shadow"
       >
         <svg
           aria-hidden="true"
@@ -180,8 +180,7 @@
       <div
         id="message"
         v-show="uploadMessage"
-        class="relative transform -translate-x-1/2 -translate-y-1/2 
-        bg-[#388aef] p-4 rounded shadow"
+        class="relative transform -translate-x-1/2 -translate-y-1/2 bg-[#388aef] p-4 rounded shadow"
       >
         {{ uploadMessage }}
       </div>
@@ -220,7 +219,6 @@ export default {
           { name: this.userName, info: this.userInfo },
           { withCredentials: true }
         );
-       
       } catch (error) {
         console.error("Error updating name and info:", error);
       }
@@ -274,10 +272,13 @@ export default {
         } else {
           this.uploadMessage = "Failed to upload background image.";
         }
+
+        if (this.userr) {
+          window.location.reload();
+        }
       } catch (error) {
         console.error("Error uploading file:", error.response.data);
         this.uploadMessage = error.response.data.error;
-        
       } finally {
         this.loading = false;
       }
@@ -310,7 +311,7 @@ export default {
         }
       } catch (error) {
         console.error("Error uploading file:", error);
-        this.uploadMessage = error.response.data.error
+        this.uploadMessage = error.response.data.error;
       } finally {
         this.loading = false;
       }
@@ -323,23 +324,26 @@ export default {
     update() {
       if (this.userName || this.userInfo) {
         this.updatedetails();
-      } 
+      }
 
       if (this.backgroundPic) {
         this.uploadBackgroundImg();
-
       }
       if (this.profilePic) {
         this.uploadProfileImg();
       }
       console.log(this.userr);
-      if (!this.userName && !this.userInfo && !this.backgroundPic && !this.profilePic) {
-        this.uploadMessage = "No new modifications detected."
+      if (
+        !this.userName &&
+        !this.userInfo &&
+        !this.backgroundPic &&
+        !this.profilePic
+      ) {
+        this.uploadMessage = "No new modifications detected.";
       }
       setTimeout(() => {
         this.uploadMessage = "";
       }, 3000);
-     
     },
   },
 };
