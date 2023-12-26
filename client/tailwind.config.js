@@ -8,10 +8,13 @@ export default {
     "./app.vue",
     "./error.vue",
   ],
+  
   theme: {
     // customized breakpoints //
     screens: {
-      'mobile': '450px',
+      'smallscreen': '300px',
+
+      'mobile': '600px',
         
       'tablet': '760px',
       // => @media (min-width: 760px) { ... }
