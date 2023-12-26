@@ -214,14 +214,33 @@ export default {
     },
     async updatedetails() {
       try {
+        this.loading = true;
+
         await axios.patch(
           `http://localhost:5000/api/v1/users/updateUser`,
           { name: this.userName, info: this.userInfo },
           { withCredentials: true }
         );
+
+        //message
+        if (response && response.status === 200) {
+          this.uploadMessage = " Uploaded successfully!";
+        } else {
+          this.uploadMessage = "Failed to upload";
+        }
+
+        if (this.userr) {
+          window.location.reload();
+        }
+
       } catch (error) {
         console.error("Error updating name and info:", error);
+      } finally {
+        this.loading = false;
       }
+      setTimeout(() => {
+        this.uploadMessage = "";
+      }, 3000);
     },
 
     focusInput() {
@@ -308,6 +327,9 @@ export default {
           this.uploadMessage = "Profile image uploaded successfully!";
         } else {
           this.uploadMessage = "Failed to upload profile image.";
+        }
+        if (this.userr) {
+          window.location.reload();
         }
       } catch (error) {
         console.error("Error uploading file:", error);
