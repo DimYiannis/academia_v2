@@ -45,13 +45,11 @@ Make sure you have the following installed:
     ```bash
     npm run dev
     ```
-    The app will be accessible at [http://localhost:3000](http://localhost:3000).
 
 2. **Start the backend (Node.js):**
     ```bash
     npm run server
     ```
-    The backend will run at [http://localhost:3001](http://localhost:3001).
 
 ## Mock Data
 
