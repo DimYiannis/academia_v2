@@ -31,10 +31,14 @@ Make sure you have the following installed:
 
 2. **Navigate to the project directory:**
     ```bash
-    cd academia-mock-app
+    cd academia
     ```
+3. **Navigate to the client/server folder:**
+   ```bash
+   cd client/server
+   ```
 
-3. **Install dependencies:**
+4. **Install dependencies:**
     ```bash
     npm install
     ```
