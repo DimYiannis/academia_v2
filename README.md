@@ -8,7 +8,8 @@ Welcome to Academia, the playful social media platform where imaginary science m
 
 ## Overview
 
-Academia is a full-stack mock app developed with Nuxt.js, Tailwind, and Node.js. It's designed to showcase the potential of these technologies in creating a fun and engaging platform for sharing and exploring mock scientific posts.
+Academia is a full-stack mock app developed with Nuxt.js, Tailwind, and Node.js. Academia provides a platform for users to create, explore, update, and delete scientific posts. The backend is implemented using Node.js and Express to expose RESTful endpoints, while the frontend is built with Nuxt.js and Tailwind CSS.
+
 
 ## Features
 
