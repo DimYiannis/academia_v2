@@ -48,7 +48,7 @@ Make sure you have the following installed:
 
 2. **Start the backend (Node.js):**
     ```bash
-    npm run server
+    npm start
     ```
 
 ## Mock Data
