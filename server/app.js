@@ -48,7 +48,7 @@ app.use(fileUpload());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(
   cors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'https://academiav2.netlify.app'],
     credentials: true,
   })
 );
