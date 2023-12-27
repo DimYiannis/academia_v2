@@ -1,56 +1,71 @@
-Academia Mock App
+# Academia Mock App
+
 Welcome to Academia, the playful social media platform where imaginary science meets real tech! 🚀
 
-Overview
+## Overview
+
 Academia is a full-stack mock app developed with Nuxt.js, Tailwind, and Node.js. It's designed to showcase the potential of these technologies in creating a fun and engaging platform for sharing and exploring mock scientific posts.
 
-Features
-Mock Scientific Posts: Dive into a world of fictitious discoveries and explore entertaining scientific content.
+## Features
 
-Full Stack Magic: Powered by Nuxt.js, Tailwind, and Node.js, Academia combines frontend elegance with backend efficiency.
+- **Mock Scientific Posts:** Dive into a world of fictitious discoveries and explore entertaining scientific content.
 
-Playful UI/UX: Tailwind CSS ensures a sleek and responsive user interface, enhancing the overall user experience.
+- **Full Stack Magic:** Powered by Nuxt.js, Tailwind, and Node.js, Academia combines frontend elegance with backend efficiency.
 
-Getting Started
-Prerequisites
+- **Playful UI/UX:** Tailwind CSS ensures a sleek and responsive user interface, enhancing the overall user experience.
+
+## Getting Started
+
+### Prerequisites
+
 Make sure you have the following installed:
 
-Node.js
-NPM
-Installation
-Clone the repository:
+- [Node.js](https://nodejs.org/)
+- [NPM](https://www.npmjs.com/)
 
-bash
-Copy code
-git clone https://github.com/your-username/academia-mock-app.git
-Navigate to the project directory:
+### Installation
 
-bash
-Copy code
-cd academia-mock-app
-Install dependencies:
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/academia-mock-app.git
+    ```
 
-bash
-Copy code
-npm install
-Running the App
-Start the frontend (Nuxt.js):
+2. **Navigate to the project directory:**
+    ```bash
+    cd academia-mock-app
+    ```
 
-bash
-Copy code
-npm run dev
-The app will be accessible at http://localhost:3000.
+3. **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-Start the backend (Node.js):
+### Running the App
 
-bash
-Copy code
-npm run server
-The backend will run at http://localhost:3001.
+1. **Start the frontend (Nuxt.js):**
+    ```bash
+    npm run dev
+    ```
+    The app will be accessible at [http://localhost:3000](http://localhost:3000).
 
-Contributing
-Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, feel free to open an issue or submit a pull request.
+2. **Start the backend (Node.js):**
+    ```bash
+    npm run server
+    ```
+    The backend will run at [http://localhost:3001](http://localhost:3001).
 
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Mock Data
+
+Academia comes with pre-populated mock data for an immersive experience. Feel free to explore the diverse range of fictitious scientific posts.
+
+## Tech Stack
+
+- **Frontend:**
+  - [Nuxt.js](https://nuxtjs.org/) - The Intuitive Vue Framework
+  - [Tailwind CSS](https://tailwindcss.com/) - A Utility-First CSS Framework
+
+- **Backend:**
+  - [Node.js](https://nodejs.org/) - JavaScript Runtime
+
+## Folder Structure
 
