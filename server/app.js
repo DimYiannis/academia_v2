@@ -50,6 +50,7 @@ app.use(
   cors({
     origin: ['http://localhost:3000', 'https://academiav2.netlify.app'],
     credentials: true,
+    allowedHeaders: 'Content-Type,Authorization',
   })
 );
 
@@ -60,7 +61,7 @@ app.use(mongoSanitize());
 // Serve the 'public/uploads' directory as static files
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
   
-app.options('*', cors());
+//app.options('*', cors()); dev
 
 app.get("/api/v1", (req, res) => {
   console.log(req.signedCookies);
