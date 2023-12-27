@@ -101,7 +101,7 @@ export default {
       const postId = this.$route.params.doi;
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/v1/posts/${postId}`,
+          `https://academiav2-backend.onrender.com/api/v1/posts/${postId}`,
           {
             withCredentials: true,
           }

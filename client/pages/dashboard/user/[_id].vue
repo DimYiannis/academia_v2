@@ -34,7 +34,7 @@
           class="mt-2 h-[250px] bg-cover bg-center mr-3"
           :style="{
             backgroundImage: user.backgroundImg
-              ? 'url(http://localhost:5000' +
+              ? 'url(https://academiav2-backend.onrender.com' +
                 user.backgroundImg +
                 ')'
               : 'none',
@@ -49,7 +49,7 @@
               class="rounded-full ml-4 w-20 h-32 absolute -top-16 left-2"
               :style="{
                 backgroundImage: user.profileImg
-                  ? 'url(http://localhost:5000' +
+                  ? 'url(https://academiav2-backend.onrender.com' +
                     user.profileImg +
                     ')'
                   : 'none',
@@ -233,7 +233,7 @@ export default {
       const userId = this.$route.params._id;
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/v1/users/${userId}`,
+          `https://academiav2-backend.onrender.com/api/v1/users/${userId}`,
           {
             withCredentials: true,
           }
@@ -249,7 +249,7 @@ export default {
       const userId = this.$route.params._id;
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/v1/users/${userId}/posts`,
+          `https://academiav2-backend.onrender.com/api/v1/users/${userId}/posts`,
           {
             withCredentials: true,
           }
@@ -269,7 +269,7 @@ export default {
       const userId = this.$route.params._id;
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/v1/likes/${userId}/likes`,
+          `https://academiav2-backend.onrender.com/api/v1/likes/${userId}/likes`,
           {
             withCredentials: true,
           }

@@ -57,7 +57,7 @@ export default {
   methods: {
     login() {
       axios
-        .post("http://localhost:5000/api/v1/auth/login", {
+        .post("https://academiav2-backend.onrender.com/api/v1/auth/login", {
           email: this.email,
           password: this.password,
         },

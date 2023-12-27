@@ -219,7 +219,7 @@ export default {
         this.bookmarkLoading = true;
 
         const response = await axios.post(
-          `http://localhost:5000/api/v1/bookmarks`,
+          `https://academiav2-backend.onrender.com/api/v1/bookmarks`,
           { post: postId },
           { withCredentials: true }
         );
@@ -241,7 +241,7 @@ export default {
         this.likeLoading = true;
 
         const response = await axios.post(
-          `http://localhost:5000/api/v1/likes`,
+          `https://academiav2-backend.onrender.com/api/v1/likes`,
           { post: postId },
           { withCredentials: true }
         );
@@ -266,7 +266,7 @@ export default {
         // console.log(postId);
         //console.log(content);
         await axios.post(
-          `http://localhost:5000/api/v1/sharedposts`,
+          `https://academiav2-backend.onrender.com/api/v1/sharedposts`,
           { post: postId, title: content },
           { withCredentials: true }
         );
@@ -277,7 +277,7 @@ export default {
     async getsinglepost(input) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/v1/posts/${input}`,
+          `https://academiav2-backend.onrender.com/api/v1/posts/${input}`,
           { withCredentials: true }
         );
         //console.log(response.data.post);
