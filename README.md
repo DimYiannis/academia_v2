@@ -8,11 +8,10 @@ Academia is a full-stack mock app developed with Nuxt.js, Tailwind, and Node.js.
 
 ## Features
 
-- **Mock Scientific Posts:** Dive into a world of fictitious discoveries and explore entertaining scientific content.
+- **Mock Scientific Posts:** Built with Mockaroo
 
 - **Full Stack Magic:** Powered by Nuxt.js, Tailwind, and Node.js, Academia combines frontend elegance with backend efficiency.
 
-- **Playful UI/UX:** Tailwind CSS ensures a sleek and responsive user interface, enhancing the overall user experience.
 
 ## Getting Started
 
@@ -56,7 +55,7 @@ Make sure you have the following installed:
 
 ## Mock Data
 
-Academia comes with pre-populated mock data for an immersive experience. Feel free to explore the diverse range of fictitious scientific posts.
+Academia comes with pre-populated mock data. 
 
 ## Tech Stack
 
@@ -67,5 +66,4 @@ Academia comes with pre-populated mock data for an immersive experience. Feel fr
 - **Backend:**
   - [Node.js](https://nodejs.org/) - JavaScript Runtime
 
-## Folder Structure
 
