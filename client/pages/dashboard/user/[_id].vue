@@ -23,15 +23,15 @@
       </div>
     </div>
   </div>
-  <main v-else class="flex mt-8 h-fit ml-20 w-5/6">
-    <section class="h-full max-w-[600px] border-r-2">
+  <main v-else class="flex mt-8 h-fit laptop:ml-20 ">
+    <section class="h-full max-w-[700px] border-r-2">
       <div class="grid gap-2 w-full">
         <div>
           <h1 class="text-xl font-semibold mt-4 capitalize border-b-2"></h1>
         </div>
 
         <div
-          class="mt-2 h-[250px] bg-cover bg-center mr-1"
+          class="mt-2 h-[250px] bg-cover bg-center mr-3"
           :style="{
             backgroundImage: user.backgroundImg
               ? 'url(http://localhost:5000' +
@@ -59,8 +59,8 @@
               }"
             ></div>
             <div>
-              <!--edit prof-->
-              <nav class="flex mt-6 text-lg font-semobold absolute right-0">
+              <!--connect prof-->
+              <nav class="flex mt-6 text-lg font-semobold absolute right-0 mr-2">
                 <button class="">Connect</button>
               </nav>
             </div>
