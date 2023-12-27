@@ -1,6 +1,8 @@
 # Academia Mock App
 
 Welcome to Academia, the playful social media platform where imaginary science meets real tech! 🚀
+
+
 <img width="1316" alt="Academia" src="https://github.com/DimYiannis/academia_v2/assets/107484245/2afc226c-cf6f-46ed-9cf6-28d7f148cf2e">
 
 
