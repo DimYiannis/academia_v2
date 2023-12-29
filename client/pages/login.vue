@@ -59,8 +59,8 @@
         </div>
         <div>
           <h1>Demo user</h1>
-          <h2>Email: leo@email.com</h1>
-          <h2>Password: secret</h1>
+          <h2>Email: leo@email.com</h2>
+          <h2>Password: secret</h2>
         </div>
       </form>
     </div>
