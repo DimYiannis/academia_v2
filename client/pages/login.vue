@@ -20,7 +20,7 @@
         </p>
 
         <label class="">Email:</label>
-        <input type="email" required v-model="email" placeholder="Email" value="leo@email.com" />
+        <input type="email" required v-model="email" placeholder="Email"/>
 
         <label>Password:</label>
         <input
@@ -28,7 +28,6 @@
           required
           v-model="password"
           placeholder="Password"
-          value="secret"
         />
 
         <div v-if="passwordError" class="error">{{ passwordError }}</div>
@@ -57,6 +56,11 @@
 
         <div class="text-center">
           <a class="underline font-semibold"> Forgot Password? </a>
+        </div>
+        <div>
+          <h1>Demo user</h1>
+          <h2>Email: leo@email.com</h1>
+          <h2>Password: secret</h1>
         </div>
       </form>
     </div>
