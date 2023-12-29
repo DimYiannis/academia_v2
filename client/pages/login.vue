@@ -20,7 +20,7 @@
         </p>
 
         <label class="">Email:</label>
-        <input type="email" required v-model="email" placeholder="Email"/>
+        <input type="email" required v-model="email" placeholder="Email" />
 
         <label>Password:</label>
         <input
@@ -57,10 +57,16 @@
         <div class="text-center">
           <a class="underline font-semibold"> Forgot Password? </a>
         </div>
-        <div>
-          <h1>Demo user</h1>
-          <h2>Email: leo@email.com</h2>
-          <h2>Password: secret</h2>
+        <div class="grid justify-items-center">
+          <h1 class="font-bold">Demo user</h1>
+          <h2 class="font-semibold flex gap-1">
+            Email:
+            <p class="font-light">leo@email.com</p>
+          </h2>
+          <h2 class="font-semibold flex gap-1">
+            Password:
+            <p class="font-light">secret</p>
+          </h2>
         </div>
       </form>
     </div>
