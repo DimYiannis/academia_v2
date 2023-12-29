@@ -317,20 +317,21 @@ export default {
         console.log("Response headers:", error.response.headers);
       }
     },
-    logout() {
+    async logout() {
       try {
-        axios
-          .get("https://academiav2-backend.onrender.com/api/v1/auth/logout", {
-            withCredentials: true,
-          })
-          .then((response) => {
-            console.log(response);
-          });
+        const response = 
+        await axios.get("https://academiav2-backend.onrender.com/api/v1/auth/logout", {
+          withCredentials: true,
+        })
+          
+        console.log(response);
+        
         this.$router.push({ name: "index" });
       } catch (error) {
         console.error("Error:", error);
       }
     },
+
     async getposts() {
       this.loading = true;
       try {
