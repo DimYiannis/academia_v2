@@ -24,7 +24,7 @@
     </div>
   </div>
   <main v-else class="flex mt-8 h-fit max-w-[800px]" >
-    <section class=" laptop:border-r-2 h-full">
+    <section class=" laptop:border-r-2 h-full w-full">
       <div class="grid gap-2 ">
         <div>
           <h1 class="text-xl font-semibold mt-4 capitalize border-b-2">
