@@ -74,6 +74,11 @@ app.get("/api/v1", (req, res) => {
   });
 });
 
+// Define a keep-alive route
+app.get("/api/v1/keep-alive", (req, res) => {
+  res.status(200).json({ message: "Server is alive!" });
+});
+
 
 
 
@@ -88,10 +93,21 @@ app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 5000;
+
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URL);
     app.listen(port, console.log(`server is listening ${port}...`));
+
+    // Periodically send a keep-alive request every 5 minutes (adjust as needed)
+    setInterval(() => {
+      
+      axios.get('http://academiav2-backend.onrender.com/api/v1/keep-alive')
+      .then(response => console.log(response.data))
+      .catch(error => console.error('Keep-alive failed', error));
+
+      console.log("Sending keep-alive request...");
+    }, 5 * 60 * 1000);
   } catch (error) {
     console.log(error);
   }
