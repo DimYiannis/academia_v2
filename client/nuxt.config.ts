@@ -3,7 +3,8 @@ import {resolve} from "path";
 export default defineNuxtConfig({
   app: {
     head: {
-        link: [{ rel: 'icon', type: 'image/png', href: '/favicon.png' }]
+        link: [{ rel: 'icon', type: 'image/png', href: '/favicon.png' }],
+        title: 'Academia'
     }
 },
   devtools: { enabled: true },
