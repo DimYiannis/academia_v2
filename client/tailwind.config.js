@@ -8,27 +8,26 @@ export default {
     "./app.vue",
     "./error.vue",
   ],
-  
+
   theme: {
     // customized breakpoints //
     screens: {
-      'smallscreen': '300px',
+      smallscreen: "300px",
 
-      'mobile': '600px',
-        
-      'tablet': '760px',
+      mobile: "600px",
+
+      tablet: "760px",
       // => @media (min-width: 760px) { ... }
 
-      'laptop': '1024px',
+      laptop: "1024px",
       // => @media (min-width: 1024px) { ... }
 
-      'desktop': '1280px',
+      desktop: "1280px",
       // => @media (min-width: 1280px) { ... }
 
-      'lgdesk' : '1600px',
+      lgdesk: "1600px",
     },
     extend: {},
   },
-  plugins: [],
-}
-
+  plugins: [require("tailwind-scrollbar")],
+};
