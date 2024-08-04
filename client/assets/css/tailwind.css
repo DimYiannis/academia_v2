@@ -24,8 +24,8 @@
 }
 
 :root {
-  --primary: rgb(25, 71, 146);
-  --secondary: rgb(255, 255, 255);
+  --primary: rgb(0, 0, 0);
+  --secondary: rgb(4, 141, 221);
 } 
 
 html {
