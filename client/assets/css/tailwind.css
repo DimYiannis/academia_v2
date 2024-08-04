@@ -23,6 +23,11 @@
   border: 3px solid var(--primary);
 }
 
+:root {
+  --primary: rgb(25, 71, 146);
+  --secondary: rgb(255, 255, 255);
+} 
+
 html {
   margin: 10px;
   scroll-behavior: smooth;
