@@ -1,38 +1,90 @@
 <template>
-  <div class="grid h-fit mt-10 justify-center">
-    <p class="bg-sky-500/40 text-white rounded-lg p-3 mt-3" v-show="showError">
-      {{ errormsg }}
-    </p>
-    <form class="grid gap-5 mx-10 w-fit" @submit.prevent="handleSubmit">
-      <h1 class="text-center font-semibold text-lg">
-        Sign up now and start Connecting
-      </h1>
-
-      <label class="">Full Name:</label>
-      <input type="name" required v-model="name" placeholder="Full Name" />
-
-      <label class="">Email:</label>
-      <input type="email" required v-model="email" placeholder="Email" />
-
-      <label>Password:</label>
-      <input
-        type="password"
-        required
-        v-model="password"
-        placeholder="Password"
-      />
-      <div v-if="passwordError" class="error">{{ passwordError }}</div>
-
-      <div class="">
-        <button @click="register" class=" ">Join Now</button>
-        <div class="place-self-start text-[10px] flex gap-1">
-          <p>Already have an account?</p>
-          <a class="cursor-pointer underline underline-offset-1" @click="login"
-            >log in</a
-          >
-        </div>
+  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-gray-50 p-8 rounded-xl shadow-lg">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+        <p class="text-gray-600">
+          Sign up now and start connecting.
+          <br />
+          Already have an account?
+          <a @click="login" class="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">
+            Log in
+          </a>
+        </p>
       </div>
-    </form>
+
+      <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
+        <!-- Error Message -->
+        <div
+          v-show="showError"
+          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          <span class="block sm:inline">{{ errormsg }}</span>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
+            <div class="mt-1">
+              <input
+                id="name"
+                type="text"
+                required
+                v-model="name"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your full name"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <div class="mt-1">
+              <input
+                id="email"
+                type="email"
+                required
+                v-model="email"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your email"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <div class="mt-1">
+              <input
+                id="password"
+                type="password"
+                required
+                v-model="password"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Create a password"
+              />
+            </div>
+            <div v-if="passwordError" class="mt-2 text-sm text-red-600">{{ passwordError }}</div>
+          </div>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            @click="register"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Create Account
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -102,12 +154,5 @@ export default {
 </script>
 
 <style>
-/* Tooltip styles */
-[v-show] {
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-[v-show].active {
-  opacity: 1;
-}
+/* Remove the existing styles as they're no longer needed */
 </style>
