@@ -126,11 +126,32 @@ export default {
           }
         )
         .then((response) => {
-          console.log("Redirecting to login page");
-          console.log(response.data);
-          alert("Welcome to Academia!");
-          // redirect to another page or show a success message.
-          this.$router.push({ name: "login" });
+          // Remove console.logs and alert
+          this.showError = false;
+          this.errormsg = "";
+          
+          // Add success message
+          const successMsg = document.createElement('div');
+          successMsg.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+          successMsg.innerHTML = `
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span>Welcome to Academia! Your journey begins now...</span>
+            </div>
+          `;
+          document.body.appendChild(successMsg);
+
+          // Remove the message after transition and redirect
+          setTimeout(() => {
+            successMsg.style.transition = 'opacity 0.5s ease-out';
+            successMsg.style.opacity = '0';
+            setTimeout(() => {
+              document.body.removeChild(successMsg);
+              this.$router.push({ name: "login" });
+            }, 500);
+          }, 1500);
         })
         .catch((error) => {
           console.error("Registration error:", error.response);
