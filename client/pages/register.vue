@@ -1,95 +1,111 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-gray-50 p-8 rounded-xl shadow-lg">
-      <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-        <p class="text-gray-600">
-          Sign up now and start connecting.
-          <br />
-          Already have an account?
-          <a @click="login" class="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">
-            Log in
-          </a>
-        </p>
-      </div>
+  <div class="min-h-screen flex flex-col tablet:flex-row">
+    <!-- Left: register form -->
+    <div class="flex-1 flex flex-col justify-center px-8 tablet:px-16 py-16 bg-white">
+      <!-- Mobile header -->
+      <a href="/" class="tablet:hidden text-xl font-bold text-[#388aef] mb-12">Academia</a>
 
-      <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
-        <!-- Error Message -->
+      <div class="max-w-sm w-full mx-auto">
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">Create account</h1>
+        <p class="text-sm text-gray-500 mb-8">
+          Already have an account?
+          <NuxtLink to="/login" class="text-[#388aef] font-medium">Sign in</NuxtLink>
+        </p>
+
         <div
           v-show="showError"
-          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          class="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm"
           role="alert"
         >
-          <span class="block sm:inline">{{ errormsg }}</span>
+          {{ errormsg }}
         </div>
 
-        <div class="space-y-4">
+        <form class="space-y-4" @submit.prevent="handleSubmit">
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <div class="mt-1">
-              <input
-                id="name"
-                type="text"
-                required
-                v-model="name"
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your full name"
-              />
-            </div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+            <input
+              id="name"
+              type="text"
+              required
+              v-model="name"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              placeholder="Jane Smith"
+            />
           </div>
 
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <div class="mt-1">
-              <input
-                id="email"
-                type="email"
-                required
-                v-model="email"
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your email"
-              />
-            </div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              id="email"
+              type="email"
+              required
+              v-model="email"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              placeholder="you@example.com"
+            />
           </div>
 
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <div class="mt-1">
-              <input
-                id="password"
-                type="password"
-                required
-                v-model="password"
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Create a password"
-              />
-            </div>
-            <div v-if="passwordError" class="mt-2 text-sm text-red-600">{{ passwordError }}</div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              id="password"
+              type="password"
+              required
+              v-model="password"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              placeholder="••••••••"
+            />
+            <p v-if="passwordError" class="mt-1.5 text-xs text-red-600">{{ passwordError }}</p>
           </div>
-        </div>
 
-        <div>
           <button
             type="submit"
             @click="register"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            class="w-full py-2.5 bg-[#388aef] text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors mt-2"
           >
-            Create Account
+            Create account
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right: branding panel -->
+    <div class="hidden tablet:flex flex-col justify-between bg-gray-900 text-white px-12 py-12 tablet:w-2/5">
+      <a href="/" class="text-xl font-bold tracking-tight text-white">Academia</a>
+
+      <div>
+        <h2 class="text-3xl font-bold leading-snug mb-4">
+          Join the feed.
+        </h2>
+        <p class="text-gray-400 mb-8 leading-relaxed">
+          Discover daily arXiv papers across AI, maths and hardware. See citation counts, share insights, follow researchers.
+        </p>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <li class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#388aef]"></span>
+            Papers from arXiv, updated daily
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+            Citation counts via OpenAlex
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Bookmark, like and share papers
+          </li>
+        </ul>
+      </div>
+
+      <p class="text-gray-600 text-sm">
+        Free forever · No credit card required
+      </p>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+definePageMeta({ layout: false });
 export default {
   data() {
     return {
@@ -103,16 +119,10 @@ export default {
   },
   methods: {
     handleSubmit() {
-      //validate password
       this.passwordError =
         this.password.length >= 4
           ? ""
           : "Password must be at least 12 characters long";
-      // if (!this.passwordError) {
-      //   console.log("email: ", this.email);
-      //   console.log("password: ", this.password);
-      //   console.log("terms accepted: ", this.terms);
-      // }
     },
 
     register() {
@@ -126,11 +136,9 @@ export default {
           }
         )
         .then((response) => {
-          // Remove console.logs and alert
           this.showError = false;
           this.errormsg = "";
-          
-          // Add success message
+
           const successMsg = document.createElement('div');
           successMsg.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
           successMsg.innerHTML = `
@@ -143,7 +151,6 @@ export default {
           `;
           document.body.appendChild(successMsg);
 
-          // Remove the message after transition and redirect
           setTimeout(() => {
             successMsg.style.transition = 'opacity 0.5s ease-out';
             successMsg.style.opacity = '0';
@@ -155,25 +162,17 @@ export default {
         })
         .catch((error) => {
           console.error("Registration error:", error.response);
-          // Handle the error and provide feedback to the user.
           this.errormsg = error.response.data.msg;
           console.log(error.response.data);
-
-          // show the tooltip
           this.showError = true;
-          // hide the tooltip after 5 seconds
           setTimeout(() => {
             this.showError = false;
           }, 5000);
         });
     },
-    login() { 
+    login() {
       this.$router.push({ name: "login" });
     },
   },
 };
 </script>
-
-<style>
-/* Remove the existing styles as they're no longer needed */
-</style>

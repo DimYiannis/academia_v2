@@ -1,13 +1,8 @@
 <template>
-    <header class="">
-      <nav class="text-3xl text-sky-600 font-bold border-b-2 ">
-        <a href="/" class="">Academia</a>
-      </nav>
-    </header>
-  
-  
-    <slot/> 
-    
-  </template>
-  
-  
+  <header class="border-b border-gray-100 px-6 py-4">
+    <nav>
+      <a href="/" class="text-xl font-bold text-[#388aef] tracking-tight">Academia</a>
+    </nav>
+  </header>
+  <slot />
+</template>
