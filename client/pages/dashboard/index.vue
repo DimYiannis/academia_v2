@@ -167,6 +167,63 @@
           </div>
         </div>
       </div>
+
+      <!-- arXiv papers section -->
+      <section class="mt-8">
+        <h2 class="text-lg font-semibold mb-4 px-1">Latest Research</h2>
+
+        <LoadSpinner v-if="papersPending && papers.length === 0" />
+
+        <div
+          v-for="paper in papers"
+          :key="paper.id"
+          class="border p-4 mb-4 rounded-3xl"
+        >
+          <div class="grid mb-2 gap-1">
+            <h1 class="text-lg font-semibold">
+              <a
+                class="underline decoration-sky-500"
+                :href="paper.link"
+                target="_blank"
+                rel="noopener"
+              >{{ paper.title }}</a>
+            </h1>
+            <h2 class="text-sm text-gray-600">{{ paper.authors.join(', ') }}</h2>
+            <div class="flex gap-3 text-sm text-gray-500">
+              <span>{{ paper.category }}</span>
+              <span v-if="paper.venue">{{ paper.venue }}</span>
+              <span>{{ new Date(paper.date).getFullYear() }}</span>
+            </div>
+          </div>
+          <p class="line-clamp-3 text-sm mb-3">{{ paper.abstract }}</p>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-4 text-sm text-gray-500">
+              <span>{{ paper.citedBy }} citations</span>
+              <span v-if="paper.doi" class="text-xs">DOI: {{ paper.doi }}</span>
+            </div>
+            <a
+              :href="paper.pdf"
+              target="_blank"
+              rel="noopener"
+              class="text-sm text-[#388aef] underline"
+            >PDF</a>
+          </div>
+        </div>
+
+        <div v-if="papersError" class="text-sm text-red-500 py-2">
+          Failed to load papers.
+        </div>
+
+        <div class="flex justify-center py-4" v-if="hasMore">
+          <button
+            @click="loadMore"
+            :disabled="papersPending"
+            class="px-5 py-2 rounded-2xl border border-[#388aef] text-[#388aef] text-sm disabled:opacity-50 disabled:cursor-progress"
+          >
+            {{ papersPending ? 'Loading...' : 'Load more' }}
+          </button>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -183,10 +240,15 @@
 
 <script>
 import axios from "axios";
+import { usePapers } from '~/composables/usePapers'
 definePageMeta({
   layout: 'dashboard'
 })
 export default {
+  setup() {
+    const { papers, pending: papersPending, error: papersError, hasMore, loadMore } = usePapers()
+    return { papers, papersPending, papersError, hasMore, loadMore }
+  },
   data() {
     return {
       showmodal: false,
