@@ -26,7 +26,7 @@
     width: 80px;
     height: 80px;
     margin: 100px auto;
-    background-color: #388aef;
+    background-color: #14b8a6;
   
     border-radius: 100%;
     -webkit-animation: sk-scaleout 1s infinite ease-in-out;

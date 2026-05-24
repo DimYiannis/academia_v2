@@ -5,7 +5,7 @@
       <div role="status">
         <svg
           aria-hidden="true"
-          class="inline w-10 h-10text-gray-200 animate-spin dark:text-gray-600 fill-[#2c6dbd]"
+          class="inline w-10 h-10text-gray-200 animate-spin dark:text-gray-600 fill-[#0d9488]"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +42,7 @@
     <div class="grid mt-5 mx-10">
       <h1 class="text-lg font-semibold">Abstract</h1>
       <p :class="{ 'line-clamp-[10]': !abstract }">{{ post.abstract }}</p>
-      <p @click="showall" class="text-[#388aef] cursor-pointer underline">
+      <p @click="showall" class="text-[#14b8a6] cursor-pointer underline">
         {{ abstract ? "Hide abstract" : "Continue reading" }}
       </p>
     </div>
@@ -51,7 +51,7 @@
     <div class="mt-5 mx-10 grid">
       <div
         class="border-b-2 text-lg font-semibold cursor-pointer"
-        :class="{ 'justify-self-end border-[#388aef] w-fit': !showarticle }"
+        :class="{ 'justify-self-end border-[#14b8a6] w-fit': !showarticle }"
         @click="article"
       >
         Full Access:

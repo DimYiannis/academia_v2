@@ -3,13 +3,13 @@
     <!-- Left: register form -->
     <div class="flex-1 flex flex-col justify-center px-8 tablet:px-16 py-16 bg-white">
       <!-- Mobile header -->
-      <a href="/" class="tablet:hidden text-xl font-bold text-[#388aef] mb-12">Academia</a>
+      <a href="/" class="tablet:hidden text-xl font-bold text-[#14b8a6] mb-12">Academia</a>
 
       <div class="max-w-sm w-full mx-auto">
         <h1 class="text-2xl font-bold text-gray-900 mb-1">Create account</h1>
         <p class="text-sm text-gray-500 mb-8">
           Already have an account?
-          <NuxtLink to="/login" class="text-[#388aef] font-medium">Sign in</NuxtLink>
+          <NuxtLink to="/login" class="text-[#14b8a6] font-medium">Sign in</NuxtLink>
         </p>
 
         <div
@@ -28,7 +28,7 @@
               type="text"
               required
               v-model="name"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
               placeholder="Jane Smith"
             />
           </div>
@@ -40,7 +40,7 @@
               type="email"
               required
               v-model="email"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
               placeholder="you@example.com"
             />
           </div>
@@ -52,7 +52,7 @@
               type="password"
               required
               v-model="password"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
               placeholder="••••••••"
             />
             <p v-if="passwordError" class="mt-1.5 text-xs text-red-600">{{ passwordError }}</p>
@@ -61,7 +61,7 @@
           <button
             type="submit"
             @click="register"
-            class="w-full py-2.5 bg-[#388aef] text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors mt-2"
+            class="w-full py-2.5 bg-[#14b8a6] text-white rounded-lg text-sm font-medium hover:bg-teal-600 transition-colors mt-2"
           >
             Create account
           </button>
@@ -82,7 +82,7 @@
         </p>
         <ul class="space-y-3 text-sm text-gray-400">
           <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#388aef]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#14b8a6]"></span>
             Papers from arXiv, updated daily
           </li>
           <li class="flex items-center gap-2">

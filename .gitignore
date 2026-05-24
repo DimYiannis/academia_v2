@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Claude
+CLAUDE.md
+
+# Node
+node_modules/
+.env
+.env.*
+
+# Nuxt
+client/.nuxt/
+client/.output/
+client/dist/
+
+# Logs
+*.log
+npm-debug.log*

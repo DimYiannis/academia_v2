@@ -1,206 +1,106 @@
 <template>
-  <!-- Loading state v-if="loading" -->
-  <div v-if="loading" class="grid place-items-center h-full">
-    <div class="text-center text-lg font-semibold py-4 animate-bounce">
-      <div role="status">
-        <svg
-          aria-hidden="true"
-          class="inline w-10 h-10text-gray-200 animate-spin dark:text-gray-600 fill-[#2c6dbd]"
-          viewBox="0 0 100 101"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-            fill="currentColor"
-          />
-          <path
-            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-            fill="currentFill"
-          />
-        </svg>
-        Loading...
-      </div>
-    </div>
+  <div v-if="loading" class="flex justify-center py-16">
+    <LoadSpinner />
   </div>
-  <main v-else class="flex mt-8 h-fit laptop:ml-20 ">
-    <section class="h-full max-w-[700px] border-r-2">
-      <div class="grid gap-2 w-full">
-        <div>
-          <h1 class="text-xl font-semibold mt-4 capitalize border-b-2"></h1>
-        </div>
 
-        <div
-          class="mt-2 h-[250px] bg-cover bg-center mr-3"
-          :style="{
-            backgroundImage: user.backgroundImg
-              ? 'url(https://academiav2-backend.onrender.com' +
-                user.backgroundImg +
-                ')'
-              : 'none',
-            backgroundColor: user.backgroundImage ? '' : '#B0A8B9',
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-          }"
-        ></div>
-        <div class="relative">
-          <div class="flex justify-between items-start">
-            <div
-              class="rounded-full ml-4 w-20 h-32 absolute -top-16 left-2"
-              :style="{
-                backgroundImage: user.profileImg
-                  ? 'url(https://academiav2-backend.onrender.com' +
-                    user.profileImg +
-                    ')'
-                  : 'none',
-                backgroundColor: user.backgroundImage ? '' : '#B0A8B9',
-                backgroundPosition: 'center',
-                backgroundSize: 'cover',
-              }"
-            ></div>
-            <div>
-              <!--connect prof-->
-              <nav class="flex mt-6 text-lg font-semobold absolute right-0 mr-2">
-                <button class="">Connect</button>
-              </nav>
-            </div>
+  <main v-else class="px-6 py-6 text-gray-100 max-w-3xl">
+
+    <!-- Banner -->
+    <div
+      class="h-40 rounded-xl mb-4 bg-gray-700"
+      :style="user.backgroundImg ? {
+        backgroundImage: 'url(https://academiav2-backend.onrender.com' + user.backgroundImg + ')',
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+      } : {}"
+    ></div>
+
+    <!-- Avatar + Connect -->
+    <div class="relative flex items-end justify-between mb-4 -mt-10 px-2">
+      <div
+        class="w-20 h-20 rounded-full border-4 border-[#1c1c1e] bg-gray-600"
+        :style="user.profileImg ? {
+          backgroundImage: 'url(https://academiav2-backend.onrender.com' + user.profileImg + ')',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+        } : {}"
+      ></div>
+      <button class="px-4 py-1.5 rounded-lg border border-gray-600 text-sm text-gray-300 hover:border-teal-500 hover:text-teal-400 transition-colors bg-transparent">
+        Connect
+      </button>
+    </div>
+
+    <!-- Name + bio -->
+    <div class="mb-6">
+      <h1 class="text-xl font-semibold text-white capitalize">{{ user.name }}</h1>
+      <p v-if="user.info" class="text-sm text-gray-400 mt-1">{{ user.info }}</p>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="flex gap-5 border-b border-gray-700 mb-5">
+      <button
+        @click="sharedPosts"
+        class="text-sm font-medium pb-2 transition-colors"
+        :class="showSharedPosts ? 'text-white border-b-2 border-teal-500' : 'text-gray-400 hover:text-gray-200'"
+      >Shared Posts</button>
+      <button
+        @click="likes"
+        class="text-sm font-medium pb-2 transition-colors"
+        :class="showlikes ? 'text-white border-b-2 border-teal-500' : 'text-gray-400 hover:text-gray-200'"
+      >Favorites</button>
+    </div>
+
+    <!-- Shared Posts -->
+    <div v-show="showSharedPosts">
+      <div
+        v-for="i of sharedposts"
+        :key="i._id"
+        class="border border-gray-700 p-4 mb-3 rounded-2xl hover:border-gray-600 transition-colors"
+      >
+        <p class="text-xs text-gray-400 mb-2">by {{ i.user?.name }}</p>
+        <p v-if="i.title" class="text-sm text-gray-300 mb-3">{{ i.title }}</p>
+        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-600 rounded-xl p-3 mb-2">
+          <h2 class="text-sm font-semibold text-white mb-1">
+            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
+          </h2>
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-400 mb-1">
+            <span v-if="j.authors">{{ j.authors }}</span>
+            <span v-if="j.university">{{ j.university }}</span>
+            <span v-if="j.date">{{ j.date }}</span>
           </div>
-        </div>
-
-        <div class="mt-20 pb-3">
-          <h1 class="text-3xl capitalize">{{ user.name }}</h1>
-          <h2 class="text-lg mt-3">{{ user.info }}</h2>
+          <p class="text-xs text-gray-500 line-clamp-2">{{ j.abstract }}</p>
         </div>
       </div>
+      <p v-if="!sharedposts.length" class="text-sm text-gray-500">No shared posts yet.</p>
+    </div>
 
-      <div>
-        <!--content-->
-        <div class="grid mt-12">
-          <div class="border-b-2 flex gap-5">
-            <h1
-              @click="sharedPosts"
-              class="text-base font-semibold cursor-pointer mb-2"
-              :class="{
-                'underline decoration-4 decoration-sky-500 underline-offset-4':
-                  showSharedPosts,
-              }"
-            >
-              Shared Posts
-            </h1>
-            <h1
-              @click="likes"
-              class="text-base font-semibold cursor-pointer"
-              :class="{
-                'underline decoration-4 decoration-sky-500 underline-offset-4':
-                  showlikes,
-              }"
-            >
-              Favorites
-            </h1>
+    <!-- Favorites -->
+    <div v-show="showlikes">
+      <div
+        v-for="i of likedposts"
+        :key="i._id"
+        class="border border-gray-700 p-4 mb-3 rounded-2xl hover:border-gray-600 transition-colors"
+      >
+        <div v-for="j in [i.postDetails]" :key="j?.doi">
+          <h2 class="text-sm font-semibold text-white mb-1">
+            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j?.doi">{{ j?.title }}</NuxtLink>
+          </h2>
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-400 mb-1">
+            <span v-if="j?.authors">{{ j.authors }}</span>
+            <span v-if="j?.university">{{ j.university }}</span>
+            <span v-if="j?.date">{{ j.date }}</span>
           </div>
-
-          <main
-            class="h-screen mt-5 mr-2 overflow-hidden overflow-y-auto overscroll-auto"
-          >
-            <div
-              :class="{
-                'transition-opacity ease-out duration-500 opacity-0 hidden':
-                  !showSharedPosts,
-                'transition-opacity ease-in duration-500 opacity-100':
-                  showSharedPosts,
-              }"
-              class="border p-4 mb-4 rounded-3xl"
-              v-for="i of sharedposts"
-            >
-              <h1>Post made by: {{ i.user.name }}</h1>
-              <p>{{ i.title }}</p>
-
-              <!--the inner v-for loop is based on i.sharedpostdetails-->
-              <div
-                v-show="showSharedPosts"
-                v-for="j in i.sharedpostdetails"
-                class="p-2 mx-6 my-4 border border-[#388aef] rounded-3xl"
-              >
-                <div class="grid items-center">
-                  <h1 class="text-lg font-semibold">
-                    <NuxtLink
-                      class="underline decoration-[#388aef] capitalize"
-                      :to="'/article/' + j.doi"
-                      >{{ j.title }}</NuxtLink
-                    >
-                  </h1>
-                  <h2>Author: {{ j.authors }}</h2>
-                  <h2>Institutions: {{ j.university }}</h2>
-                  <h3>Year: {{ j.date }}</h3>
-                </div>
-                <div class="post-content mb-2">
-                  <p class="line-clamp-3">Abstract: {{ j.abstract }}</p>
-                  <h3>doi: {{ j.doi }}</h3>
-                  <!-- You can add other multimedia content (images, videos) here -->
-                </div>
-              </div>
-            </div>
-
-            <section class="mt-5">
-              <!--Likes-->
-              <div class="mt-34">
-                <!--content-->
-                <div>
-                  <div
-                    :class="{
-                      'transition-opacity ease-out duration-500 opacity-0 hidden':
-                        !showlikes,
-                      'transition-opacity ease-in duration-500 opacity-100':
-                        showlikes,
-                    }"
-                  >
-                    <main
-                      class="h-screen mt-5 mr-2 overflow-hidden overflow-y-auto overscroll-auto"
-                    >
-                      <div
-                        v-show="showlikes"
-                        class="border p-4 mb-4 rounded-3xl grid"
-                        v-for="i of likedposts"
-                      >
-                        <div
-                          v-for="j in [i.postDetails]"
-                          class="p-2 mx-6 my-4 border border-[#388aef] rounded-3xl"
-                        >
-                          <div class="grid items-center">
-                            <h1 class="text-lg font-semibold">
-                              <NuxtLink
-                                class="underline decoration-[#388aef] capitalize"
-                                :to="'/article/' + j.doi"
-                                >{{ j.title }}</NuxtLink
-                              >
-                            </h1>
-                            <h2>Author: {{ j.authors }}</h2>
-                            <h2>Institutions: {{ j.university }}</h2>
-                            <h3>Year: {{ j.date }}</h3>
-                          </div>
-                          <div class="post-content mb-2">
-                            <p class="line-clamp-3">
-                              Abstract: {{ j.abstract }}
-                            </p>
-                            <h3>doi: {{ j.doi }}</h3>
-                          </div>
-                        </div>
-                      </div>
-                    </main>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </main>
+          <p class="text-xs text-gray-500 line-clamp-2">{{ j?.abstract }}</p>
         </div>
       </div>
-    </section>
+      <p v-if="!likedposts.length" class="text-sm text-gray-500">No liked posts yet.</p>
+    </div>
+
   </main>
 </template>
 
 <script>
 import axios from "axios";
-const {_id} = useRoute().params; //dynamic route
 
 definePageMeta({
   layout: "dashboard",
@@ -215,12 +115,6 @@ export default {
       likedposts: [],
       loading: false,
     };
-  },
-  props: {
-    shownotif: {
-      type: Boolean,
-      required: true,
-    },
   },
   mounted() {
     // Invoke when the component is mounted

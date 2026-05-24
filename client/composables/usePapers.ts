@@ -18,8 +18,9 @@ interface PapersResponse {
   nextStart: number | null
 }
 
+const API_BASE = 'https://academiav2-backend.onrender.com'
+
 export function usePapers(initialTopic = 'ai') {
-  const config = useRuntimeConfig()
   const papers = ref<Paper[]>([])
   const pending = ref(false)
   const error = ref<Error | null>(null)
@@ -30,7 +31,7 @@ export function usePapers(initialTopic = 'ai') {
     error.value = null
     try {
       const data = await $fetch<PapersResponse>(
-        `${config.public.apiBase}/api/papers`,
+        `${API_BASE}/api/papers`,
         { params: { topic: initialTopic, start } }
       )
       if (start === 0) {

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col tablet:flex-row">
     <!-- Left: branding panel -->
-    <div class="hidden tablet:flex flex-col justify-between bg-[#388aef] text-white px-12 py-12 tablet:w-2/5">
+    <div class="hidden tablet:flex flex-col justify-between bg-[#14b8a6] text-white px-12 py-12 tablet:w-2/5">
       <a href="/" class="text-xl font-bold tracking-tight">Academia</a>
 
       <div>
@@ -13,7 +13,7 @@
         </p>
         <NuxtLink
           to="/register"
-          class="inline-block px-6 py-3 bg-white text-[#388aef] rounded-xl text-sm font-medium hover:bg-blue-50 transition-colors"
+          class="inline-block px-6 py-3 bg-white text-[#14b8a6] rounded-xl text-sm font-medium hover:bg-teal-50 transition-colors"
         >
           Create account
         </NuxtLink>
@@ -27,13 +27,13 @@
     <!-- Right: login form -->
     <div class="flex-1 flex flex-col justify-center px-8 tablet:px-16 py-16 bg-white">
       <!-- Mobile header -->
-      <a href="/" class="tablet:hidden text-xl font-bold text-[#388aef] mb-12">Academia</a>
+      <a href="/" class="tablet:hidden text-xl font-bold text-[#14b8a6] mb-12">Academia</a>
 
       <div class="max-w-sm w-full mx-auto">
         <h1 class="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
         <p class="text-sm text-gray-500 mb-8">
           No account?
-          <NuxtLink to="/register" class="text-[#388aef] font-medium">Sign up</NuxtLink>
+          <NuxtLink to="/register" class="text-[#14b8a6] font-medium">Sign up</NuxtLink>
         </p>
 
         <div
@@ -52,7 +52,7 @@
               type="email"
               required
               v-model="email"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
               placeholder="you@example.com"
             />
           </div>
@@ -60,21 +60,21 @@
           <div>
             <div class="flex justify-between mb-1">
               <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-              <a href="#" class="text-sm text-[#388aef]">Forgot?</a>
+              <a href="#" class="text-sm text-[#14b8a6]">Forgot?</a>
             </div>
             <input
               id="password"
               type="password"
               required
               v-model="password"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#388aef] focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            class="w-full py-2.5 bg-[#388aef] text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 mt-2"
+            class="w-full py-2.5 bg-[#14b8a6] text-white rounded-lg text-sm font-medium hover:bg-teal-600 transition-colors flex items-center justify-center gap-2 mt-2"
           >
             <svg
               v-if="loading"

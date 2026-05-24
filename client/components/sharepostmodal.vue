@@ -31,10 +31,10 @@
           <div
             class="rounded-full w-10 h-10 mt-2"
             :style="{
-              backgroundImage: user.profileImg
+              backgroundImage: user?.profileImg
                 ? `url(https://academiav2-backend.onrender.com${user.profileImg})`
                 : 'none',
-              backgroundColor: user.backgroundImage ? '' : '#B0A8B9',
+              backgroundColor: user?.backgroundImage ? '' : '#B0A8B9',
               backgroundPosition: 'center',
               backgroundSize: 'cover',
             }"
@@ -43,7 +43,7 @@
             v-model="postContent"
             type="text"
             id="large-input"
-            class="block w-full p-4 mb-5 outline-none caret-[#388aef]"
+            class="block w-full p-4 mb-5 outline-none caret-[#14b8a6]"
             placeholder="Capture your viewpoint and share with everyone..."
           />
         </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-[calc(100vh-57px)] flex flex-col items-center justify-center px-6 py-24 text-center">
-    <span class="inline-block mb-6 px-3 py-1 rounded-full bg-blue-50 text-[#388aef] text-sm font-medium">
+    <span class="inline-block mb-6 px-3 py-1 rounded-full bg-teal-50 text-[#14b8a6] text-sm font-medium">
       arXiv · OpenAlex · open access
     </span>
 
@@ -32,7 +32,7 @@
     <div class="mt-12 flex gap-3">
       <NuxtLink
         to="/register"
-        class="px-6 py-3 bg-[#388aef] text-white rounded-xl text-sm font-medium hover:bg-blue-600 transition-colors"
+        class="px-6 py-3 bg-[#14b8a6] text-white rounded-xl text-sm font-medium hover:bg-teal-600 transition-colors"
       >
         Get started
       </NuxtLink>

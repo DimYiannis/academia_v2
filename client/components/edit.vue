@@ -126,7 +126,7 @@
                 v-model="userName"
                 ref="nameInput"
                 type="text"
-                class="block w-max m-2 outline-none caret-[#388aef]"
+                class="block w-max m-2 outline-none caret-[#14b8a6]"
                 placeholder=""
               />
             </div>
@@ -137,7 +137,7 @@
                 v-model="userInfo"
                 ref="infoInput"
                 type="text"
-                class="block w-max m-2 outline-none caret-[#388aef]"
+                class="block w-max m-2 outline-none caret-[#14b8a6]"
                 placeholder=""
               />
             </div>
@@ -156,7 +156,7 @@
       <div
         id="loader"
         v-show="loading"
-        class="relative transform -translate-x-1/2 -translate-y-1/2 bg-[#388aef] p-4 rounded shadow"
+        class="relative transform -translate-x-1/2 -translate-y-1/2 bg-[#14b8a6] p-4 rounded shadow"
       >
         <svg
           aria-hidden="true"
@@ -180,7 +180,7 @@
       <div
         id="message"
         v-show="uploadMessage"
-        class="relative transform -translate-x-1/2 -translate-y-1/2 bg-[#388aef] p-4 rounded shadow"
+        class="relative transform -translate-x-1/2 -translate-y-1/2 bg-[#14b8a6] p-4 rounded shadow"
       >
         {{ uploadMessage }}
       </div>
