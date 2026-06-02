@@ -50,7 +50,13 @@ app.use(fileUpload());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://academiav2.netlify.app'],
+    origin: (origin, callback) => {
+      if (!origin || /^http:\/\/localhost(:\d+)?$/.test(origin) || origin === 'https://academiav2.netlify.app') {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
     credentials: true,
     allowedHeaders: 'Content-Type,Authorization',
   })
