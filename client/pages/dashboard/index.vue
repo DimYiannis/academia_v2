@@ -140,7 +140,8 @@
               v-if="i.thumbnail"
               :src="i.thumbnail"
               :alt="i.title"
-              class="absolute top-3 right-3 w-28 h-20 rounded-xl object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl border border-gray-700/40"
+              class="absolute top-0 right-0 h-full w-44 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+              style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
               @error="$event.target.style.display='none'"
@@ -198,7 +199,8 @@
               v-if="paper.thumbnail"
               :src="paper.thumbnail"
               :alt="paper.title"
-              class="absolute top-3 right-3 w-28 h-20 rounded-xl object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl border border-gray-700/40"
+              class="absolute top-0 right-0 h-full w-44 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+              style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
               @error="$event.target.style.display='none'"
