@@ -125,57 +125,42 @@
           {{ message }}
         </div>
 
-        <!-- User posts -->
+        <!-- HuggingFace featured papers -->
         <div v-if="displayedPosts && displayedPosts.length" class="mb-6">
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Community</p>
+          <div class="flex items-center gap-2 mb-3">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Today on HuggingFace</p>
+            <span class="text-xs text-gray-600">· curated</span>
+          </div>
           <div
-            v-for="(i, index) in displayedPosts"
+            v-for="(i, index) in displayedPosts.slice(0, 8)"
             :key="index"
             class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
           >
-            <div class="mb-3">
-              <h2 class="text-sm font-semibold text-white leading-snug mb-1">
-                <router-link class="hover:text-teal-400 transition-colors" :to="'/article/' + i.doi">
-                  {{ i.title }}
-                </router-link>
-              </h2>
-              <div class="flex flex-wrap gap-x-3 text-xs text-gray-400">
-                <span v-if="i.authors">{{ i.authors }}</span>
-                <span v-if="i.university">{{ i.university }}</span>
-                <span v-if="i.date">{{ i.date }}</span>
-              </div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-300 font-medium">HF Daily</span>
+              <span v-if="i.date" class="text-xs text-gray-500">{{ new Date(i.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
             </div>
-            <p class="text-sm text-gray-400 line-clamp-3 mb-4">{{ i.abstract }}</p>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-1">
-                <button
-                  class="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors disabled:cursor-progress"
-                  @click="addLike(i._id)"
-                  :disabled="likeLoading"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 8.25c0-2.485-2.099-4.5-4.687-4.5-1.936 0-3.598 1.126-4.313 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.098 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                  </svg>
-                </button>
-                <button
-                  class="p-1.5 rounded-lg text-gray-400 hover:text-teal-500 hover:bg-teal-900/20 transition-colors"
-                  @click="modal(i._id)"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.25 13.25a.75.75 0 0 0 1.5 0V4.636l2.955 3.129a.75.75 0 0 0 1.09-1.03l-4.25-4.5a.75.75 0 0 0-1.09 0l-4.25 4.5a.75.75 0 1 0 1.09 1.03L9.25 4.636v8.614Z" />
-                    <path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" />
-                  </svg>
-                </button>
-              </div>
-              <button
-                class="p-1.5 rounded-lg text-gray-400 hover:text-teal-500 hover:bg-teal-900/20 transition-colors disabled:cursor-progress"
-                @click="addBookmark(i._id)"
-                :disabled="bookmarkLoading"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+            <h2 class="text-sm font-semibold text-white leading-snug mb-2">
+              <NuxtLink :to="'/article/' + i.id" class="hover:text-teal-400 transition-colors">
+                {{ i.title }}
+              </NuxtLink>
+            </h2>
+            <p v-if="i.authors && i.authors.length" class="text-xs text-gray-400 mb-2 truncate">
+              {{ i.authors.slice(0, 4).join(', ') }}{{ i.authors.length > 4 ? ` +${i.authors.length - 4} more` : '' }}
+            </p>
+            <p class="text-sm text-gray-400 line-clamp-3 mb-3 leading-relaxed">{{ i.abstract }}</p>
+            <div class="flex items-center gap-3">
+              <a v-if="i.pdf" :href="i.pdf" target="_blank" rel="noopener"
+                class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>
-              </button>
+                PDF
+              </a>
+              <span v-if="i.upvotes" class="flex items-center gap-1 text-xs text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
+                {{ i.upvotes }}
+              </span>
             </div>
           </div>
         </div>
@@ -402,7 +387,7 @@ export default {
     const sourceArxiv     = ref(true);
     const sourceCommunity = ref(true);
     const sourcePwC       = ref(true);
-    const activeFilters   = reactive({ openAccess: false, last30: false, mostCited: false });
+    const activeFilters   = reactive({ hasCode: false, last30: false, mostCited: false });
 
     const topicData = {
       ai:   usePapers('ai'),
@@ -424,9 +409,9 @@ export default {
       { id: 'pwc',       label: 'Papers With Code' },
     ];
     const filters = [
-      { id: 'openAccess', label: 'Open access only' },
-      { id: 'last30',     label: 'Last 30 days' },
-      { id: 'mostCited',  label: 'Most cited' },
+      { id: 'hasCode',   label: 'Has code' },
+      { id: 'last30',    label: 'Last 30 days' },
+      { id: 'mostCited', label: 'Most cited' },
     ];
     const feedTabs = ['Latest', 'Trending', 'Saved'];
 
@@ -458,6 +443,10 @@ export default {
           p.title.toLowerCase().includes(q) ||
           p.authors.some(a => a.toLowerCase().includes(q))
         );
+      }
+
+      if (activeFilters.hasCode) {
+        result = result.filter(p => p.hasCode);
       }
 
       if (activeFilters.last30) {
@@ -538,10 +527,10 @@ export default {
       const all = this.posts || [];
       const q = (this.searchQuery || '').trim().toLowerCase();
       if (!q) return all;
-      return all.filter(p =>
-        (p.title || '').toLowerCase().includes(q) ||
-        (p.authors || '').toLowerCase().includes(q)
-      );
+      return all.filter(p => {
+        const authors = Array.isArray(p.authors) ? p.authors.join(' ') : (p.authors || '');
+        return (p.title || '').toLowerCase().includes(q) || authors.toLowerCase().includes(q);
+      });
     },
   },
 

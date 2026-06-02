@@ -93,11 +93,8 @@ async function fetchUser() {
 async function fetchPosts() {
   postsLoading.value = true
   try {
-    const { data } = await axios.get(
-      `${API_BASE}/api/v1/posts`,
-      { withCredentials: true }
-    )
-    posts.value = data.posts
+    const { data } = await axios.get(`${API_BASE}/api/papers/featured`)
+    posts.value = data.papers || []
   } catch (e) {
     console.error(e)
   } finally {

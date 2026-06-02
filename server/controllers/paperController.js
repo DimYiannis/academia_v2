@@ -1,5 +1,5 @@
 const { fetchPapers, fetchPaperById } = require('../lib/arxiv')
-const { fetchPwCPapers } = require('../lib/paperswithcode')
+const { fetchCodeForPapers, fetchFeaturedPapers } = require('../lib/paperswithcode')
 const { fetchCitations } = require('../lib/openalex')
 const cache = require('../lib/cache')
 
@@ -16,23 +16,15 @@ const getPapers = async (req, res, next) => {
     let papers = arxivPapers.map(p => ({ ...p, hasCode: false, codeUrl: null, source: 'arxiv' }))
 
     if (topic === 'ai') {
-      const page = Math.floor(start / 10) + 1
-      const pwcPapers = await fetchPwCPapers(page)
+      const ids = papers.map(p => p.id)
+      const codeMap = await fetchCodeForPapers(ids)
 
-      // Index arXiv papers by ID for O(1) enrichment lookup
-      const arxivMap = {}
-      for (const p of papers) arxivMap[p.id] = p
-
-      for (const pwc of pwcPapers) {
-        if (pwc.arxivId && arxivMap[pwc.arxivId]) {
-          // Enrich matching arXiv paper with code info
-          arxivMap[pwc.arxivId].hasCode = pwc.hasCode
-          arxivMap[pwc.arxivId].codeUrl = pwc.codeUrl
-          if (pwc.hasCode) arxivMap[pwc.arxivId].source = 'arxiv+pwc'
-        } else if (pwc.id && !arxivMap[pwc.id]) {
-          // PwC-only paper — not on arXiv
-          papers.push(pwc)
-          arxivMap[pwc.id] = pwc
+      for (const paper of papers) {
+        const pwc = codeMap[paper.id]
+        if (pwc) {
+          paper.hasCode = pwc.hasCode
+          paper.codeUrl = pwc.codeUrl
+          if (pwc.hasCode) paper.source = 'arxiv+pwc'
         }
       }
     }
@@ -86,4 +78,19 @@ const getPaper = async (req, res, next) => {
   }
 }
 
-module.exports = { getPapers, getPaper }
+const getFeatured = async (req, res, next) => {
+  try {
+    const key = 'papers:featured'
+    const cached = cache.get(key)
+    if (cached) return res.json(cached)
+
+    const papers = await fetchFeaturedPapers()
+    const payload = { papers }
+    cache.set(key, payload, 3600) // 1hr — changes slowly
+    res.json(payload)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { getPapers, getPaper, getFeatured }
