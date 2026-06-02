@@ -37,7 +37,7 @@
               class="w-full h-[250px] grid place-items-center border-2 mt-10 mobile:mt-0"
               :style="{
                 backgroundImage: this.userr.backgroundImg
-                  ? 'url(https://academiav2-backend.onrender.com' + userr.backgroundImg + ')'
+                  ? `url(${API_BASE}` + userr.backgroundImg + ')'
                   : 'none',
                 backgroundColor: userr.backgroundImg ? '' : '#B0A8B9',
                 backgroundPosition: 'center',
@@ -78,7 +78,7 @@
                 class="absolute -top-24 left-2 rounded-full w-16 h-28 ml-3 border-2"
                 :style="{
                   backgroundImage: userr.profileImg
-                    ? 'url(https://academiav2-backend.onrender.com' + userr.profileImg + ')'
+                    ? `url(${API_BASE}` + userr.profileImg + ')'
                     : 'none',
                   backgroundColor: userr.profileImg ? '' : '#B0A8B9',
                   backgroundPosition: 'center',
@@ -190,6 +190,7 @@
 
 <script>
 import axios from "axios";
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 export default {
   data() {
     return {
@@ -217,7 +218,7 @@ export default {
         this.loading = true;
 
         await axios.patch(
-          `http://localhost:5000/api/v1/users/updateUser`,
+          `${API_BASE}/api/v1/users/updateUser`,
           { name: this.userName, info: this.userInfo },
           { withCredentials: true }
         );
@@ -276,7 +277,7 @@ export default {
         this.loading = true;
 
         const response = await axios.post(
-          "http://localhost:5000/api/v1/users/uploadbackimage",
+          `${API_BASE}/api/v1/users/uploadbackimage`,
           { image: this.backgroundPic },
           {
             withCredentials: true,
@@ -312,7 +313,7 @@ export default {
         console.log(this.profilePic);
 
         const response = await axios.post(
-          "http://localhost:5000/api/v1/users/uploadprofimage",
+          "${API_BASE}/api/v1/users/uploadprofimage",
           { image: this.profilePic },
           {
             withCredentials: true,

@@ -12,6 +12,38 @@ const ARXIV_CATEGORIES = {
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_' })
 
+function mapEntry(entry, defaultTopic = 'ai') {
+  const rawId = String(entry.id || '')
+  const id = rawId.replace('http://arxiv.org/abs/', '').replace(/v\d+$/, '')
+
+  const authorRaw = entry.author || []
+  const authorList = Array.isArray(authorRaw) ? authorRaw : [authorRaw]
+  const authors = authorList.map(a => a.name).filter(Boolean)
+
+  const category = entry['arxiv:primary_category']?.['@_term'] || ''
+
+  let topic = defaultTopic
+  if (/^cs\.(AI|LG|NE)/.test(category)) topic = 'ai'
+  else if (/^math\./.test(category)) topic = 'math'
+  else if (/^(cs\.AR|eess\.)/.test(category)) topic = 'hw'
+  else if (/^cs\.(DS|CC|DC)/.test(category)) topic = 'cs'
+
+  return {
+    id,
+    title: String(entry.title || '').replace(/\s+/g, ' ').trim(),
+    abstract: String(entry.summary || '').replace(/\s+/g, ' ').trim(),
+    authors,
+    date: entry.published || '',
+    pdf: `https://arxiv.org/pdf/${id}`,
+    link: `https://arxiv.org/abs/${id}`,
+    category,
+    topic,
+    citedBy: 0,
+    venue: null,
+    doi: null,
+  }
+}
+
 async function fetchPapers(topic = 'ai', start = 0) {
   const search_query = ARXIV_CATEGORIES[topic] || ARXIV_CATEGORIES.ai
   const url = `${ARXIV_BASE}?search_query=${encodeURIComponent(search_query)}&start=${start}&max_results=${RESULTS_PER_PAGE}&sortBy=submittedDate&sortOrder=descending`
@@ -25,32 +57,21 @@ async function fetchPapers(topic = 'ai', start = 0) {
   if (!entries) return []
 
   const list = Array.isArray(entries) ? entries : [entries]
-
-  return list.map(entry => {
-    const rawId = String(entry.id || '')
-    const id = rawId.replace('http://arxiv.org/abs/', '').replace(/v\d+$/, '')
-
-    const authorRaw = entry.author || []
-    const authorList = Array.isArray(authorRaw) ? authorRaw : [authorRaw]
-    const authors = authorList.map(a => a.name).filter(Boolean)
-
-    const category = entry['arxiv:primary_category']?.['@_term'] || ''
-
-    return {
-      id,
-      title: String(entry.title || '').replace(/\s+/g, ' ').trim(),
-      abstract: String(entry.summary || '').replace(/\s+/g, ' ').trim(),
-      authors,
-      date: entry.published || '',
-      pdf: `https://arxiv.org/pdf/${id}`,
-      link: `https://arxiv.org/abs/${id}`,
-      category,
-      topic,
-      citedBy: 0,
-      venue: null,
-      doi: null,
-    }
-  })
+  return list.map(entry => mapEntry(entry, topic))
 }
 
-module.exports = { fetchPapers, ARXIV_CATEGORIES }
+async function fetchPaperById(id) {
+  const url = `${ARXIV_BASE}?id_list=${encodeURIComponent(id)}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`arXiv fetch failed: ${res.status}`)
+  const xml = await res.text()
+
+  const parsed = parser.parse(xml)
+  const entries = parsed.feed?.entry
+  if (!entries) return null
+
+  const list = Array.isArray(entries) ? entries : [entries]
+  return mapEntry(list[0], 'ai')
+}
+
+module.exports = { fetchPapers, fetchPaperById, ARXIV_CATEGORIES }

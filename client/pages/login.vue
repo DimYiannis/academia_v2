@@ -103,6 +103,7 @@
 
 <script>
 import axios from "axios";
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 definePageMeta({ layout: false });
 export default {
   data() {
@@ -126,7 +127,7 @@ export default {
 
       axios
         .post(
-          "https://academiav2-backend.onrender.com/api/v1/auth/login",
+          `${API_BASE}/api/v1/auth/login`,
           {
             email: this.email,
             password: this.password,

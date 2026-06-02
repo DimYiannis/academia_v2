@@ -38,6 +38,7 @@
 
 <script>
 import axios from "axios";
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 definePageMeta({
   layout: 'dashboard'
 })
@@ -57,7 +58,7 @@ export default {
       try {
         this.loading = true;
         const response = await axios.get(
-          "https://academiav2-backend.onrender.com/api/v1/bookmarks",
+          `${API_BASE}/api/v1/bookmarks`,
           {
             withCredentials: true,
           }
@@ -75,7 +76,7 @@ export default {
       try {
         //console.log(this.bookmarks);
         await axios.delete(
-          `https://academiav2-backend.onrender.com/api/v1/bookmarks/${bookmarkId}`,
+          `${API_BASE}/api/v1/bookmarks/${bookmarkId}`,
           {
             withCredentials: true,
           }

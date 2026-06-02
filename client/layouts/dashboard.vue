@@ -40,6 +40,7 @@
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
         <input
+          v-model="searchQuery"
           class="bg-transparent outline-none text-white placeholder-white/40 text-sm w-32"
           placeholder="Search papers"
         />
@@ -62,6 +63,8 @@
 <script setup lang="ts">
 import axios from 'axios'
 
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
+const searchQuery = useSearchQuery()
 const user = ref<any>(null)
 const posts = ref<any[]>([])
 const postsLoading = ref(false)
@@ -78,7 +81,7 @@ const userInitials = computed(() => {
 async function fetchUser() {
   try {
     const { data } = await axios.get(
-      'https://academiav2-backend.onrender.com/api/v1/users/showUser',
+      `${API_BASE}/api/v1/users/showUser`,
       { withCredentials: true }
     )
     user.value = data.user
@@ -91,7 +94,7 @@ async function fetchPosts() {
   postsLoading.value = true
   try {
     const { data } = await axios.get(
-      'https://academiav2-backend.onrender.com/api/v1/posts',
+      `${API_BASE}/api/v1/posts`,
       { withCredentials: true }
     )
     posts.value = data.posts
@@ -105,7 +108,7 @@ async function fetchPosts() {
 async function logout() {
   try {
     await axios.get(
-      'https://academiav2-backend.onrender.com/api/v1/auth/logout',
+      `${API_BASE}/api/v1/auth/logout`,
       { withCredentials: true }
     )
   } finally {

@@ -41,11 +41,20 @@
         <p class="text-xs font-semibold text-gray-400 tracking-widest uppercase mb-3 px-2">Sources</p>
         <div
           v-for="source in sources"
-          :key="source"
-          class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-800 cursor-pointer group transition-colors"
+          :key="source.id"
+          @click="!source.disabled && toggleSource(source.id)"
+          class="flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer group transition-colors"
+          :class="isSourceActive(source.id) ? 'bg-teal-900/30' : source.disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-800'"
         >
-          <div class="w-4 h-4 rounded border-2 border-gray-600 group-hover:border-gray-400 shrink-0 transition-colors"></div>
-          <span class="text-xs text-gray-300 flex-1">{{ source }}</span>
+          <div
+            class="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
+            :class="isSourceActive(source.id) ? 'border-teal-500 bg-teal-500' : 'border-gray-600 group-hover:border-gray-400'"
+          >
+            <svg v-if="isSourceActive(source.id)" xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <span class="text-xs flex-1 transition-colors" :class="isSourceActive(source.id) ? 'text-teal-300 font-medium' : 'text-gray-300'">{{ source.label }}</span>
         </div>
       </div>
 
@@ -54,11 +63,20 @@
         <p class="text-xs font-semibold text-gray-400 tracking-widest uppercase mb-3 px-2">Filter By</p>
         <div
           v-for="filter in filters"
-          :key="filter"
-          class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-800 cursor-pointer group transition-colors"
+          :key="filter.id"
+          @click="toggleFilter(filter.id)"
+          class="flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer group transition-colors"
+          :class="activeFilters[filter.id] ? 'bg-teal-900/30' : 'hover:bg-gray-800'"
         >
-          <div class="w-4 h-4 rounded border-2 border-gray-600 group-hover:border-gray-400 shrink-0 transition-colors"></div>
-          <span class="text-xs text-gray-300">{{ filter }}</span>
+          <div
+            class="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
+            :class="activeFilters[filter.id] ? 'border-teal-500 bg-teal-500' : 'border-gray-600 group-hover:border-gray-400'"
+          >
+            <svg v-if="activeFilters[filter.id]" xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <span class="text-xs transition-colors" :class="activeFilters[filter.id] ? 'text-teal-300 font-medium' : 'text-gray-300'">{{ filter.label }}</span>
         </div>
       </div>
     </aside>
@@ -108,10 +126,10 @@
         </div>
 
         <!-- User posts -->
-        <div v-if="posts && posts.length" class="mb-6">
+        <div v-if="displayedPosts && displayedPosts.length" class="mb-6">
           <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Community</p>
           <div
-            v-for="(i, index) in posts"
+            v-for="(i, index) in displayedPosts"
             :key="index"
             class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
           >
@@ -164,12 +182,18 @@
 
         <!-- arXiv paper cards -->
         <div>
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Latest papers</p>
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            {{ activeTab === 'Trending' ? 'Trending papers' : 'Latest papers' }}
+          </p>
 
           <LoadSpinner v-if="papersPending && papers.length === 0" />
 
+          <p v-if="!papersPending && displayedPapers.length === 0 && papers.length > 0" class="text-sm text-gray-500 py-4 text-center">
+            No papers match current filters.
+          </p>
+
           <div
-            v-for="paper in papers"
+            v-for="paper in displayedPapers"
             :key="paper.id"
             class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
           >
@@ -183,9 +207,9 @@
             </div>
 
             <h2 class="text-sm font-semibold text-white leading-snug mb-2">
-              <a :href="paper.link" target="_blank" rel="noopener" class="hover:text-teal-400 transition-colors">
+              <NuxtLink :to="'/article/' + paper.id" class="hover:text-teal-400 transition-colors">
                 {{ paper.title }}
-              </a>
+              </NuxtLink>
             </h2>
 
             <p class="text-sm text-gray-400 line-clamp-3 mb-3 leading-relaxed">{{ paper.abstract }}</p>
@@ -204,17 +228,31 @@
                 </span>
                 <span v-if="paper.venue" class="truncate max-w-[120px]">{{ paper.venue }}</span>
               </div>
-              <a
-                :href="paper.pdf"
-                target="_blank"
-                rel="noopener"
-                class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                </svg>
-                PDF
-              </a>
+              <div class="flex items-center gap-2">
+                <a
+                  v-if="paper.codeUrl"
+                  :href="paper.codeUrl"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center gap-1 text-xs font-medium text-green-400 hover:text-green-300 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                  Code
+                </a>
+                <a
+                  :href="paper.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                  </svg>
+                  PDF
+                </a>
+              </div>
             </div>
           </div>
 
@@ -245,25 +283,49 @@
       <div class="mb-7">
         <p class="text-xs font-semibold text-gray-400 tracking-widest uppercase mb-3">Live sources</p>
         <ul class="space-y-3">
-          <!-- OpenAlex — on -->
+          <!-- Community posts -->
           <li class="flex items-center justify-between">
-            <span class="text-xs text-gray-300">OpenAlex API</span>
-            <button class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-teal-500" aria-label="Toggle OpenAlex">
-              <span class="absolute right-0.5 w-4 h-4 rounded-full bg-white shadow-sm"></span>
+            <span class="text-xs text-gray-300">Community posts</span>
+            <button
+              class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors"
+              :class="sourceCommunity ? 'bg-teal-500' : 'bg-gray-600'"
+              @click="sourceCommunity = !sourceCommunity"
+              aria-label="Toggle Community posts"
+            >
+              <span
+                class="absolute w-4 h-4 rounded-full bg-white shadow-sm transition-all"
+                :class="sourceCommunity ? 'right-0.5' : 'left-0.5'"
+              ></span>
             </button>
           </li>
-          <!-- arXiv — on -->
+          <!-- arXiv feed -->
           <li class="flex items-center justify-between">
             <span class="text-xs text-gray-300">arXiv feed</span>
-            <button class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-teal-500" aria-label="Toggle arXiv">
-              <span class="absolute right-0.5 w-4 h-4 rounded-full bg-white shadow-sm"></span>
+            <button
+              class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors"
+              :class="sourceArxiv ? 'bg-teal-500' : 'bg-gray-600'"
+              @click="sourceArxiv = !sourceArxiv"
+              aria-label="Toggle arXiv"
+            >
+              <span
+                class="absolute w-4 h-4 rounded-full bg-white shadow-sm transition-all"
+                :class="sourceArxiv ? 'right-0.5' : 'left-0.5'"
+              ></span>
             </button>
           </li>
-          <!-- Semantic Scholar — off -->
+          <!-- Papers With Code -->
           <li class="flex items-center justify-between">
-            <span class="text-xs text-gray-300">Semantic Scholar</span>
-            <button class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-gray-600" aria-label="Toggle Semantic Scholar">
-              <span class="absolute left-0.5 w-4 h-4 rounded-full bg-gray-300 shadow-sm"></span>
+            <span class="text-xs text-gray-300">Papers With Code</span>
+            <button
+              class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors"
+              :class="sourcePwC ? 'bg-teal-500' : 'bg-gray-600'"
+              @click="sourcePwC = !sourcePwC"
+              aria-label="Toggle Papers With Code"
+            >
+              <span
+                class="absolute w-4 h-4 rounded-full bg-white shadow-sm transition-all"
+                :class="sourcePwC ? 'right-0.5' : 'left-0.5'"
+              ></span>
             </button>
           </li>
         </ul>
@@ -297,26 +359,16 @@
       <!-- Section 3: Top venues -->
       <div>
         <p class="text-xs font-semibold text-gray-400 tracking-widest uppercase mb-3">Top venues</p>
-        <ul class="space-y-2.5">
-          <li class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full shrink-0 bg-purple-500"></span>
-            <span class="text-xs text-gray-200">NeurIPS</span>
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full shrink-0 bg-purple-400"></span>
-            <span class="text-xs text-gray-200">ICLR</span>
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full shrink-0 bg-teal-400"></span>
-            <span class="text-xs text-gray-200">Annals of Mathematics</span>
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full shrink-0" style="background-color:#FF7F50"></span>
-            <span class="text-xs text-gray-200">IEEE Micro</span>
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full shrink-0 bg-blue-400"></span>
-            <span class="text-xs text-gray-200">STOC / FOCS</span>
+        <template v-if="!topVenues.length">
+          <div v-for="n in 4" :key="n" class="flex items-center gap-2 py-1.5">
+            <div class="w-2 h-2 rounded-full bg-gray-700 animate-pulse shrink-0"></div>
+            <div class="h-2.5 bg-gray-700 rounded animate-pulse flex-1"></div>
+          </div>
+        </template>
+        <ul v-else class="space-y-2.5">
+          <li v-for="(venue, i) in topVenues" :key="venue" class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full shrink-0" :class="venueColors[i % venueColors.length]"></span>
+            <span class="text-xs text-gray-200 truncate">{{ venue }}</span>
           </li>
         </ul>
       </div>
@@ -339,11 +391,18 @@
 <script>
 import axios from "axios";
 import { usePapers } from '~/composables/usePapers';
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 definePageMeta({ layout: 'dashboard' });
 export default {
   setup() {
     const activeTopic = ref('ai');
     const activeTab   = ref('Latest');
+    const searchQuery = useSearchQuery();
+
+    const sourceArxiv     = ref(true);
+    const sourceCommunity = ref(true);
+    const sourcePwC       = ref(true);
+    const activeFilters   = reactive({ openAccess: false, last30: false, mostCited: false });
 
     const topicData = {
       ai:   usePapers('ai'),
@@ -359,8 +418,16 @@ export default {
       { id: 'cs',   label: 'CS Theory' },
     ];
 
-    const sources  = ['arXiv', 'OpenAlex', 'Semantic Scholar'];
-    const filters  = ['Open access only', 'Last 30 days', 'Most cited'];
+    const sources = [
+      { id: 'arxiv',     label: 'arXiv' },
+      { id: 'community', label: 'Community' },
+      { id: 'pwc',       label: 'Papers With Code' },
+    ];
+    const filters = [
+      { id: 'openAccess', label: 'Open access only' },
+      { id: 'last30',     label: 'Last 30 days' },
+      { id: 'mostCited',  label: 'Most cited' },
+    ];
     const feedTabs = ['Latest', 'Trending', 'Saved'];
 
     const topicColor = {
@@ -373,10 +440,51 @@ export default {
     const papers        = computed(() => topicData[activeTopic.value].papers.value);
     const papersPending = computed(() => topicData[activeTopic.value].pending.value);
     const papersError   = computed(() => topicData[activeTopic.value].error.value);
-    const hasMore       = computed(() => topicData[activeTopic.value].hasMore.value);
+    const hasMore       = computed(() => activeTab.value !== 'Saved' && topicData[activeTopic.value].hasMore.value);
 
     function loadMore() {
       topicData[activeTopic.value].loadMore();
+    }
+
+    const displayedPapers = computed(() => {
+      if (!sourceArxiv.value || activeTab.value === 'Saved') return [];
+      let result = papers.value.filter(p =>
+        sourcePwC.value || p.source !== 'pwc'
+      );
+
+      const q = searchQuery.value.trim().toLowerCase();
+      if (q) {
+        result = result.filter(p =>
+          p.title.toLowerCase().includes(q) ||
+          p.authors.some(a => a.toLowerCase().includes(q))
+        );
+      }
+
+      if (activeFilters.last30) {
+        const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+        result = result.filter(p => new Date(p.date).getTime() >= cutoff);
+      }
+
+      if (activeFilters.mostCited || activeTab.value === 'Trending') {
+        result = result.slice().sort((a, b) => b.citedBy - a.citedBy);
+      }
+
+      return result;
+    });
+
+    function isSourceActive(id) {
+      if (id === 'arxiv')     return sourceArxiv.value;
+      if (id === 'community') return sourceCommunity.value;
+      if (id === 'pwc')       return sourcePwC.value;
+      return false;
+    }
+    function toggleSource(id) {
+      if (id === 'arxiv')     sourceArxiv.value = !sourceArxiv.value;
+      if (id === 'community') sourceCommunity.value = !sourceCommunity.value;
+      if (id === 'pwc')       sourcePwC.value = !sourcePwC.value;
+    }
+    function toggleFilter(id) {
+      activeFilters[id] = !activeFilters[id];
     }
 
     const trendingCategories = computed(() => {
@@ -388,13 +496,17 @@ export default {
     });
 
     const topVenues = computed(() =>
-      [...new Set(papers.value.map(p => p.venue).filter(Boolean))].slice(0, 4)
+      [...new Set(papers.value.map(p => p.venue).filter(Boolean))].slice(0, 5)
     );
 
+    const venueColors = ['bg-purple-500', 'bg-teal-400', 'bg-orange-400', 'bg-blue-400', 'bg-pink-400'];
+
     return {
-      activeTopic, activeTab,
-      topics, sources, filters, feedTabs, topicColor,
+      activeTopic, activeTab, searchQuery,
+      sourceArxiv, sourceCommunity, sourcePwC, activeFilters,
+      topics, sources, filters, feedTabs, topicColor, venueColors,
       papers, papersPending, papersError, hasMore, loadMore,
+      displayedPapers, isSourceActive, toggleSource, toggleFilter,
       trendingCategories, topVenues,
     };
   },
@@ -408,6 +520,8 @@ export default {
       bookmarkLoading: false,
       message: "",
       showTooltip: false,
+      savedPosts: [],
+      savedLoading: false,
     };
   },
 
@@ -417,12 +531,48 @@ export default {
     loading: { type: Boolean, required: true },
   },
 
+  computed: {
+    displayedPosts() {
+      if (this.activeTab === 'Saved') return this.savedPosts;
+      if (!this.sourceCommunity) return [];
+      const all = this.posts || [];
+      const q = (this.searchQuery || '').trim().toLowerCase();
+      if (!q) return all;
+      return all.filter(p =>
+        (p.title || '').toLowerCase().includes(q) ||
+        (p.authors || '').toLowerCase().includes(q)
+      );
+    },
+  },
+
+  watch: {
+    activeTab(tab) {
+      if (tab === 'Saved') this.fetchSaved();
+    },
+  },
+
   methods: {
+    async fetchSaved() {
+      this.savedLoading = true;
+      try {
+        const { data } = await axios.get(
+          `${API_BASE}/api/v1/bookmarks`,
+          { withCredentials: true }
+        );
+        this.savedPosts = (data.bookmarks || [])
+          .map(b => b.postDetails)
+          .filter(Boolean);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.savedLoading = false;
+      }
+    },
     async addBookmark(postId) {
       try {
         this.bookmarkLoading = true;
         const response = await axios.post(
-          `https://academiav2-backend.onrender.com/api/v1/bookmarks`,
+          `${API_BASE}/api/v1/bookmarks`,
           { post: postId },
           { withCredentials: true }
         );
@@ -439,7 +589,7 @@ export default {
       try {
         this.likeLoading = true;
         const response = await axios.post(
-          `https://academiav2-backend.onrender.com/api/v1/likes`,
+          `${API_BASE}/api/v1/likes`,
           { post: postId },
           { withCredentials: true }
         );
@@ -456,7 +606,7 @@ export default {
       try {
         const { postId, content } = sharedPost;
         await axios.post(
-          `https://academiav2-backend.onrender.com/api/v1/sharedposts`,
+          `${API_BASE}/api/v1/sharedposts`,
           { post: postId, title: content },
           { withCredentials: true }
         );
@@ -467,7 +617,7 @@ export default {
     async getsinglepost(input) {
       try {
         const response = await axios.get(
-          `https://academiav2-backend.onrender.com/api/v1/posts/${input}`,
+          `${API_BASE}/api/v1/posts/${input}`,
           { withCredentials: true }
         );
         this.$emit("update-posts", [response.data.post]);

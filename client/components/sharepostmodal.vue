@@ -32,7 +32,7 @@
             class="rounded-full w-10 h-10 mt-2"
             :style="{
               backgroundImage: user?.profileImg
-                ? `url(https://academiav2-backend.onrender.com${user.profileImg})`
+                ? `url(${API_BASE}${user.profileImg})`
                 : 'none',
               backgroundColor: user?.backgroundImage ? '' : '#B0A8B9',
               backgroundPosition: 'center',
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 export default {
   data() {
     return {

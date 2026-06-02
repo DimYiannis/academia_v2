@@ -11,6 +11,9 @@ interface Paper {
   citedBy: number
   venue: string | null
   doi: string | null
+  hasCode: boolean
+  codeUrl: string | null
+  source: string
 }
 
 interface PapersResponse {
@@ -18,7 +21,7 @@ interface PapersResponse {
   nextStart: number | null
 }
 
-const API_BASE = 'https://academiav2-backend.onrender.com'
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 
 export function usePapers(initialTopic = 'ai') {
   const papers = ref<Paper[]>([])

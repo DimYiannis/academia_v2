@@ -9,7 +9,7 @@
     <div
       class="h-40 rounded-xl mb-4 bg-gray-700"
       :style="user.backgroundImg ? {
-        backgroundImage: 'url(https://academiav2-backend.onrender.com' + user.backgroundImg + ')',
+        backgroundImage: `url(${API_BASE}` + user.backgroundImg + ')',
         backgroundPosition: 'center',
         backgroundSize: 'cover',
       } : {}"
@@ -20,7 +20,7 @@
       <div
         class="w-20 h-20 rounded-full border-4 border-[#1c1c1e] bg-gray-600"
         :style="user.profileImg ? {
-          backgroundImage: 'url(https://academiav2-backend.onrender.com' + user.profileImg + ')',
+          backgroundImage: `url(${API_BASE}` + user.profileImg + ')',
           backgroundPosition: 'center',
           backgroundSize: 'cover',
         } : {}"
@@ -101,6 +101,7 @@
 
 <script>
 import axios from "axios";
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 
 definePageMeta({
   layout: "dashboard",
@@ -127,7 +128,7 @@ export default {
       const userId = this.$route.params._id;
       try {
         const response = await axios.get(
-          `https://academiav2-backend.onrender.com/api/v1/users/${userId}`,
+          `${API_BASE}/api/v1/users/${userId}`,
           {
             withCredentials: true,
           }
@@ -143,7 +144,7 @@ export default {
       const userId = this.$route.params._id;
       try {
         const response = await axios.get(
-          `https://academiav2-backend.onrender.com/api/v1/users/${userId}/posts`,
+          `${API_BASE}/api/v1/users/${userId}/posts`,
           {
             withCredentials: true,
           }
@@ -163,7 +164,7 @@ export default {
       const userId = this.$route.params._id;
       try {
         const response = await axios.get(
-          `https://academiav2-backend.onrender.com/api/v1/likes/${userId}/likes`,
+          `${API_BASE}/api/v1/likes/${userId}/likes`,
           {
             withCredentials: true,
           }

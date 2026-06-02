@@ -9,7 +9,7 @@
     <div
       class="h-40 rounded-xl mb-4 bg-gray-700"
       :style="user.backgroundImg ? {
-        backgroundImage: 'url(https://academiav2-backend.onrender.com' + user.backgroundImg + ')',
+        backgroundImage: `url(${API_BASE}` + user.backgroundImg + ')',
         backgroundPosition: 'center',
         backgroundSize: 'cover',
       } : {}"
@@ -20,7 +20,7 @@
       <div
         class="w-20 h-20 rounded-full border-4 border-[#1c1c1e] bg-gray-600"
         :style="user.profileImg ? {
-          backgroundImage: 'url(https://academiav2-backend.onrender.com' + user.profileImg + ')',
+          backgroundImage: `url(${API_BASE}` + user.profileImg + ')',
           backgroundPosition: 'center',
           backgroundSize: 'cover',
         } : {}"
@@ -127,6 +127,7 @@
 
 <script>
 import axios from "axios";
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 definePageMeta({
   layout: 'dashboard'
 })
@@ -161,7 +162,7 @@ export default {
       this.loading = true;
       try {
         const response = await axios.get(
-          "https://academiav2-backend.onrender.com/api/v1/sharedposts/mysharedposts",
+          `${API_BASE}/api/v1/sharedposts/mysharedposts`,
           {
             withCredentials: true,
           }
@@ -184,7 +185,7 @@ export default {
     async deletepost(postId) {
       try {
         await axios.delete(
-          `https://academiav2-backend.onrender.com/api/v1/sharedposts/${postId}`,
+          `${API_BASE}/api/v1/sharedposts/${postId}`,
           {
             withCredentials: true,
           }
@@ -198,7 +199,7 @@ export default {
     },
     async getlikedposts() {
       try {
-        const response = await axios.get("https://academiav2-backend.onrender.com/api/v1/likes", {
+        const response = await axios.get(`${API_BASE}/api/v1/likes`, {
           withCredentials: true,
         });
 
@@ -212,7 +213,7 @@ export default {
     },
     async unlike(postId) {
       try {
-        await axios.delete(`https://academiav2-backend.onrender.com/api/v1/likes/${postId}`, {
+        await axios.delete(`${API_BASE}/api/v1/likes/${postId}`, {
           withCredentials: true,
         });
 
