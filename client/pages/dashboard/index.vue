@@ -535,6 +535,14 @@ export default {
       'math.NT': 'Number Theory',         'math.CO': 'Combinatorics',
       'math.AG': 'Algebraic Geometry',    'cs.CR': 'Cryptography',
       'cs.SE': 'Software Engineering',    'cs.PL': 'Programming Languages',
+      'cs.GT': 'Game Theory',             'cs.SY': 'Systems & Control',
+      'eess.AS': 'Audio & Speech',        'eess.IV': 'Image & Video',
+      'stat.ML': 'Statistical ML',        'stat.AP': 'Applied Statistics',
+      'q-fin.GN': 'Quant Finance',        'q-fin.CP': 'Computational Finance',
+      'q-fin.ST': 'Statistical Finance',  'q-fin.RM': 'Risk Management',
+      'q-fin.MF': 'Mathematical Finance', 'q-fin.PM': 'Portfolio Management',
+      'q-fin.TR': 'Trading',              'q-fin.PR': 'Pricing',
+      'q-bio.NC': 'Neuroscience',         'physics.comp-ph': 'Computational Physics',
     };
     function categoryLabel(cat) {
       return CATEGORY_NAMES[cat] || cat;
