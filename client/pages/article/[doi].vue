@@ -19,28 +19,39 @@
       </NuxtLink>
 
       <!-- Main card — matches feed card style -->
-      <div class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3">
+      <div class="bg-[#242426] border border-gray-700/60 rounded-2xl p-6 mb-3">
 
-        <!-- Meta row: dot + category + date + venue -->
-        <div class="flex items-center gap-2 mb-3 flex-wrap">
-          <span class="w-2 h-2 rounded-full shrink-0" :class="topicDot"></span>
-          <span v-if="post.category" class="text-xs text-gray-400">{{ post.category }}</span>
-          <span v-if="post.date" class="text-gray-600">·</span>
-          <span v-if="post.date" class="text-xs text-gray-400">{{ formatDate(post.date) }}</span>
-          <span v-if="post.venue" class="text-gray-600">·</span>
-          <span v-if="post.venue" class="text-xs text-gray-400 truncate max-w-[200px]">{{ post.venue }}</span>
+        <!-- Meta row: pill + date + venue -->
+        <div class="flex items-center gap-2 mb-4 flex-wrap">
+          <span
+            v-if="post.category"
+            class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
+            :class="topicPill"
+          >{{ post.category }}</span>
+          <span v-if="post.date" class="text-xs text-gray-500">{{ formatDate(post.date) }}</span>
+          <span v-if="post.venue" class="text-xs text-gray-600 truncate max-w-[200px]">· {{ post.venue }}</span>
         </div>
 
-        <!-- Title -->
-        <h1 class="text-base font-semibold text-white leading-snug mb-2">{{ post.title }}</h1>
+        <!-- Thumbnail -->
+        <img
+          v-if="post.thumbnail"
+          :src="post.thumbnail"
+          :alt="post.title"
+          class="w-full h-48 object-cover rounded-xl mb-4 bg-gray-800"
+          loading="lazy"
+          @error="$event.target.style.display='none'"
+        />
+
+        <!-- Title — prominent -->
+        <h1 class="text-xl font-bold text-white leading-snug mb-2">{{ post.title }}</h1>
 
         <!-- Authors -->
-        <p v-if="authors.length" class="text-xs text-gray-400 mb-4">
+        <p v-if="authors.length" class="text-xs text-gray-500 mb-5">
           {{ authors.slice(0, 6).join(', ') }}{{ authors.length > 6 ? ` +${authors.length - 6} more` : '' }}
         </p>
 
         <!-- Full abstract — no line-clamp -->
-        <p class="text-sm text-gray-400 leading-relaxed mb-4">{{ post.abstract }}</p>
+        <p class="text-sm text-gray-400 leading-relaxed mb-5">{{ post.abstract }}</p>
 
         <!-- Bottom row: citations + doi | code + pdf + arxiv -->
         <div class="flex items-center justify-between pt-3 border-t border-gray-700/60">
@@ -118,11 +129,14 @@ const authors = computed(() => {
   return Array.isArray(post.value.authors) ? post.value.authors : [post.value.authors]
 })
 
-const topicDot = computed(() => {
+const topicPill = computed(() => {
   const map: Record<string, string> = {
-    ai: 'bg-teal-500', math: 'bg-purple-500', hw: 'bg-orange-400', cs: 'bg-emerald-500',
+    ai:   'bg-teal-900/50 text-teal-300',
+    math: 'bg-purple-900/50 text-purple-300',
+    hw:   'bg-orange-900/50 text-orange-300',
+    cs:   'bg-emerald-900/50 text-emerald-300',
   }
-  return map[post.value?.topic] || 'bg-gray-500'
+  return map[post.value?.topic] || 'bg-gray-700 text-gray-300'
 })
 
 function formatDate(d: string) {

@@ -13,6 +13,7 @@ interface Paper {
   doi: string | null
   hasCode: boolean
   codeUrl: string | null
+  thumbnail: string | null
   source: string
 }
 

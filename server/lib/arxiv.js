@@ -36,6 +36,7 @@ function mapEntry(entry, defaultTopic = 'ai') {
     date: entry.published || '',
     pdf: `https://arxiv.org/pdf/${id}`,
     link: `https://arxiv.org/abs/${id}`,
+    thumbnail: `https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/${id}.png`,
     category,
     topic,
     citedBy: 0,

@@ -136,31 +136,43 @@
             :key="index"
             class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
           >
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-300 font-medium">HF Daily</span>
-              <span v-if="i.date" class="text-xs text-gray-500">{{ new Date(i.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
+            <div class="flex gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-900/40 text-orange-300 shrink-0">HuggingFace</span>
+                  <span v-if="i.date" class="text-xs text-gray-500">{{ new Date(i.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
+                  <span v-if="i.upvotes" class="flex items-center gap-1 text-xs text-gray-600 ml-auto shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
+                    {{ i.upvotes }}
+                  </span>
+                </div>
+                <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5">
+                  <NuxtLink :to="'/article/' + i.id" class="hover:text-teal-400 transition-colors">
+                    {{ i.title }}
+                  </NuxtLink>
+                </h2>
+                <p v-if="i.authors && i.authors.length" class="text-xs text-gray-500 mb-2 truncate">
+                  {{ i.authors.slice(0, 4).join(', ') }}{{ i.authors.length > 4 ? ` +${i.authors.length - 4} more` : '' }}
+                </p>
+                <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ i.abstract }}</p>
+              </div>
+              <img
+                v-if="i.thumbnail"
+                :src="i.thumbnail"
+                :alt="i.title"
+                class="w-24 h-24 rounded-xl object-cover shrink-0 bg-gray-800 self-start"
+                loading="lazy"
+                @error="$event.target.style.display='none'"
+              />
             </div>
-            <h2 class="text-sm font-semibold text-white leading-snug mb-2">
-              <NuxtLink :to="'/article/' + i.id" class="hover:text-teal-400 transition-colors">
-                {{ i.title }}
-              </NuxtLink>
-            </h2>
-            <p v-if="i.authors && i.authors.length" class="text-xs text-gray-400 mb-2 truncate">
-              {{ i.authors.slice(0, 4).join(', ') }}{{ i.authors.length > 4 ? ` +${i.authors.length - 4} more` : '' }}
-            </p>
-            <p class="text-sm text-gray-400 line-clamp-3 mb-3 leading-relaxed">{{ i.abstract }}</p>
-            <div class="flex items-center gap-3">
+            <div class="mt-3 pt-3 border-t border-gray-700/40">
               <a v-if="i.pdf" :href="i.pdf" target="_blank" rel="noopener"
-                class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors">
+                class="flex items-center gap-1 w-fit text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>
                 PDF
               </a>
-              <span v-if="i.upvotes" class="flex items-center gap-1 text-xs text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
-                {{ i.upvotes }}
-              </span>
             </div>
           </div>
         </div>
@@ -182,36 +194,58 @@
             :key="paper.id"
             class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
           >
-            <div class="flex items-center gap-2 mb-3">
-              <span class="w-2 h-2 rounded-full shrink-0" :class="topicColor[paper.topic] || 'bg-gray-400'"></span>
-              <span class="text-xs text-gray-400">{{ paper.category }}</span>
-              <span class="text-gray-600">·</span>
-              <span class="text-xs text-gray-400">
-                {{ new Date(paper.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}
-              </span>
+            <div class="flex gap-3">
+              <!-- Text content -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                  <span
+                    class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
+                    :class="{
+                      'bg-teal-900/50 text-teal-300':     paper.topic === 'ai',
+                      'bg-purple-900/50 text-purple-300':  paper.topic === 'math',
+                      'bg-orange-900/50 text-orange-300':  paper.topic === 'hw',
+                      'bg-emerald-900/50 text-emerald-300':paper.topic === 'cs',
+                      'bg-gray-700 text-gray-300':         !paper.topic,
+                    }"
+                  >{{ paper.category }}</span>
+                  <span class="text-xs text-gray-500">
+                    {{ new Date(paper.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}
+                  </span>
+                  <span v-if="paper.venue" class="text-xs text-gray-600 truncate max-w-[120px]">· {{ paper.venue }}</span>
+                </div>
+
+                <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5">
+                  <NuxtLink :to="'/article/' + paper.id" class="hover:text-teal-400 transition-colors">
+                    {{ paper.title }}
+                  </NuxtLink>
+                </h2>
+
+                <p v-if="paper.authors.length" class="text-xs text-gray-500 mb-2 truncate">
+                  {{ paper.authors.slice(0, 4).join(', ') }}{{ paper.authors.length > 4 ? ` +${paper.authors.length - 4} more` : '' }}
+                </p>
+
+                <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ paper.abstract }}</p>
+              </div>
+
+              <!-- Thumbnail -->
+              <img
+                v-if="paper.thumbnail"
+                :src="paper.thumbnail"
+                :alt="paper.title"
+                class="w-24 h-24 rounded-xl object-cover shrink-0 bg-gray-800 self-start"
+                loading="lazy"
+                @error="$event.target.style.display='none'"
+              />
             </div>
 
-            <h2 class="text-sm font-semibold text-white leading-snug mb-2">
-              <NuxtLink :to="'/article/' + paper.id" class="hover:text-teal-400 transition-colors">
-                {{ paper.title }}
-              </NuxtLink>
-            </h2>
-
-            <p class="text-sm text-gray-400 line-clamp-3 mb-3 leading-relaxed">{{ paper.abstract }}</p>
-
-            <p class="text-xs text-gray-400 mb-4 truncate">
-              {{ paper.authors.slice(0, 4).join(', ') }}{{ paper.authors.length > 4 ? ` +${paper.authors.length - 4} more` : '' }}
-            </p>
-
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3 text-xs text-gray-400">
+            <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-700/40">
+              <div class="flex items-center gap-3 text-xs text-gray-500">
                 <span v-if="paper.citedBy" class="flex items-center gap-1">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
                   </svg>
-                  {{ paper.citedBy.toLocaleString() }}
+                  {{ paper.citedBy.toLocaleString() }} citations
                 </span>
-                <span v-if="paper.venue" class="truncate max-w-[120px]">{{ paper.venue }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <a

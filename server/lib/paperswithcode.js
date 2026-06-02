@@ -55,6 +55,7 @@ async function fetchFeaturedPapers() {
         date: item.publishedAt || p.publishedAt || '',
         pdf: id ? `https://arxiv.org/pdf/${id}` : null,
         link: id ? `https://arxiv.org/abs/${id}` : null,
+        thumbnail: item.thumbnail || (id ? `https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/${id}.png` : null),
         category: 'cs.AI',
         topic: 'ai',
         citedBy: 0,
