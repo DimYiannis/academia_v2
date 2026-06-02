@@ -3,7 +3,7 @@
   <div class="grid min-h-[calc(100vh-52px)] bg-[#1c1c1e]" style="grid-template-columns: 180px 1fr 200px">
 
     <!-- ── Col 1: Left nav ─────────────────────────────────── -->
-    <aside class="flex flex-col border-r border-gray-800 py-6 px-3 overflow-y-auto bg-[#1c1c1e]">
+    <aside class="flex flex-col border-r border-gray-800 py-6 px-3 overflow-y-auto bg-[#1c1c1e] sticky top-0 h-[calc(100vh-52px)]">
 
       <!-- TOPICS -->
       <div class="mb-6">
@@ -134,19 +134,19 @@
           <div
             v-for="(i, index) in displayedPosts.slice(0, 8)"
             :key="index"
-            class="group relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
+            class="relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
           >
             <img
               v-if="i.thumbnail"
               :src="i.thumbnail"
               :alt="i.title"
-              class="absolute top-0 right-0 h-full w-44 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+              class="absolute top-0 right-0 h-full w-44 object-cover pointer-events-none"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
-              @error="$event.target.style.display='none'"
+              @load="onThumbLoad" @error="$event.target.style.display='none'"
             />
-            <div class="relative">
+            <div class="relative pr-44">
               <div class="flex items-center gap-2 mb-2 flex-wrap">
                 <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-900/40 text-orange-300 shrink-0">HuggingFace</span>
                 <span v-if="i.date" class="text-xs text-gray-500">{{ new Date(i.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
@@ -155,24 +155,25 @@
                   {{ i.upvotes }}
                 </span>
               </div>
-              <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5 pr-32">
+              <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5">
                 <NuxtLink :to="'/article/' + i.id" class="hover:text-teal-400 transition-colors">
                   {{ i.title }}
                 </NuxtLink>
               </h2>
-              <p v-if="i.authors && i.authors.length" class="text-xs text-gray-500 mb-2 truncate pr-32">
+              <p v-if="i.authors && i.authors.length" class="text-xs text-gray-500 mb-2 truncate">
                 {{ i.authors.slice(0, 4).join(', ') }}{{ i.authors.length > 4 ? ` +${i.authors.length - 4} more` : '' }}
               </p>
-              <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed pr-8">{{ i.abstract }}</p>
+              <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ i.abstract }}</p>
             </div>
-            <div class="mt-3 pt-3 border-t border-gray-700/40">
-              <a v-if="i.pdf" :href="i.pdf" target="_blank" rel="noopener"
-                class="flex items-center gap-1 w-fit text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors">
+            <div class="mt-3 pt-3 border-t border-gray-700/40 flex items-center gap-3">
+              <a v-if="i.id" :href="'https://arxiv.org/html/' + i.id" target="_blank" rel="noopener"
+                class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                  <path d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
-                PDF
+                Read
               </a>
+              <a v-if="i.pdf" :href="i.pdf" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">PDF</a>
             </div>
           </div>
         </div>
@@ -192,21 +193,21 @@
           <div
             v-for="paper in displayedPapers"
             :key="paper.id"
-            class="group relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
+            class="relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
           >
             <!-- Thumbnail — fades in on hover -->
             <img
               v-if="paper.thumbnail"
               :src="paper.thumbnail"
               :alt="paper.title"
-              class="absolute top-0 right-0 h-full w-44 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+              class="absolute top-0 right-0 h-full w-44 object-cover pointer-events-none"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
-              @error="$event.target.style.display='none'"
+              @load="onThumbLoad" @error="$event.target.style.display='none'"
             />
 
-            <div class="relative">
+            <div class="relative pr-44">
               <div class="flex items-center gap-2 mb-2 flex-wrap">
                 <span
                   class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
@@ -217,24 +218,24 @@
                     'bg-emerald-900/50 text-emerald-300':paper.topic === 'cs',
                     'bg-gray-700 text-gray-300':         !paper.topic,
                   }"
-                >{{ paper.category }}</span>
+                >{{ categoryLabel(paper.category) }}</span>
                 <span class="text-xs text-gray-500">
                   {{ new Date(paper.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}
                 </span>
                 <span v-if="paper.venue" class="text-xs text-gray-600 truncate max-w-[120px]">· {{ paper.venue }}</span>
               </div>
 
-              <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5 pr-32">
+              <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5">
                 <NuxtLink :to="'/article/' + paper.id" class="hover:text-teal-400 transition-colors">
                   {{ paper.title }}
                 </NuxtLink>
               </h2>
 
-              <p v-if="paper.authors.length" class="text-xs text-gray-500 mb-2 truncate pr-32">
+              <p v-if="paper.authors.length" class="text-xs text-gray-500 mb-2 truncate">
                 {{ paper.authors.slice(0, 4).join(', ') }}{{ paper.authors.length > 4 ? ` +${paper.authors.length - 4} more` : '' }}
               </p>
 
-              <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed pr-8">{{ paper.abstract }}</p>
+              <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ paper.abstract }}</p>
             </div>
 
             <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-700/40">
@@ -260,16 +261,17 @@
                   Code
                 </a>
                 <a
-                  :href="paper.pdf"
+                  :href="'https://arxiv.org/html/' + paper.id"
                   target="_blank"
                   rel="noopener"
                   class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    <path d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                   </svg>
-                  PDF
+                  Read
                 </a>
+                <a :href="paper.pdf" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">PDF</a>
               </div>
             </div>
           </div>
@@ -295,7 +297,7 @@
     </main>
 
     <!-- ── Col 3: Right sidebar ────────────────────────────── -->
-    <aside class="flex flex-col border-l border-gray-800 py-6 px-4 overflow-y-auto bg-[#1c1c1e]">
+    <aside class="flex flex-col border-l border-gray-800 py-6 px-4 overflow-y-auto bg-[#1c1c1e] sticky top-0 h-[calc(100vh-52px)]">
 
       <!-- Section 1: Live sources -->
       <div class="mb-7">
@@ -368,7 +370,7 @@
             :key="cat"
             class="flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer hover:bg-gray-800 transition-colors"
           >
-            <span class="text-xs text-gray-200 truncate">{{ cat }}</span>
+            <span class="text-xs text-gray-200 truncate">{{ categoryLabel(cat) }}</span>
             <span class="text-xs font-medium text-gray-400 ml-2 shrink-0">{{ i + 1 }}</span>
           </li>
         </ul>
@@ -523,13 +525,31 @@ export default {
 
     const venueColors = ['bg-purple-500', 'bg-teal-400', 'bg-orange-400', 'bg-blue-400', 'bg-pink-400'];
 
+    const CATEGORY_NAMES = {
+      'cs.AI': 'Artificial Intelligence', 'cs.LG': 'Machine Learning',
+      'cs.NE': 'Neural Computing',        'cs.CV': 'Computer Vision',
+      'cs.CL': 'NLP',                     'cs.RO': 'Robotics',
+      'cs.IR': 'Information Retrieval',   'cs.DS': 'Algorithms',
+      'cs.CC': 'Complexity Theory',       'cs.DC': 'Distributed Computing',
+      'cs.AR': 'Hardware Architecture',   'eess.SP': 'Signal Processing',
+      'math.NT': 'Number Theory',         'math.CO': 'Combinatorics',
+      'math.AG': 'Algebraic Geometry',    'cs.CR': 'Cryptography',
+      'cs.SE': 'Software Engineering',    'cs.PL': 'Programming Languages',
+    };
+    function categoryLabel(cat) {
+      return CATEGORY_NAMES[cat] || cat;
+    }
+    function onThumbLoad(e) {
+      if (e.target.naturalWidth <= 10) e.target.style.display = 'none';
+    }
+
     return {
       activeTopic, activeTab, searchQuery,
       sourceArxiv, sourceCommunity, sourcePwC, activeFilters,
       topics, sources, filters, feedTabs, topicColor, venueColors,
       papers, papersPending, papersError, hasMore, loadMore,
       displayedPapers, isSourceActive, toggleSource, toggleFilter,
-      trendingCategories, topVenues,
+      trendingCategories, topVenues, categoryLabel, onThumbLoad,
     };
   },
 
