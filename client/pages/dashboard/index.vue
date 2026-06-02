@@ -134,36 +134,35 @@
           <div
             v-for="(i, index) in displayedPosts.slice(0, 8)"
             :key="index"
-            class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
+            class="group relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
           >
-            <div class="flex gap-3">
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-2 flex-wrap">
-                  <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-900/40 text-orange-300 shrink-0">HuggingFace</span>
-                  <span v-if="i.date" class="text-xs text-gray-500">{{ new Date(i.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
-                  <span v-if="i.upvotes" class="flex items-center gap-1 text-xs text-gray-600 ml-auto shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
-                    {{ i.upvotes }}
-                  </span>
-                </div>
-                <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5">
-                  <NuxtLink :to="'/article/' + i.id" class="hover:text-teal-400 transition-colors">
-                    {{ i.title }}
-                  </NuxtLink>
-                </h2>
-                <p v-if="i.authors && i.authors.length" class="text-xs text-gray-500 mb-2 truncate">
-                  {{ i.authors.slice(0, 4).join(', ') }}{{ i.authors.length > 4 ? ` +${i.authors.length - 4} more` : '' }}
-                </p>
-                <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ i.abstract }}</p>
+            <img
+              v-if="i.thumbnail"
+              :src="i.thumbnail"
+              :alt="i.title"
+              class="absolute top-3 right-3 w-28 h-20 rounded-xl object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl border border-gray-700/40"
+              
+              loading="lazy"
+              @error="$event.target.style.display='none'"
+            />
+            <div class="relative">
+              <div class="flex items-center gap-2 mb-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-900/40 text-orange-300 shrink-0">HuggingFace</span>
+                <span v-if="i.date" class="text-xs text-gray-500">{{ new Date(i.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
+                <span v-if="i.upvotes" class="flex items-center gap-1 text-xs text-gray-600 ml-auto shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
+                  {{ i.upvotes }}
+                </span>
               </div>
-              <img
-                v-if="i.thumbnail"
-                :src="i.thumbnail"
-                :alt="i.title"
-                class="w-24 h-24 rounded-xl object-cover shrink-0 bg-gray-800 self-start"
-                loading="lazy"
-                @error="$event.target.style.display='none'"
-              />
+              <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5 pr-32">
+                <NuxtLink :to="'/article/' + i.id" class="hover:text-teal-400 transition-colors">
+                  {{ i.title }}
+                </NuxtLink>
+              </h2>
+              <p v-if="i.authors && i.authors.length" class="text-xs text-gray-500 mb-2 truncate pr-32">
+                {{ i.authors.slice(0, 4).join(', ') }}{{ i.authors.length > 4 ? ` +${i.authors.length - 4} more` : '' }}
+              </p>
+              <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed pr-8">{{ i.abstract }}</p>
             </div>
             <div class="mt-3 pt-3 border-t border-gray-700/40">
               <a v-if="i.pdf" :href="i.pdf" target="_blank" rel="noopener"
@@ -192,50 +191,48 @@
           <div
             v-for="paper in displayedPapers"
             :key="paper.id"
-            class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
+            class="group relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
           >
-            <div class="flex gap-3">
-              <!-- Text content -->
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-2 flex-wrap">
-                  <span
-                    class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
-                    :class="{
-                      'bg-teal-900/50 text-teal-300':     paper.topic === 'ai',
-                      'bg-purple-900/50 text-purple-300':  paper.topic === 'math',
-                      'bg-orange-900/50 text-orange-300':  paper.topic === 'hw',
-                      'bg-emerald-900/50 text-emerald-300':paper.topic === 'cs',
-                      'bg-gray-700 text-gray-300':         !paper.topic,
-                    }"
-                  >{{ paper.category }}</span>
-                  <span class="text-xs text-gray-500">
-                    {{ new Date(paper.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}
-                  </span>
-                  <span v-if="paper.venue" class="text-xs text-gray-600 truncate max-w-[120px]">· {{ paper.venue }}</span>
-                </div>
+            <!-- Thumbnail — fades in on hover -->
+            <img
+              v-if="paper.thumbnail"
+              :src="paper.thumbnail"
+              :alt="paper.title"
+              class="absolute top-3 right-3 w-28 h-20 rounded-xl object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl border border-gray-700/40"
+              
+              loading="lazy"
+              @error="$event.target.style.display='none'"
+            />
 
-                <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5">
-                  <NuxtLink :to="'/article/' + paper.id" class="hover:text-teal-400 transition-colors">
-                    {{ paper.title }}
-                  </NuxtLink>
-                </h2>
-
-                <p v-if="paper.authors.length" class="text-xs text-gray-500 mb-2 truncate">
-                  {{ paper.authors.slice(0, 4).join(', ') }}{{ paper.authors.length > 4 ? ` +${paper.authors.length - 4} more` : '' }}
-                </p>
-
-                <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ paper.abstract }}</p>
+            <div class="relative">
+              <div class="flex items-center gap-2 mb-2 flex-wrap">
+                <span
+                  class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
+                  :class="{
+                    'bg-teal-900/50 text-teal-300':     paper.topic === 'ai',
+                    'bg-purple-900/50 text-purple-300':  paper.topic === 'math',
+                    'bg-orange-900/50 text-orange-300':  paper.topic === 'hw',
+                    'bg-emerald-900/50 text-emerald-300':paper.topic === 'cs',
+                    'bg-gray-700 text-gray-300':         !paper.topic,
+                  }"
+                >{{ paper.category }}</span>
+                <span class="text-xs text-gray-500">
+                  {{ new Date(paper.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}
+                </span>
+                <span v-if="paper.venue" class="text-xs text-gray-600 truncate max-w-[120px]">· {{ paper.venue }}</span>
               </div>
 
-              <!-- Thumbnail -->
-              <img
-                v-if="paper.thumbnail"
-                :src="paper.thumbnail"
-                :alt="paper.title"
-                class="w-24 h-24 rounded-xl object-cover shrink-0 bg-gray-800 self-start"
-                loading="lazy"
-                @error="$event.target.style.display='none'"
-              />
+              <h2 class="text-[15px] font-semibold text-white leading-snug mb-1.5 pr-32">
+                <NuxtLink :to="'/article/' + paper.id" class="hover:text-teal-400 transition-colors">
+                  {{ paper.title }}
+                </NuxtLink>
+              </h2>
+
+              <p v-if="paper.authors.length" class="text-xs text-gray-500 mb-2 truncate pr-32">
+                {{ paper.authors.slice(0, 4).join(', ') }}{{ paper.authors.length > 4 ? ` +${paper.authors.length - 4} more` : '' }}
+              </p>
+
+              <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed pr-8">{{ paper.abstract }}</p>
             </div>
 
             <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-700/40">
