@@ -17,14 +17,13 @@ const attachCookiesToResponse = ({ res, user }) => {
   console.log("NODE_ENV:", process.env.NODE_ENV);
   
 
+  const isProd = process.env.NODE_ENV === 'production'
   res.cookie("token", token, {
     httpOnly: true,
-    expires:new Date(Date.now() + oneDay),
-    //secure:process.env.NODE_ENV !== 'production' , // dev
-    secure:process.env.NODE_ENV === 'production' , //production
-    signed:true,
-    sameSite: 'None',
-    
+    expires: new Date(Date.now() + oneDay),
+    secure: isProd,
+    signed: true,
+    sameSite: isProd ? 'None' : 'Lax',
   });
   
 };
