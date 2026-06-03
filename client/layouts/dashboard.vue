@@ -31,6 +31,17 @@
           class="px-4 py-1.5 rounded-lg border border-white/40 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
           active-class="bg-white/10 !text-white border-white/60"
         >Explore</NuxtLink>
+        <NuxtLink
+          to="/dashboard/Profile"
+          class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg border border-white/40 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+          active-class="bg-white/10 !text-white border-white/60"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="12" cy="12" r="2"/>
+            <path d="M8 6h4m4 0h-1M8 18h4M6 8v4M18 8v4M9 15l2-2M15 9l-2 2"/>
+          </svg>
+          Graph
+        </NuxtLink>
       </nav>
 
       <div class="flex-1" />
