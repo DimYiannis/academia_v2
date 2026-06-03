@@ -3,95 +3,66 @@
     <LoadSpinner />
   </div>
 
-  <main v-else class="px-6 py-8 max-w-2xl">
+  <main v-else class="px-6 py-6 w-full max-w-4xl">
 
-    <!-- Banner -->
-    <div
-      class="h-36 rounded-2xl mb-0 overflow-hidden"
-      :class="user.backgroundImg ? '' : 'bg-gradient-to-br from-teal-900/50 via-gray-800 to-gray-900'"
-      :style="user.backgroundImg ? {
-        backgroundImage: `url(${API_BASE}${user.backgroundImg})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-      } : {}"
-    ></div>
-
-    <!-- Avatar row -->
-    <div class="flex items-end justify-between -mt-8 px-1 mb-4">
-      <div
-        class="w-16 h-16 rounded-2xl border-4 border-[#1c1c1e] flex items-center justify-center text-lg font-bold shrink-0"
-        :class="user.profileImg ? '' : 'bg-teal-600 text-white'"
-        :style="user.profileImg ? {
-          backgroundImage: `url(${API_BASE}${user.profileImg})`,
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-        } : {}"
-      >
-        <span v-if="!user.profileImg">{{ initials }}</span>
+    <!-- Compact header -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
+          :class="user.profileImg ? '' : 'bg-teal-600 text-white'"
+          :style="user.profileImg ? { backgroundImage: `url(${API_BASE}${user.profileImg})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
+        >
+          <span v-if="!user.profileImg">{{ initials }}</span>
+        </div>
+        <div>
+          <h1 class="text-base font-semibold text-white capitalize leading-none">{{ user.name }}</h1>
+          <p v-if="user.info" class="text-xs text-gray-500 mt-0.5">{{ user.info }}</p>
+        </div>
       </div>
-      <button
-        @click="edit"
-        class="px-4 py-1.5 rounded-lg border border-gray-700 text-xs text-gray-400 hover:border-gray-500 hover:text-white transition-colors"
-      >Edit Profile</button>
-    </div>
-
-    <!-- Name + bio -->
-    <div class="mb-5">
-      <h1 class="text-xl font-bold text-white capitalize">{{ user.name }}</h1>
-      <p v-if="user.info" class="text-sm text-gray-400 mt-1">{{ user.info }}</p>
-      <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
-        <span>{{ sharedposts.length }} shared</span>
-        <span>{{ likedposts.length }} favorites</span>
-      </div>
+      <button @click="edit" class="px-3 py-1.5 rounded-lg border border-gray-700 text-xs text-gray-400 hover:border-gray-500 hover:text-white transition-colors">
+        Edit Profile
+      </button>
     </div>
 
     <!-- Pill tabs -->
-    <div class="flex gap-1 p-1 bg-gray-800/60 rounded-xl mb-5 w-fit">
-      <button
-        @click="SharedPosts"
-        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        :class="showSharedPosts ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-      >Shared Posts</button>
-      <button
-        @click="favorites"
-        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        :class="showfavorites ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-      >Favorites</button>
-      <button
-        @click="notif"
-        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        :class="shownotif ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-      >Notifications</button>
+    <div class="flex gap-1 p-1 bg-gray-800/60 rounded-xl mb-6 w-fit">
+      <button @click="activeTab = 'graph'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="activeTab === 'graph' ? 'bg-[#242426] text-white' : 'text-gray-400 hover:text-gray-200'">
+        Knowledge Graph
+      </button>
+      <button @click="activeTab = 'papers'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="activeTab === 'papers' ? 'bg-[#242426] text-white' : 'text-gray-400 hover:text-gray-200'">
+        Favorites <span v-if="likedposts.length" class="ml-1 text-xs text-gray-600">{{ likedposts.length }}</span>
+      </button>
+      <button @click="activeTab = 'shared'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="activeTab === 'shared' ? 'bg-[#242426] text-white' : 'text-gray-400 hover:text-gray-200'">
+        Shared <span v-if="sharedposts.length" class="ml-1 text-xs text-gray-600">{{ sharedposts.length }}</span>
+      </button>
     </div>
 
-    <!-- Shared Posts tab -->
-    <div v-show="showSharedPosts">
-      <div
-        v-for="i of sharedposts"
-        :key="i._id"
-        class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
-      >
-        <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
-        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4 mb-2">
-          <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
-            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
-          </h2>
-          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
-            <span v-if="j.authors">{{ j.authors }}</span>
-            <span v-if="j.date">{{ j.date }}</span>
-          </div>
-          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j.abstract }}</p>
-        </div>
-        <button
-          @click="deletepost(i._id)"
-          class="mt-1 px-3 py-1 text-xs rounded-lg border border-red-900/60 text-red-500 hover:bg-red-900/20 transition-colors"
-        >Delete</button>
+    <!-- ── Knowledge Graph tab ── -->
+    <div v-show="activeTab === 'graph'">
+      <!-- Research areas -->
+      <div v-if="researchAreas.length" class="flex flex-wrap gap-2 mb-4">
+        <span v-for="area in researchAreas" :key="area.label"
+          class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border"
+          :style="{ borderColor: area.color + '60', color: area.color, background: area.color + '15' }"
+        >
+          {{ area.label }}
+          <span class="opacity-60">{{ area.count }}</span>
+        </span>
       </div>
-      <p v-if="!sharedposts.length" class="text-sm text-gray-600 py-8 text-center">No shared posts yet.</p>
+
+      <PaperGraph :papers="likedposts" :height="420" @select="goToArticle" />
+
+      <p class="text-xs text-gray-600 mt-3 text-center">
+        Nodes = liked papers · Edges = shared topic or author · Click to open
+      </p>
     </div>
 
-    <!-- Favorites tab -->
-    <div v-show="showfavorites">
+    <!-- ── Favorites tab ── -->
+    <div v-show="activeTab === 'papers'">
       <div
         v-for="i of likedposts"
         :key="i._id"
@@ -112,15 +83,38 @@
             <span v-if="j?.authors">{{ j.authors }}</span>
             <span v-if="j?.date">{{ j.date }}</span>
           </div>
-          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j?.abstract }}</p>
+          <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ j?.abstract }}</p>
         </div>
       </div>
-      <p v-if="!likedposts.length" class="text-sm text-gray-600 py-8 text-center">No favorites yet.</p>
+      <p v-if="!likedposts.length" class="text-sm text-gray-600 py-10 text-center">
+        Like papers from the feed to add them here.
+      </p>
     </div>
 
-    <!-- Notifications tab -->
-    <div v-show="shownotif" class="py-10 text-center">
-      <p class="text-sm text-gray-600">No notifications yet.</p>
+    <!-- ── Shared tab ── -->
+    <div v-show="activeTab === 'shared'">
+      <div
+        v-for="i of sharedposts"
+        :key="i._id"
+        class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
+      >
+        <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
+        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4 mb-2">
+          <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
+            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
+          </h2>
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
+            <span v-if="j.authors">{{ j.authors }}</span>
+            <span v-if="j.date">{{ j.date }}</span>
+          </div>
+          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j.abstract }}</p>
+        </div>
+        <button @click="deletepost(i._id)"
+          class="mt-1 px-3 py-1 text-xs rounded-lg border border-red-900/60 text-red-500 hover:bg-red-900/20 transition-colors">
+          Delete
+        </button>
+      </div>
+      <p v-if="!sharedposts.length" class="text-sm text-gray-600 py-10 text-center">No shared posts yet.</p>
     </div>
 
   </main>
@@ -140,21 +134,15 @@ export default {
   data() {
     return {
       sharedposts: [],
-      showlikes: false,
       likedposts: [],
       loading: false,
       showedit: false,
       userr: '',
-      showSharedPosts: true,
-      showfavorites: false,
-      shownotif: false,
+      activeTab: 'graph',
     };
   },
   props: {
-    user: {
-      type: Object,
-      required: true,
-    },
+    user: { type: Object, required: true },
   },
   computed: {
     initials() {
@@ -163,10 +151,28 @@ export default {
       if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
       return this.user.name.slice(0, 2).toUpperCase()
     },
+    researchAreas() {
+      const map = {}
+      const colors = {
+        'cs.AI': { color: '#14b8a6', label: 'Artificial Intelligence' },
+        'cs.LG': { color: '#14b8a6', label: 'Machine Learning' },
+        'cs.CV': { color: '#8b5cf6', label: 'Computer Vision' },
+        'cs.CL': { color: '#3b82f6', label: 'NLP' },
+        'cs.RO': { color: '#f59e0b', label: 'Robotics' },
+        'math':  { color: '#a855f7', label: 'Mathematics' },
+        'eess':  { color: '#f97316', label: 'Engineering' },
+      }
+      for (const p of this.likedposts) {
+        const cat = p.postDetails?.category || ''
+        const key = Object.keys(colors).find(k => cat.startsWith(k.split('.')[0])) || null
+        const meta = key ? colors[key] : { color: '#6b7280', label: 'Research' }
+        if (!map[meta.label]) map[meta.label] = { ...meta, count: 0 }
+        map[meta.label].count++
+      }
+      return Object.values(map).sort((a, b) => b.count - a.count)
+    },
   },
-  
   mounted() {
-    // Invoke when the component is mounted
     this.getsharedposts();
     this.getlikedposts();
   },
@@ -235,26 +241,12 @@ export default {
         console.error("Error deleting liked post from your likes:", error);
       }
     },
-    likes() {
-      this.showlikes = !this.showlikes;
-    },
-    favorites() {
-      this.showfavorites = true;
-      this.showSharedPosts = false;
-      this.shownotif = false;
-    },
-    notif() {
-      this.shownotif = true;
-      this.showSharedPosts = false;
-      this.showfavorites = false;
-    },
     edit() {
       this.showedit = !this.showedit;
     },
-    SharedPosts() {
-      this.showSharedPosts = true;
-      this.showfavorites = false;
-      this.shownotif = false;
+    goToArticle(paper) {
+      const id = paper?.doi || paper?._id
+      if (id) this.$router.push('/article/' + id)
     },
   },
 };
