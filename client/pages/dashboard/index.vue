@@ -238,41 +238,25 @@
               <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ paper.abstract }}</p>
             </div>
 
-            <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-700/40">
-              <div class="flex items-center gap-3 text-xs text-gray-500">
-                <span v-if="paper.citedBy" class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-                  </svg>
-                  {{ paper.citedBy.toLocaleString() }} citations
-                </span>
-              </div>
-              <div class="flex items-center gap-2">
-                <a
-                  v-if="paper.codeUrl"
-                  :href="paper.codeUrl"
-                  target="_blank"
-                  rel="noopener"
-                  class="flex items-center gap-1 text-xs font-medium text-green-400 hover:text-green-300 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-                  </svg>
-                  Code
-                </a>
-                <a
-                  :href="'https://arxiv.org/html/' + paper.id"
-                  target="_blank"
-                  rel="noopener"
-                  class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  </svg>
-                  Read
-                </a>
-                <a :href="paper.pdf" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">PDF</a>
-              </div>
+            <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-700/40 pr-44">
+              <a
+                :href="'https://arxiv.org/html/' + paper.id"
+                target="_blank"
+                rel="noopener"
+                class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                Read
+              </a>
+              <a :href="paper.pdf" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">PDF</a>
+              <span v-if="paper.citedBy" class="flex items-center gap-1 text-xs text-gray-500 ml-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                </svg>
+                {{ paper.citedBy.toLocaleString() }}
+              </span>
             </div>
           </div>
 
@@ -330,21 +314,6 @@
               <span
                 class="absolute w-4 h-4 rounded-full bg-white shadow-sm transition-all"
                 :class="sourceArxiv ? 'right-0.5' : 'left-0.5'"
-              ></span>
-            </button>
-          </li>
-          <!-- Papers With Code -->
-          <li class="flex items-center justify-between">
-            <span class="text-xs text-gray-300">Papers With Code</span>
-            <button
-              class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors"
-              :class="sourcePwC ? 'bg-teal-500' : 'bg-gray-600'"
-              @click="sourcePwC = !sourcePwC"
-              aria-label="Toggle Papers With Code"
-            >
-              <span
-                class="absolute w-4 h-4 rounded-full bg-white shadow-sm transition-all"
-                :class="sourcePwC ? 'right-0.5' : 'left-0.5'"
               ></span>
             </button>
           </li>
@@ -421,7 +390,6 @@ export default {
 
     const sourceArxiv     = ref(true);
     const sourceCommunity = ref(true);
-    const sourcePwC       = ref(true);
     const activeFilters   = reactive({ last30: false, mostCited: false });
 
     const topicData = {
@@ -441,7 +409,6 @@ export default {
     const sources = [
       { id: 'arxiv',     label: 'arXiv' },
       { id: 'community', label: 'Community' },
-      { id: 'pwc',       label: 'Papers With Code' },
     ];
     const filters = [
       { id: 'last30',    label: 'Last 30 days' },
@@ -471,9 +438,7 @@ export default {
 
     const displayedPapers = computed(() => {
       if (!sourceArxiv.value || activeTab.value === 'Saved') return [];
-      let result = papers.value.filter(p =>
-        sourcePwC.value || p.source !== 'pwc'
-      );
+      let result = papers.value.slice();
 
       const q = searchQuery.value.trim().toLowerCase();
       if (q) {
@@ -511,13 +476,11 @@ export default {
     function isSourceActive(id) {
       if (id === 'arxiv')     return sourceArxiv.value;
       if (id === 'community') return sourceCommunity.value;
-      if (id === 'pwc')       return sourcePwC.value;
       return false;
     }
     function toggleSource(id) {
       if (id === 'arxiv')     sourceArxiv.value = !sourceArxiv.value;
       if (id === 'community') sourceCommunity.value = !sourceCommunity.value;
-      if (id === 'pwc')       sourcePwC.value = !sourcePwC.value;
     }
     function toggleFilter(id) {
       activeFilters[id] = !activeFilters[id];
@@ -565,7 +528,7 @@ export default {
 
     return {
       activeTopic, activeTab, searchQuery,
-      sourceArxiv, sourceCommunity, sourcePwC, activeFilters,
+      sourceArxiv, sourceCommunity, activeFilters,
       topics, sources, filters, feedTabs, topicColor, venueColors,
       papers, papersPending, papersError, hasMore, loadMore,
       displayedPapers, isSourceActive, toggleSource, toggleFilter,
