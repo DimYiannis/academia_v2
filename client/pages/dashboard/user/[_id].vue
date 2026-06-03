@@ -3,50 +3,58 @@
     <LoadSpinner />
   </div>
 
-  <main v-else class="px-6 py-6 text-gray-100 max-w-3xl">
+  <main v-else class="px-6 py-8 max-w-2xl">
 
     <!-- Banner -->
     <div
-      class="h-40 rounded-xl mb-4 bg-gray-700"
+      class="h-36 rounded-2xl mb-0 overflow-hidden"
+      :class="user.backgroundImg ? '' : 'bg-gradient-to-br from-teal-900/50 via-gray-800 to-gray-900'"
       :style="user.backgroundImg ? {
-        backgroundImage: `url(${API_BASE}` + user.backgroundImg + ')',
+        backgroundImage: `url(${API_BASE}${user.backgroundImg})`,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
       } : {}"
     ></div>
 
-    <!-- Avatar + Connect -->
-    <div class="relative flex items-end justify-between mb-4 -mt-10 px-2">
+    <!-- Avatar row -->
+    <div class="flex items-end justify-between -mt-8 px-1 mb-4">
       <div
-        class="w-20 h-20 rounded-full border-4 border-[#1c1c1e] bg-gray-600"
+        class="w-16 h-16 rounded-2xl border-4 border-[#1c1c1e] flex items-center justify-center text-lg font-bold shrink-0"
+        :class="user.profileImg ? '' : 'bg-teal-600 text-white'"
         :style="user.profileImg ? {
-          backgroundImage: `url(${API_BASE}` + user.profileImg + ')',
+          backgroundImage: `url(${API_BASE}${user.profileImg})`,
           backgroundPosition: 'center',
           backgroundSize: 'cover',
         } : {}"
-      ></div>
-      <button class="px-4 py-1.5 rounded-lg border border-gray-600 text-sm text-gray-300 hover:border-teal-500 hover:text-teal-400 transition-colors bg-transparent">
+      >
+        <span v-if="!user.profileImg">{{ initials }}</span>
+      </div>
+      <button class="px-4 py-1.5 rounded-lg border border-gray-700 text-xs text-gray-400 hover:border-teal-500 hover:text-teal-400 transition-colors">
         Connect
       </button>
     </div>
 
     <!-- Name + bio -->
-    <div class="mb-6">
-      <h1 class="text-xl font-semibold text-white capitalize">{{ user.name }}</h1>
+    <div class="mb-5">
+      <h1 class="text-xl font-bold text-white capitalize">{{ user.name }}</h1>
       <p v-if="user.info" class="text-sm text-gray-400 mt-1">{{ user.info }}</p>
+      <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+        <span>{{ sharedposts.length }} shared</span>
+        <span>{{ likedposts.length }} favorites</span>
+      </div>
     </div>
 
-    <!-- Tab bar -->
-    <div class="flex gap-5 border-b border-gray-700 mb-5">
+    <!-- Pill tabs -->
+    <div class="flex gap-1 p-1 bg-gray-800/60 rounded-xl mb-5 w-fit">
       <button
         @click="sharedPosts"
-        class="text-sm font-medium pb-2 transition-colors"
-        :class="showSharedPosts ? 'text-white border-b-2 border-teal-500' : 'text-gray-400 hover:text-gray-200'"
+        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="showSharedPosts ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
       >Shared Posts</button>
       <button
         @click="likes"
-        class="text-sm font-medium pb-2 transition-colors"
-        :class="showlikes ? 'text-white border-b-2 border-teal-500' : 'text-gray-400 hover:text-gray-200'"
+        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="showlikes ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
       >Favorites</button>
     </div>
 
@@ -55,23 +63,21 @@
       <div
         v-for="i of sharedposts"
         :key="i._id"
-        class="border border-gray-700 p-4 mb-3 rounded-2xl hover:border-gray-600 transition-colors"
+        class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
       >
-        <p class="text-xs text-gray-400 mb-2">by {{ i.user?.name }}</p>
-        <p v-if="i.title" class="text-sm text-gray-300 mb-3">{{ i.title }}</p>
-        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-600 rounded-xl p-3 mb-2">
-          <h2 class="text-sm font-semibold text-white mb-1">
+        <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
+        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4">
+          <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
             <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
           </h2>
-          <div class="flex flex-wrap gap-x-3 text-xs text-gray-400 mb-1">
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
             <span v-if="j.authors">{{ j.authors }}</span>
-            <span v-if="j.university">{{ j.university }}</span>
             <span v-if="j.date">{{ j.date }}</span>
           </div>
-          <p class="text-xs text-gray-500 line-clamp-2">{{ j.abstract }}</p>
+          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j.abstract }}</p>
         </div>
       </div>
-      <p v-if="!sharedposts.length" class="text-sm text-gray-500">No shared posts yet.</p>
+      <p v-if="!sharedposts.length" class="text-sm text-gray-600 py-8 text-center">No shared posts yet.</p>
     </div>
 
     <!-- Favorites -->
@@ -79,21 +85,20 @@
       <div
         v-for="i of likedposts"
         :key="i._id"
-        class="border border-gray-700 p-4 mb-3 rounded-2xl hover:border-gray-600 transition-colors"
+        class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
       >
         <div v-for="j in [i.postDetails]" :key="j?.doi">
-          <h2 class="text-sm font-semibold text-white mb-1">
+          <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
             <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j?.doi">{{ j?.title }}</NuxtLink>
           </h2>
-          <div class="flex flex-wrap gap-x-3 text-xs text-gray-400 mb-1">
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
             <span v-if="j?.authors">{{ j.authors }}</span>
-            <span v-if="j?.university">{{ j.university }}</span>
             <span v-if="j?.date">{{ j.date }}</span>
           </div>
-          <p class="text-xs text-gray-500 line-clamp-2">{{ j?.abstract }}</p>
+          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j?.abstract }}</p>
         </div>
       </div>
-      <p v-if="!likedposts.length" class="text-sm text-gray-500">No liked posts yet.</p>
+      <p v-if="!likedposts.length" class="text-sm text-gray-600 py-8 text-center">No favorites yet.</p>
     </div>
 
   </main>
@@ -116,6 +121,14 @@ export default {
       likedposts: [],
       loading: false,
     };
+  },
+  computed: {
+    initials() {
+      if (!this.user?.name) return '?'
+      const parts = this.user.name.trim().split(' ')
+      if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      return this.user.name.slice(0, 2).toUpperCase()
+    },
   },
   mounted() {
     // Invoke when the component is mounted
