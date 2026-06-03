@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading" class="flex justify-center py-16">
+  <div v-if="loading || !user" class="flex justify-center py-16">
     <LoadSpinner />
   </div>
 
