@@ -6,6 +6,7 @@ const Bookmarks = require('./models/Bookmarks')
 const Sharedposts = require('./models/Sharedposts')
 const { fetchFeaturedPapers } = require('./lib/paperswithcode')
 const { fetchPapers } = require('./lib/arxiv')
+const { fetchSSPapers } = require('./lib/semanticscholar')
 
 const seed = async () => {
   await connectDB(process.env.MONGO_URL)
@@ -34,21 +35,39 @@ const seed = async () => {
 
   let aiPapers = []
   let mlPapers = []
+  let ssPapers = []
 
+  // Try Semantic Scholar first (higher quality, citation counts included)
   try {
-    console.log('Fetching arXiv AI papers (page 1)...')
-    aiPapers = await fetchPapers('ai', 0)
-    console.log(`Got ${aiPapers.length} arXiv AI papers`)
-    await new Promise(r => setTimeout(r, 5000))
-    console.log('Fetching arXiv AI papers (page 2)...')
-    mlPapers = await fetchPapers('ai', 10)
-    console.log(`Got ${mlPapers.length} more arXiv papers`)
+    console.log('Fetching Semantic Scholar — LLMs...')
+    const ss1 = await fetchSSPapers('large language models', 15, 0)
+    console.log(`Got ${ss1.length} SS papers`)
+    await new Promise(r => setTimeout(r, 3000))
+    console.log('Fetching Semantic Scholar — deep learning...')
+    const ss2 = await fetchSSPapers('deep learning transformer', 15, 0)
+    console.log(`Got ${ss2.length} SS papers`)
+    // Deduplicate by id
+    const seen = new Set(ss1.map(p => p.id))
+    ssPapers = [...ss1, ...ss2.filter(p => !seen.has(p.id))]
+    console.log(`Total unique SS papers: ${ssPapers.length}`)
   } catch (e) {
-    console.warn(`arXiv unavailable (${e.message})${arxivOnly ? ' — try again in a few minutes' : ' — seeding with HF only'}`)
-    if (arxivOnly) { process.exit(1) }
+    console.warn(`Semantic Scholar unavailable (${e.message}) — trying arXiv...`)
+
+    // Fallback to arXiv
+    try {
+      console.log('Fetching arXiv AI papers (page 1)...')
+      aiPapers = await fetchPapers('ai', 0)
+      console.log(`Got ${aiPapers.length} arXiv papers`)
+      await new Promise(r => setTimeout(r, 5000))
+      mlPapers = await fetchPapers('ai', 10)
+      console.log(`Got ${mlPapers.length} more arXiv papers`)
+    } catch (e2) {
+      console.warn(`arXiv also unavailable (${e2.message})${arxivOnly ? ' — try again later' : ' — seeding with HF only'}`)
+      if (arxivOnly) process.exit(1)
+    }
   }
 
-  const allPapers = [...hfPapers, ...aiPapers, ...mlPapers]
+  const allPapers = [...hfPapers, ...ssPapers, ...aiPapers, ...mlPapers]
 
   const posts_to_insert = allPapers
     .filter(p => p.title && p.abstract)
