@@ -18,7 +18,7 @@
 
         <div v-for="j in i.sharedpostdetails" :key="j.doi" class="p-3 my-3 border border-gray-600 rounded-xl">
           <h1 class="text-sm font-semibold text-white mb-1">
-            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
+            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j.arxivId || j.doi)">{{ j.title }}</NuxtLink>
           </h1>
           <div class="flex flex-wrap gap-x-3 text-xs text-gray-400 mb-2">
             <span v-if="j.authors">{{ j.authors }}</span>

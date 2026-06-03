@@ -68,7 +68,7 @@
         <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
         <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4">
           <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
-            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
+            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j.arxivId || j.doi)">{{ j.title }}</NuxtLink>
           </h2>
           <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
             <span v-if="j.authors">{{ j.authors }}</span>
@@ -89,7 +89,7 @@
       >
         <div v-for="j in [i.postDetails]" :key="j?.doi">
           <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
-            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j?.doi">{{ j?.title }}</NuxtLink>
+            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j?.arxivId || j?.doi)">{{ j?.title }}</NuxtLink>
           </h2>
           <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
             <span v-if="j?.authors">{{ j.authors }}</span>

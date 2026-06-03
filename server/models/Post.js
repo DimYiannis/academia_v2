@@ -16,6 +16,9 @@ const PostSchema = new mongoose.Schema({
   abstract: {
     type: String,
   },
+  arxivId: {
+    type: String,
+  },
   doi: {
     type: Number,
   },

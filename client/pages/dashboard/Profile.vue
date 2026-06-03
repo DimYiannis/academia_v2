@@ -71,7 +71,7 @@
         <div v-for="j in [i.postDetails]" :key="j?.doi">
           <div class="flex items-start justify-between mb-1">
             <h2 class="text-[15px] font-semibold text-white leading-snug">
-              <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j?.doi">{{ j?.title }}</NuxtLink>
+              <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j?.arxivId || j?.doi)">{{ j?.title }}</NuxtLink>
             </h2>
             <button @click="unlike(i._id)" class="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-900/20 transition-colors shrink-0 ml-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -101,7 +101,7 @@
         <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
         <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4 mb-2">
           <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
-            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
+            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j.arxivId || j.doi)">{{ j.title }}</NuxtLink>
           </h2>
           <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
             <span v-if="j.authors">{{ j.authors }}</span>

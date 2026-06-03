@@ -10,7 +10,7 @@
 
       <div v-else class="border border-gray-700 p-4 mb-4 rounded-2xl hover:border-gray-600 transition-colors" v-for="j of bookmarks" :key="j._id">
         <h1 class="text-sm font-semibold text-white mb-1">
-          <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">
+          <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j.arxivId || j.doi)">
             {{ j.postDetails?.title }}
           </NuxtLink>
         </h1>
