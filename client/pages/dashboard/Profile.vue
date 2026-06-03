@@ -8,12 +8,8 @@
     <!-- Compact header -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
-          :class="user.profileImg ? '' : 'bg-teal-600 text-white'"
-          :style="user.profileImg ? { backgroundImage: `url(${API_BASE}${user.profileImg})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
-        >
-          <span v-if="!user.profileImg">{{ initials }}</span>
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 bg-teal-600 text-white">
+          {{ initials }}
         </div>
         <div>
           <h1 class="text-base font-semibold text-white capitalize leading-none">{{ user.name }}</h1>

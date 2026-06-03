@@ -6,28 +6,12 @@
   <main v-else class="px-6 py-8 max-w-2xl">
 
     <!-- Banner -->
-    <div
-      class="h-36 rounded-2xl mb-0 overflow-hidden"
-      :class="user.backgroundImg ? '' : 'bg-gradient-to-br from-teal-900/50 via-gray-800 to-gray-900'"
-      :style="user.backgroundImg ? {
-        backgroundImage: `url(${API_BASE}${user.backgroundImg})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-      } : {}"
-    ></div>
+    <div class="h-36 rounded-2xl mb-0 overflow-hidden bg-gradient-to-br from-teal-900/50 via-gray-800 to-gray-900"></div>
 
     <!-- Avatar row -->
     <div class="flex items-end justify-between -mt-8 px-1 mb-4">
-      <div
-        class="w-16 h-16 rounded-2xl border-4 border-[#1c1c1e] flex items-center justify-center text-lg font-bold shrink-0"
-        :class="user.profileImg ? '' : 'bg-teal-600 text-white'"
-        :style="user.profileImg ? {
-          backgroundImage: `url(${API_BASE}${user.profileImg})`,
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-        } : {}"
-      >
-        <span v-if="!user.profileImg">{{ initials }}</span>
+      <div class="w-16 h-16 rounded-2xl border-4 border-[#1c1c1e] flex items-center justify-center text-lg font-bold shrink-0 bg-teal-600 text-white">
+        {{ initials }}
       </div>
       <button class="px-4 py-1.5 rounded-lg border border-gray-700 text-xs text-gray-400 hover:border-teal-500 hover:text-teal-400 transition-colors">
         Connect
