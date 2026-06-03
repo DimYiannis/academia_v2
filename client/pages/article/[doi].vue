@@ -1,8 +1,28 @@
 <template>
   <div class="min-h-screen bg-[#1c1c1e] px-6 py-8 max-w-2xl mx-auto">
 
-    <div v-if="loading" class="flex justify-center py-24">
-      <LoadSpinner />
+    <!-- Skeleton -->
+    <div v-if="loading" class="animate-pulse">
+      <div class="bg-[#242426] border border-gray-700/60 rounded-2xl p-6 mb-3">
+        <div class="flex gap-2 mb-4">
+          <div class="h-5 w-20 bg-gray-700 rounded-full"></div>
+          <div class="h-5 w-24 bg-gray-700 rounded-full"></div>
+        </div>
+        <div class="h-6 bg-gray-700 rounded w-3/4 mb-2"></div>
+        <div class="h-6 bg-gray-700 rounded w-1/2 mb-5"></div>
+        <div class="h-4 bg-gray-700 rounded w-2/3 mb-5"></div>
+        <div class="space-y-2 mb-5">
+          <div class="h-3 bg-gray-700 rounded"></div>
+          <div class="h-3 bg-gray-700 rounded w-5/6"></div>
+          <div class="h-3 bg-gray-700 rounded w-4/6"></div>
+          <div class="h-3 bg-gray-700 rounded"></div>
+          <div class="h-3 bg-gray-700 rounded w-5/6"></div>
+        </div>
+        <div class="flex gap-2 pt-3 border-t border-gray-700/60">
+          <div class="h-7 w-16 bg-gray-700 rounded-lg"></div>
+          <div class="h-7 w-10 bg-gray-700 rounded-lg"></div>
+        </div>
+      </div>
     </div>
 
     <div v-else-if="error" class="text-center py-24 text-sm text-red-400">
