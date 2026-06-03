@@ -422,7 +422,7 @@ export default {
     const sourceArxiv     = ref(true);
     const sourceCommunity = ref(true);
     const sourcePwC       = ref(true);
-    const activeFilters   = reactive({ hasCode: false, last30: false, mostCited: false });
+    const activeFilters   = reactive({ last30: false, mostCited: false });
 
     const topicData = {
       ai:   usePapers('ai'),
@@ -444,7 +444,6 @@ export default {
       { id: 'pwc',       label: 'Papers With Code' },
     ];
     const filters = [
-      { id: 'hasCode',   label: 'Has code' },
       { id: 'last30',    label: 'Last 30 days' },
       { id: 'mostCited', label: 'Most cited' },
     ];
@@ -478,10 +477,6 @@ export default {
           p.title.toLowerCase().includes(q) ||
           p.authors.some(a => a.toLowerCase().includes(q))
         );
-      }
-
-      if (activeFilters.hasCode) {
-        result = result.filter(p => p.hasCode);
       }
 
       if (activeFilters.last30) {
