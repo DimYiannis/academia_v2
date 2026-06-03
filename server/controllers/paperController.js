@@ -57,21 +57,22 @@ const getPaper = async (req, res, next) => {
     const cached = cache.get(key)
     if (cached) return res.json(cached)
 
-    // Check if paper is already in a topic feed cache — skip arXiv fetch if so
-    let paper = null
+    // If paper is already in a topic feed cache, it's fully enriched — return as-is.
     const topics = ['ai', 'math', 'hw', 'cs']
     for (const topic of topics) {
       for (let start = 0; start <= 30; start += 10) {
         const feed = cache.get(`papers:${topic}:${start}`)
-        if (feed?.papers) {
-          const found = feed.papers.find(p => p.id === id)
-          if (found) { paper = found; break }
+        const found = feed?.papers?.find(p => p.id === id)
+        if (found) {
+          const payload = { paper: found }
+          cache.set(key, payload)
+          return res.json(payload)
         }
       }
-      if (paper) break
     }
 
-    if (!paper) paper = await fetchPaperById(id)
+    // Not cached — fetch fresh and enrich.
+    const paper = await fetchPaperById(id)
     if (!paper) return res.status(404).json({ message: 'Paper not found' })
 
     const citationMap = await fetchCitations([paper.id])

@@ -29,6 +29,7 @@ export function usePapers(initialTopic = 'ai') {
   const pending = ref(false)
   const error = ref<Error | null>(null)
   const nextStart = ref<number | null>(0)
+  const loaded = ref(false)
 
   async function fetchPage(start: number) {
     pending.value = true
@@ -56,7 +57,12 @@ export function usePapers(initialTopic = 'ai') {
     await fetchPage(nextStart.value)
   }
 
-  onMounted(() => fetchPage(0))
+  // Fetch first page once. Safe to call repeatedly — no-op if already loaded/loading.
+  function ensureLoaded() {
+    if (loaded.value || pending.value) return
+    loaded.value = true
+    fetchPage(0)
+  }
 
   return {
     papers: readonly(papers),
@@ -64,5 +70,6 @@ export function usePapers(initialTopic = 'ai') {
     error: readonly(error),
     hasMore: computed(() => nextStart.value !== null),
     loadMore,
+    ensureLoaded,
   }
 }

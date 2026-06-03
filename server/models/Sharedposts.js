@@ -17,6 +17,12 @@ const SingleSharedpostsSchema = mongoose.Schema({
   abstract: {
     type: String,
   },
+  arxivId: {
+    type: String,
+  },
+  category: {
+    type: String,
+  },
   doi: {
     type: Number,
   },

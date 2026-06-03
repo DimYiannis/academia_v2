@@ -79,6 +79,7 @@ const seed = async () => {
       university: p.venue || p.category || 'arXiv',
       abstract: p.abstract,
       arxivId: p.id || null,
+      category: p.category || 'cs.AI',
       date: p.date
         ? new Date(p.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
         : '',

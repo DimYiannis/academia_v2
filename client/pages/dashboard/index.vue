@@ -465,6 +465,10 @@ export default {
       topicData[activeTopic.value].loadMore();
     }
 
+    // Lazy-load: only fetch the active topic. Fetch others when user switches to them.
+    onMounted(() => topicData[activeTopic.value].ensureLoaded());
+    watch(activeTopic, (t) => topicData[t].ensureLoaded());
+
     const displayedPapers = computed(() => {
       if (!sourceArxiv.value || activeTab.value === 'Saved') return [];
       let result = papers.value.filter(p =>

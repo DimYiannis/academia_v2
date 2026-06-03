@@ -46,6 +46,8 @@ const createlike = async (req, res) => {
             authors: dbPost.authors,
             university: dbPost.university,
             abstract: dbPost.abstract,
+            arxivId: dbPost.arxivId,
+            category: dbPost.category,
             doi: dbPost.doi,
             date: dbPost.date,
           },
@@ -83,6 +85,8 @@ const getAllLikes = async (req, res) => {
           authors: postDetails.authors,
           university: postDetails.university,
           abstract: postDetails.abstract,
+          arxivId: postDetails.arxivId,
+          category: postDetails.category,
           doi: postDetails.doi,
           date: postDetails.date,
         }
@@ -149,6 +153,8 @@ const getUsersLikes = async (req,res) => {
           authors: postDetails.authors,
           university: postDetails.university,
           abstract: postDetails.abstract,
+          arxivId: postDetails.arxivId,
+          category: postDetails.category,
           doi: postDetails.doi,
           date: postDetails.date,
         }
