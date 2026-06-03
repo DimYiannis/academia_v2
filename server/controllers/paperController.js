@@ -7,6 +7,10 @@ const Post = require('../models/Post')
 // Last successful arXiv payload per topic:start — served when arXiv is throttled/down
 const lastGood = {}
 
+// Circuit breaker: after an arXiv failure, skip arXiv for this long and serve fallback instantly
+let arxivDownUntil = 0
+const ARXIV_COOLDOWN_MS = 60000
+
 // Category prefixes per topic — used to filter DB fallback by topic
 const TOPIC_CATEGORY_RE = {
   ai:   /^cs\.(AI|LG|NE)/,
@@ -54,11 +58,18 @@ const getPapers = async (req, res, next) => {
     const cached = cache.get(key)
     if (cached) return res.json(cached)
 
-    let papers
-    let nextStart
+    // Circuit open: arXiv recently failed — serve fallback immediately, don't wait on it
+    if (Date.now() < arxivDownUntil) {
+      if (lastGood[key]) return res.json(lastGood[key])
+      const fallback = await dbFallback(topic, start)
+      const payload = { papers: fallback, nextStart: fallback.length === 10 ? start + 10 : null }
+      cache.set(key, payload, 120)
+      return res.json(payload)
+    }
+
     try {
       const arxivPapers = await fetchPapers(topic, start)
-      papers = arxivPapers.map(p => ({ ...p, hasCode: false, codeUrl: null, source: 'arxiv' }))
+      let papers = arxivPapers.map(p => ({ ...p, hasCode: false, codeUrl: null, source: 'arxiv' }))
 
       const ids = papers.map(p => p.id).filter(Boolean)
       const citationMap = await fetchCitations(ids)
@@ -69,17 +80,18 @@ const getPapers = async (req, res, next) => {
         doi: citationMap[paper.id]?.doi ?? paper.doi ?? null,
       }))
 
-      nextStart = arxivPapers.length === 10 ? start + 10 : null
+      const nextStart = arxivPapers.length === 10 ? start + 10 : null
       const payload = { papers, nextStart }
       lastGood[key] = payload
       cache.set(key, payload)
       return res.json(payload)
     } catch (arxivErr) {
-      // arXiv throttled/down — serve last-good snapshot, else seeded DB papers
+      // arXiv throttled/down — trip the breaker, serve last-good snapshot, else seeded DB papers
+      arxivDownUntil = Date.now() + ARXIV_COOLDOWN_MS
       if (lastGood[key]) return res.json(lastGood[key])
       const fallback = await dbFallback(topic, start)
       const payload = { papers: fallback, nextStart: fallback.length === 10 ? start + 10 : null }
-      cache.set(key, payload, 120) // short TTL — retry arXiv in 2min
+      cache.set(key, payload, 120) // short TTL — retry arXiv after cooldown
       return res.json(payload)
     }
   } catch (error) {
