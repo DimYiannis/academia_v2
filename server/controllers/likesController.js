@@ -34,7 +34,7 @@ const createlike = async (req, res) => {
 
       res.status(StatusCodes.CREATED).json({
         message: "Like created successfully!",
-        bookmark: {
+        like: {
           _id: newLike._id,
           user: newLike.user,
           post: newLike.post,
@@ -62,42 +62,40 @@ const createlike = async (req, res) => {
 };
 
 
+// Shared projection for a Post → postDetails
+const toDetails = (p) => p ? {
+  title: p.title,
+  authors: p.authors,
+  university: p.university,
+  abstract: p.abstract,
+  arxivId: p.arxivId,
+  category: p.category,
+  doi: p.doi,
+  date: p.date,
+} : null;
+
+// Build like-with-details for a set of likes using a single batched Post query
+const attachDetails = async (likes) => {
+  const postIds = likes.map(l => l.post);
+  const posts = await Post.find({ _id: { $in: postIds } }).lean();
+  const byId = {};
+  for (const p of posts) byId[String(p._id)] = p;
+  return likes.map(l => ({
+    _id: l._id,
+    user: l.user,
+    post: l.post,
+    createdAt: l.createdAt,
+    updatedAt: l.updatedAt,
+    postDetails: toDetails(byId[String(l.post)]),
+  }));
+};
+
 // All likes
 const getAllLikes = async (req, res) => {
   try {
-    // Fetch all likes
-    const likes = await Like.find({ user: req.user.userId });
-
-    // Iterate through likes and include post details for each
-    const likesWithDetails = likes.map(async (like) => {
-      // Fetch post details for each like
-      const postDetails = await Post.findOne({ _id: like.post });
-
-      return {
-        _id: like._id,
-        user: like.user,
-        post: like.post,
-        createdAt: like.createdAt,
-        updatedAt: like.updatedAt,
-        postDetails:postDetails
-        ? {
-          title: postDetails.title,
-          authors: postDetails.authors,
-          university: postDetails.university,
-          abstract: postDetails.abstract,
-          arxivId: postDetails.arxivId,
-          category: postDetails.category,
-          doi: postDetails.doi,
-          date: postDetails.date,
-        }
-        : null
-      };
-    });
-
-    // Wait for all asynchronous operations to complete
-    const resolvedLike = await Promise.all(likesWithDetails);
-
-    res.status(StatusCodes.OK).json({ likes: resolvedLike});
+    const likes = await Like.find({ user: req.user.userId }).lean();
+    const resolvedLike = await attachDetails(likes);
+    res.status(StatusCodes.OK).json({ likes: resolvedLike });
   } catch (error) {
     console.error(error);
     res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
@@ -132,46 +130,15 @@ const deleteLike = async (req, res) => {
   }
 };
 
-const getUsersLikes = async (req,res) => {
-  const {id: userId} = req.params;
+const getUsersLikes = async (req, res) => {
+  const { id: userId } = req.params;
   try {
-    const likes = await Like.find({user:userId});
-
-    const likesWithDetails = likes.map(async (like) => {
-      // Fetch post details for each like
-      const postDetails = await Post.findOne({ _id: like.post });
-
-      return {
-        _id: like._id,
-        user: like.user,
-        post: like.post,
-        createdAt: like.createdAt,
-        updatedAt: like.updatedAt,
-        postDetails:postDetails
-        ? {
-          title: postDetails.title,
-          authors: postDetails.authors,
-          university: postDetails.university,
-          abstract: postDetails.abstract,
-          arxivId: postDetails.arxivId,
-          category: postDetails.category,
-          doi: postDetails.doi,
-          date: postDetails.date,
-        }
-        : null
-      };
-    });
-
-    const resolvedLike = await Promise.all(likesWithDetails);
-
-    if (!likes || likes.length === 0) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        message: `No shared posts found for user with ID: ${userId}`,
-      })
-    }
-    res.status(StatusCodes.OK).json({ likes: resolvedLike});
+    const likes = await Like.find({ user: userId }).lean();
+    const resolvedLike = await attachDetails(likes);
+    // Empty list is valid — return [] rather than 404
+    res.status(StatusCodes.OK).json({ likes: resolvedLike });
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: error.message})
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message })
   }
 }
 

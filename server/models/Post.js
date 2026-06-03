@@ -23,7 +23,7 @@ const PostSchema = new mongoose.Schema({
     type: String,
   },
   doi: {
-    type: Number,
+    type: String,
   },
   paper: {
     type: String,

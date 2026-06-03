@@ -24,7 +24,7 @@ const SingleSharedpostsSchema = mongoose.Schema({
     type: String,
   },
   doi: {
-    type: Number,
+    type: String,
   },
   date: {
     type: String,

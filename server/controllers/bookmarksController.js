@@ -66,37 +66,34 @@ const createbookmark = async (req, res) => {
 // All bookmarks
 const getAllBookmarks = async (req, res) => {
   try {
-    // Fetch all bookmarks
-    const bookmarks = await Bookmarks.find({ user: req.user.userId });
+    const bookmarks = await Bookmarks.find({ user: req.user.userId }).lean();
 
-    // Iterate through bookmarks and include post details for each
-    const bookmarksWithDetails = bookmarks.map(async (bookmark) => {
-      // Fetch post details for each bookmark
-      const postDetails = await Post.findOne({ _id: bookmark.post });
+    // Batch-fetch all referenced posts in one query (avoid N+1)
+    const postIds = bookmarks.map(b => b.post);
+    const posts = await Post.find({ _id: { $in: postIds } }).lean();
+    const byId = {};
+    for (const p of posts) byId[String(p._id)] = p;
 
+    const resolvedBookmarks = bookmarks.map(b => {
+      const p = byId[String(b.post)];
       return {
-        _id: bookmark._id,
-        user: bookmark.user,
-        post: bookmark.post,
-        createdAt: bookmark.createdAt,
-        updatedAt: bookmark.updatedAt,
-        postDetails:postDetails
-        ? {
-          title: postDetails.title,
-          authors: postDetails.authors,
-          university: postDetails.university,
-          abstract: postDetails.abstract,
-          arxivId: postDetails.arxivId,
-          category: postDetails.category,
-          doi: postDetails.doi,
-          date: postDetails.date,
-        }
-        : null
+        _id: b._id,
+        user: b.user,
+        post: b.post,
+        createdAt: b.createdAt,
+        updatedAt: b.updatedAt,
+        postDetails: p ? {
+          title: p.title,
+          authors: p.authors,
+          university: p.university,
+          abstract: p.abstract,
+          arxivId: p.arxivId,
+          category: p.category,
+          doi: p.doi,
+          date: p.date,
+        } : null,
       };
     });
-
-    // Wait for all asynchronous operations to complete
-    const resolvedBookmarks = await Promise.all(bookmarksWithDetails);
 
     res.status(StatusCodes.OK).json({ bookmarks: resolvedBookmarks });
   } catch (error) {

@@ -1,7 +1,39 @@
 const { fetchPapers, fetchPaperById } = require('../lib/arxiv')
-const { fetchCodeForPapers, fetchFeaturedPapers } = require('../lib/paperswithcode')
+const { fetchFeaturedPapers } = require('../lib/paperswithcode')
 const { fetchCitations } = require('../lib/openalex')
 const cache = require('../lib/cache')
+const Post = require('../models/Post')
+
+// Last successful arXiv payload per topic:start — served when arXiv is throttled/down
+const lastGood = {}
+
+// Map seeded DB posts to the Paper shape — final fallback when arXiv is unreachable
+async function dbFallback(topic, start) {
+  const docs = await Post.find({})
+    .sort({ createdAt: -1 })
+    .skip(start)
+    .limit(10)
+    .lean()
+
+  return docs.map(d => ({
+    id: d.arxivId || String(d._id),
+    title: d.title,
+    abstract: d.abstract || '',
+    authors: d.authors ? String(d.authors).split(',').map(s => s.trim()) : [],
+    date: d.date || '',
+    pdf: d.arxivId ? `https://arxiv.org/pdf/${d.arxivId}` : null,
+    link: d.arxivId ? `https://arxiv.org/abs/${d.arxivId}` : null,
+    thumbnail: d.arxivId ? `https://arxiv.org/html/${d.arxivId}/x1.png` : null,
+    category: d.category || 'cs.AI',
+    topic,
+    citedBy: d.citations || 0,
+    venue: null,
+    doi: null,
+    hasCode: false,
+    codeUrl: null,
+    source: 'db',
+  }))
+}
 
 const getPapers = async (req, res, next) => {
   try {
@@ -12,38 +44,34 @@ const getPapers = async (req, res, next) => {
     const cached = cache.get(key)
     if (cached) return res.json(cached)
 
-    const arxivPapers = await fetchPapers(topic, start)
-    let papers = arxivPapers.map(p => ({ ...p, hasCode: false, codeUrl: null, source: 'arxiv' }))
+    let papers
+    let nextStart
+    try {
+      const arxivPapers = await fetchPapers(topic, start)
+      papers = arxivPapers.map(p => ({ ...p, hasCode: false, codeUrl: null, source: 'arxiv' }))
 
-    if (topic === 'ai') {
-      const ids = papers.map(p => p.id)
-      const codeMap = await fetchCodeForPapers(ids)
+      const ids = papers.map(p => p.id).filter(Boolean)
+      const citationMap = await fetchCitations(ids)
+      papers = papers.map(paper => ({
+        ...paper,
+        citedBy: citationMap[paper.id]?.citedBy ?? 0,
+        venue: citationMap[paper.id]?.venue ?? paper.venue ?? null,
+        doi: citationMap[paper.id]?.doi ?? paper.doi ?? null,
+      }))
 
-      for (const paper of papers) {
-        const pwc = codeMap[paper.id]
-        if (pwc) {
-          paper.hasCode = pwc.hasCode
-          paper.codeUrl = pwc.codeUrl
-          if (pwc.hasCode) paper.source = 'arxiv+pwc'
-        }
-      }
+      nextStart = arxivPapers.length === 10 ? start + 10 : null
+      const payload = { papers, nextStart }
+      lastGood[key] = payload
+      cache.set(key, payload)
+      return res.json(payload)
+    } catch (arxivErr) {
+      // arXiv throttled/down — serve last-good snapshot, else seeded DB papers
+      if (lastGood[key]) return res.json(lastGood[key])
+      const fallback = await dbFallback(topic, start)
+      const payload = { papers: fallback, nextStart: fallback.length === 10 ? start + 10 : null }
+      cache.set(key, payload, 120) // short TTL — retry arXiv in 2min
+      return res.json(payload)
     }
-
-    const ids = papers.map(p => p.id).filter(Boolean)
-    const citationMap = await fetchCitations(ids)
-
-    const enriched = papers.map(paper => ({
-      ...paper,
-      citedBy: citationMap[paper.id]?.citedBy ?? 0,
-      venue: citationMap[paper.id]?.venue ?? paper.venue ?? null,
-      doi: citationMap[paper.id]?.doi ?? paper.doi ?? null,
-    }))
-
-    const nextStart = arxivPapers.length === 10 ? start + 10 : null
-    const payload = { papers: enriched, nextStart }
-
-    cache.set(key, payload)
-    res.json(payload)
   } catch (error) {
     next(error)
   }
@@ -71,8 +99,29 @@ const getPaper = async (req, res, next) => {
       }
     }
 
-    // Not cached — fetch fresh and enrich.
-    const paper = await fetchPaperById(id)
+    // Not cached — fetch fresh from arXiv. Fall back to DB if arXiv is down.
+    let paper
+    try {
+      paper = await fetchPaperById(id)
+    } catch (arxivErr) {
+      const doc = await Post.findOne({ arxivId: id }).lean()
+      if (doc) {
+        const fb = {
+          id: doc.arxivId, title: doc.title, abstract: doc.abstract || '',
+          authors: doc.authors ? String(doc.authors).split(',').map(s => s.trim()) : [],
+          date: doc.date || '', pdf: `https://arxiv.org/pdf/${doc.arxivId}`,
+          link: `https://arxiv.org/abs/${doc.arxivId}`,
+          thumbnail: `https://arxiv.org/html/${doc.arxivId}/x1.png`,
+          category: doc.category || 'cs.AI', topic: 'ai',
+          citedBy: doc.citations || 0, venue: null, doi: null,
+          hasCode: false, codeUrl: null, source: 'db',
+        }
+        const payload = { paper: fb }
+        cache.set(key, payload, 120)
+        return res.json(payload)
+      }
+      return res.status(503).json({ message: 'Paper source temporarily unavailable' })
+    }
     if (!paper) return res.status(404).json({ message: 'Paper not found' })
 
     const citationMap = await fetchCitations([paper.id])

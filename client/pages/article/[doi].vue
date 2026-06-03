@@ -144,7 +144,9 @@ const post = ref<any>(null)
 const loading = ref(true)
 const error = ref(false)
 
-const isArxivId = (id: string) => !/^[0-9a-f]{24}$/i.test(id)
+// arXiv IDs: new "2405.12345" / "2405.12345v2", old "cs/0501001". MongoDB _id is 24-hex.
+const isArxivId = (id: string) =>
+  /^\d{4}\.\d{4,5}(v\d+)?$/.test(id) || /^[a-z-]+\/\d{7}(v\d+)?$/i.test(id)
 
 const authors = computed(() => {
   if (!post.value?.authors) return []

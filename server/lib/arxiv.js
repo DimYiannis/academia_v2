@@ -14,7 +14,7 @@ const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_
 
 function mapEntry(entry, defaultTopic = 'ai') {
   const rawId = String(entry.id || '')
-  const id = rawId.replace('http://arxiv.org/abs/', '').replace(/v\d+$/, '')
+  const id = rawId.replace(/^https?:\/\/arxiv\.org\/abs\//, '').replace(/v\d+$/, '')
 
   const authorRaw = entry.author || []
   const authorList = Array.isArray(authorRaw) ? authorRaw : [authorRaw]
@@ -45,11 +45,25 @@ function mapEntry(entry, defaultTopic = 'ai') {
   }
 }
 
-async function arxivFetch(url, retries = 1) {
-  const res = await fetch(url)
-  if (res.status === 429 && retries > 0) {
-    await new Promise(r => setTimeout(r, 20000))
-    return arxivFetch(url, retries - 1)
+async function arxivFetch(url, attempt = 0) {
+  const MAX_ATTEMPTS = 2
+  let res
+  try {
+    res = await fetch(url, {
+      headers: { 'User-Agent': 'AcademiaV2/1.0 (research feed)' },
+      signal: AbortSignal.timeout(6000),
+    })
+  } catch (e) {
+    // Network error / timeout — retry once, then bubble up so caller can fall back
+    if (attempt < MAX_ATTEMPTS - 1) {
+      await new Promise(r => setTimeout(r, 1000))
+      return arxivFetch(url, attempt + 1)
+    }
+    throw new Error(`arXiv fetch failed: ${e.name === 'TimeoutError' ? 'timeout' : e.message}`)
+  }
+  if ((res.status === 429 || res.status === 503) && attempt < MAX_ATTEMPTS - 1) {
+    await new Promise(r => setTimeout(r, 1500))
+    return arxivFetch(url, attempt + 1)
   }
   if (!res.ok) throw new Error(`arXiv fetch failed: ${res.status}`)
   return res
