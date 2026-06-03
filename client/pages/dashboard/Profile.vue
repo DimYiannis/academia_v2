@@ -3,56 +3,64 @@
     <LoadSpinner />
   </div>
 
-  <main v-else class="px-6 py-6 text-gray-100 max-w-3xl">
+  <main v-else class="px-6 py-8 max-w-2xl">
 
     <!-- Banner -->
     <div
-      class="h-40 rounded-xl mb-4 bg-gray-700"
+      class="h-36 rounded-2xl mb-0 overflow-hidden"
+      :class="user.backgroundImg ? '' : 'bg-gradient-to-br from-teal-900/50 via-gray-800 to-gray-900'"
       :style="user.backgroundImg ? {
-        backgroundImage: `url(${API_BASE}` + user.backgroundImg + ')',
+        backgroundImage: `url(${API_BASE}${user.backgroundImg})`,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
       } : {}"
     ></div>
 
-    <!-- Avatar + actions row -->
-    <div class="relative flex items-end justify-between mb-4 -mt-10 px-2">
+    <!-- Avatar row -->
+    <div class="flex items-end justify-between -mt-8 px-1 mb-4">
       <div
-        class="w-20 h-20 rounded-full border-4 border-[#1c1c1e] bg-gray-600"
+        class="w-16 h-16 rounded-2xl border-4 border-[#1c1c1e] flex items-center justify-center text-lg font-bold shrink-0"
+        :class="user.profileImg ? '' : 'bg-teal-600 text-white'"
         :style="user.profileImg ? {
-          backgroundImage: `url(${API_BASE}` + user.profileImg + ')',
+          backgroundImage: `url(${API_BASE}${user.profileImg})`,
           backgroundPosition: 'center',
           backgroundSize: 'cover',
         } : {}"
-      ></div>
+      >
+        <span v-if="!user.profileImg">{{ initials }}</span>
+      </div>
       <button
         @click="edit"
-        class="px-4 py-1.5 rounded-lg border border-gray-600 text-sm text-gray-300 hover:border-gray-400 hover:text-white transition-colors bg-transparent"
+        class="px-4 py-1.5 rounded-lg border border-gray-700 text-xs text-gray-400 hover:border-gray-500 hover:text-white transition-colors"
       >Edit Profile</button>
     </div>
 
     <!-- Name + bio -->
-    <div class="mb-6">
-      <h1 class="text-xl font-semibold text-white capitalize">{{ user.name }}</h1>
+    <div class="mb-5">
+      <h1 class="text-xl font-bold text-white capitalize">{{ user.name }}</h1>
       <p v-if="user.info" class="text-sm text-gray-400 mt-1">{{ user.info }}</p>
+      <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+        <span>{{ sharedposts.length }} shared</span>
+        <span>{{ likedposts.length }} favorites</span>
+      </div>
     </div>
 
-    <!-- Tab bar -->
-    <div class="flex gap-5 border-b border-gray-700 mb-5">
+    <!-- Pill tabs -->
+    <div class="flex gap-1 p-1 bg-gray-800/60 rounded-xl mb-5 w-fit">
       <button
         @click="SharedPosts"
-        class="text-sm font-medium pb-2 transition-colors"
-        :class="showSharedPosts ? 'text-white border-b-2 border-teal-500' : 'text-gray-400 hover:text-gray-200'"
+        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="showSharedPosts ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
       >Shared Posts</button>
       <button
         @click="favorites"
-        class="text-sm font-medium pb-2 transition-colors"
-        :class="showfavorites ? 'text-white border-b-2 border-teal-500' : 'text-gray-400 hover:text-gray-200'"
+        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="showfavorites ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
       >Favorites</button>
       <button
         @click="notif"
-        class="text-sm font-medium pb-2 transition-colors"
-        :class="shownotif ? 'text-white border-b-2 border-teal-500' : 'text-gray-400 hover:text-gray-200'"
+        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="shownotif ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
       >Notifications</button>
     </div>
 
@@ -61,27 +69,25 @@
       <div
         v-for="i of sharedposts"
         :key="i._id"
-        class="border border-gray-700 p-4 mb-3 rounded-2xl hover:border-gray-600 transition-colors"
+        class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
       >
-        <p class="text-xs text-gray-400 mb-2">Shared by {{ i.user?.name }}</p>
-        <p v-if="i.title" class="text-sm text-gray-300 mb-3">{{ i.title }}</p>
-        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-600 rounded-xl p-3 mb-2">
-          <h2 class="text-sm font-semibold text-white mb-1">
+        <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
+        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4 mb-2">
+          <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
             <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j.doi">{{ j.title }}</NuxtLink>
           </h2>
-          <div class="flex flex-wrap gap-x-3 text-xs text-gray-400 mb-1">
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
             <span v-if="j.authors">{{ j.authors }}</span>
-            <span v-if="j.university">{{ j.university }}</span>
             <span v-if="j.date">{{ j.date }}</span>
           </div>
-          <p class="text-xs text-gray-500 line-clamp-2">{{ j.abstract }}</p>
+          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j.abstract }}</p>
         </div>
         <button
           @click="deletepost(i._id)"
-          class="mt-2 px-3 py-1 text-xs rounded-lg border border-red-800 text-red-400 hover:bg-red-900/20 transition-colors bg-transparent"
+          class="mt-1 px-3 py-1 text-xs rounded-lg border border-red-900/60 text-red-500 hover:bg-red-900/20 transition-colors"
         >Delete</button>
       </div>
-      <p v-if="!sharedposts.length" class="text-sm text-gray-500">No shared posts yet.</p>
+      <p v-if="!sharedposts.length" class="text-sm text-gray-600 py-8 text-center">No shared posts yet.</p>
     </div>
 
     <!-- Favorites tab -->
@@ -89,33 +95,32 @@
       <div
         v-for="i of likedposts"
         :key="i._id"
-        class="border border-gray-700 p-4 mb-3 rounded-2xl hover:border-gray-600 transition-colors"
+        class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
       >
         <div v-for="j in [i.postDetails]" :key="j?.doi">
           <div class="flex items-start justify-between mb-1">
-            <h2 class="text-sm font-semibold text-white">
+            <h2 class="text-[15px] font-semibold text-white leading-snug">
               <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + j?.doi">{{ j?.title }}</NuxtLink>
             </h2>
-            <button @click="unlike(i._id)" class="p-1 text-gray-500 hover:text-red-400 transition-colors bg-transparent border-0 ml-2 shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                <path fill="currentColor" fill-rule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12L5.47 6.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            <button @click="unlike(i._id)" class="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-900/20 transition-colors shrink-0 ml-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18M6 6l12 12"/>
               </svg>
             </button>
           </div>
-          <div class="flex flex-wrap gap-x-3 text-xs text-gray-400 mb-1">
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2 mt-1">
             <span v-if="j?.authors">{{ j.authors }}</span>
-            <span v-if="j?.university">{{ j.university }}</span>
             <span v-if="j?.date">{{ j.date }}</span>
           </div>
-          <p class="text-xs text-gray-500 line-clamp-2">{{ j?.abstract }}</p>
+          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j?.abstract }}</p>
         </div>
       </div>
-      <p v-if="!likedposts.length" class="text-sm text-gray-500">No liked posts yet.</p>
+      <p v-if="!likedposts.length" class="text-sm text-gray-600 py-8 text-center">No favorites yet.</p>
     </div>
 
     <!-- Notifications tab -->
-    <div v-show="shownotif" class="flex flex-col items-center py-10 gap-4">
-      <p class="text-sm text-gray-400">No notifications yet.</p>
+    <div v-show="shownotif" class="py-10 text-center">
+      <p class="text-sm text-gray-600">No notifications yet.</p>
     </div>
 
   </main>
@@ -149,6 +154,14 @@ export default {
     user: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    initials() {
+      if (!this.user?.name) return '?'
+      const parts = this.user.name.trim().split(' ')
+      if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      return this.user.name.slice(0, 2).toUpperCase()
     },
   },
   
