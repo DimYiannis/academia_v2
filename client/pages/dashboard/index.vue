@@ -186,8 +186,8 @@
 
           <LoadSpinner v-if="papersPending && papers.length === 0" />
 
-          <p v-if="!papersPending && displayedPapers.length === 0 && papers.length > 0" class="text-sm text-gray-500 py-4 text-center">
-            No papers match current filters.
+          <p v-else-if="displayedPapers.length === 0" class="text-sm text-gray-500 py-8 text-center">
+            {{ papers.length > 0 ? 'No papers match current filters.' : 'No papers available for this topic right now.' }}
           </p>
 
           <div
@@ -390,7 +390,7 @@ export default {
 
     const sourceArxiv     = ref(true);
     const sourceCommunity = ref(true);
-    const activeFilters   = reactive({ last30: false, mostCited: false });
+    const activeFilters   = reactive({ last30: false, hasCitations: false });
 
     const topicData = {
       ai:   usePapers('ai'),
@@ -411,8 +411,8 @@ export default {
       { id: 'community', label: 'Community' },
     ];
     const filters = [
-      { id: 'last30',    label: 'Last 30 days' },
-      { id: 'mostCited', label: 'Most cited' },
+      { id: 'last30',     label: 'Last 30 days' },
+      { id: 'hasCitations', label: 'Has citations' },
     ];
     const feedTabs = ['Latest', 'Most Cited', 'Trending', 'Saved'];
 
@@ -450,7 +450,15 @@ export default {
 
       if (activeFilters.last30) {
         const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
-        result = result.filter(p => new Date(p.date).getTime() >= cutoff);
+        result = result.filter(p => {
+          const t = new Date(p.date).getTime();
+          // keep papers within 30 days; drop only those with a valid older date
+          return isNaN(t) ? true : t >= cutoff;
+        });
+      }
+
+      if (activeFilters.hasCitations) {
+        result = result.filter(p => (p.citedBy || 0) > 0);
       }
 
       if (activeTab.value === 'Most Cited') {

@@ -7,9 +7,19 @@ const Post = require('../models/Post')
 // Last successful arXiv payload per topic:start — served when arXiv is throttled/down
 const lastGood = {}
 
+// Category prefixes per topic — used to filter DB fallback by topic
+const TOPIC_CATEGORY_RE = {
+  ai:   /^cs\.(AI|LG|NE)/,
+  math: /^math\./,
+  hw:   /^(cs\.AR|eess\.)/,
+  cs:   /^cs\.(DS|CC|DC)/,
+}
+
 // Map seeded DB posts to the Paper shape — final fallback when arXiv is unreachable
 async function dbFallback(topic, start) {
-  const docs = await Post.find({})
+  const re = TOPIC_CATEGORY_RE[topic]
+  const query = re ? { category: { $regex: re } } : {}
+  const docs = await Post.find(query)
     .sort({ createdAt: -1 })
     .skip(start)
     .limit(10)

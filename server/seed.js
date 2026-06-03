@@ -52,25 +52,41 @@ const seed = async () => {
     console.log(`Total unique SS papers: ${ssPapers.length}`)
   } catch (e) {
     console.warn(`Semantic Scholar unavailable (${e.message}) — trying arXiv...`)
+  }
 
-    // Fallback to arXiv
+  // Seed every topic from arXiv so each has data even when arXiv is later down.
+  // Sequential with delay to respect arXiv rate limits.
+  let gotAny = false
+  for (const topic of ['ai', 'math', 'hw', 'cs']) {
     try {
-      console.log('Fetching arXiv AI papers (page 1)...')
-      aiPapers = await fetchPapers('ai', 0)
-      console.log(`Got ${aiPapers.length} arXiv papers`)
-      await new Promise(r => setTimeout(r, 5000))
-      mlPapers = await fetchPapers('ai', 10)
-      console.log(`Got ${mlPapers.length} more arXiv papers`)
+      const papers = await fetchPapers(topic, 0)
+      aiPapers.push(...papers)
+      gotAny = true
+      console.log(`arXiv ${topic}: ${papers.length} papers`)
+      await new Promise(r => setTimeout(r, 4000))
     } catch (e2) {
-      console.warn(`arXiv also unavailable (${e2.message})${arxivOnly ? ' — try again later' : ' — seeding with HF only'}`)
-      if (arxivOnly) process.exit(1)
+      console.warn(`arXiv ${topic} failed (${e2.message})`)
     }
+  }
+  if (arxivOnly && !gotAny && !ssPapers.length) {
+    console.warn('No arXiv/SS papers fetched — try again later')
+    process.exit(1)
   }
 
   const allPapers = [...hfPapers, ...ssPapers, ...aiPapers, ...mlPapers]
 
+  // Dedup against papers already in DB (arxiv-only re-runs) and within this batch
+  const existing = new Set((await Post.find({}, 'arxivId').lean()).map(d => d.arxivId).filter(Boolean))
+  const batchSeen = new Set()
+
   const posts_to_insert = allPapers
     .filter(p => p.title && p.abstract)
+    .filter(p => {
+      if (!p.id) return true
+      if (existing.has(p.id) || batchSeen.has(p.id)) return false
+      batchSeen.add(p.id)
+      return true
+    })
     .map(p => ({
       title: p.title,
       authors: Array.isArray(p.authors)
