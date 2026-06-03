@@ -181,7 +181,7 @@
         <!-- arXiv paper cards -->
         <div>
           <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-            {{ activeTab === 'Trending' ? 'Trending papers' : 'Latest papers' }}
+            {{ activeTab === 'Trending' ? 'Trending papers' : activeTab === 'Most Cited' ? 'Most cited papers' : 'Latest papers' }}
           </p>
 
           <LoadSpinner v-if="papersPending && papers.length === 0" />
@@ -447,7 +447,7 @@ export default {
       { id: 'last30',    label: 'Last 30 days' },
       { id: 'mostCited', label: 'Most cited' },
     ];
-    const feedTabs = ['Latest', 'Trending', 'Saved'];
+    const feedTabs = ['Latest', 'Most Cited', 'Trending', 'Saved'];
 
     const topicColor = {
       ai:   'bg-teal-500',
@@ -459,7 +459,7 @@ export default {
     const papers        = computed(() => topicData[activeTopic.value].papers.value);
     const papersPending = computed(() => topicData[activeTopic.value].pending.value);
     const papersError   = computed(() => topicData[activeTopic.value].error.value);
-    const hasMore       = computed(() => activeTab.value !== 'Saved' && topicData[activeTopic.value].hasMore.value);
+    const hasMore       = computed(() => !['Saved','Most Cited','Trending'].includes(activeTab.value) && topicData[activeTopic.value].hasMore.value);
 
     function loadMore() {
       topicData[activeTopic.value].loadMore();
@@ -484,8 +484,21 @@ export default {
         result = result.filter(p => new Date(p.date).getTime() >= cutoff);
       }
 
-      if (activeFilters.mostCited || activeTab.value === 'Trending') {
+      if (activeTab.value === 'Most Cited') {
         result = result.slice().sort((a, b) => b.citedBy - a.citedBy);
+      } else if (activeTab.value === 'Trending') {
+        // Trending: score = citedBy + (upvotes * 5) weighted by recency (last 14 days = 2x)
+        const twoWeeksAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
+        result = result.slice().sort((a, b) => {
+          const aScore = (a.citedBy || 0) + (a.upvotes || 0) * 5;
+          const bScore = (b.citedBy || 0) + (b.upvotes || 0) * 5;
+          const aBoost = new Date(a.date).getTime() > twoWeeksAgo ? 2 : 1;
+          const bBoost = new Date(b.date).getTime() > twoWeeksAgo ? 2 : 1;
+          return bScore * bBoost - aScore * aBoost;
+        });
+      } else {
+        // Latest: sort by date desc
+        result = result.slice().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       }
 
       return result;

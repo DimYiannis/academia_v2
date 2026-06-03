@@ -48,7 +48,7 @@ function mapEntry(entry, defaultTopic = 'ai') {
 async function arxivFetch(url, retries = 1) {
   const res = await fetch(url)
   if (res.status === 429 && retries > 0) {
-    await new Promise(r => setTimeout(r, 5000))
+    await new Promise(r => setTimeout(r, 20000))
     return arxivFetch(url, retries - 1)
   }
   if (!res.ok) throw new Error(`arXiv fetch failed: ${res.status}`)

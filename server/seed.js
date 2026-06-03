@@ -11,46 +11,44 @@ const seed = async () => {
   await connectDB(process.env.MONGO_URL)
   console.log('Connected to MongoDB')
 
-  // Clear mock data and orphaned records
-  const [posts, likes, bookmarks, shares] = await Promise.all([
-    Post.countDocuments(),
-    Likes.countDocuments(),
-    Bookmarks.countDocuments(),
-    Sharedposts.countDocuments(),
-  ])
-  console.log(`Deleting: ${posts} posts, ${likes} likes, ${bookmarks} bookmarks, ${shares} shared posts`)
+  const arxivOnly = process.argv.includes('--arxiv-only')
 
-  await Promise.all([
-    Post.deleteMany({}),
-    Likes.deleteMany({}),
-    Bookmarks.deleteMany({}),
-    Sharedposts.deleteMany({}),
-  ])
+  if (!arxivOnly) {
+    // Full reset: clear everything and re-seed HF + arXiv
+    const [posts, likes, bookmarks, shares] = await Promise.all([
+      Post.countDocuments(), Likes.countDocuments(),
+      Bookmarks.countDocuments(), Sharedposts.countDocuments(),
+    ])
+    console.log(`Deleting: ${posts} posts, ${likes} likes, ${bookmarks} bookmarks, ${shares} shared posts`)
+    await Promise.all([Post.deleteMany({}), Likes.deleteMany({}), Bookmarks.deleteMany({}), Sharedposts.deleteMany({})])
+  } else {
+    console.log('--arxiv-only: skipping deletion, appending arXiv papers only')
+  }
 
-  // Fetch real papers
-  console.log('Fetching HuggingFace daily papers...')
-  const hfPapers = await fetchFeaturedPapers()
-  console.log(`Got ${hfPapers.length} HF papers`)
+  let hfPapers = []
+  if (!arxivOnly) {
+    console.log('Fetching HuggingFace daily papers...')
+    hfPapers = await fetchFeaturedPapers()
+    console.log(`Got ${hfPapers.length} HF papers`)
+  }
 
   let aiPapers = []
   let mlPapers = []
 
   try {
-    console.log('Fetching arXiv AI papers...')
+    console.log('Fetching arXiv AI papers (page 1)...')
     aiPapers = await fetchPapers('ai', 0)
     console.log(`Got ${aiPapers.length} arXiv AI papers`)
-    await new Promise(r => setTimeout(r, 4000))
+    await new Promise(r => setTimeout(r, 5000))
+    console.log('Fetching arXiv AI papers (page 2)...')
     mlPapers = await fetchPapers('ai', 10)
     console.log(`Got ${mlPapers.length} more arXiv papers`)
   } catch (e) {
-    console.warn(`arXiv unavailable (${e.message}) — seeding with HF papers only`)
+    console.warn(`arXiv unavailable (${e.message})${arxivOnly ? ' — try again in a few minutes' : ' — seeding with HF only'}`)
+    if (arxivOnly) { process.exit(1) }
   }
 
-  const allPapers = [
-    ...hfPapers,
-    ...aiPapers,
-    ...mlPapers,
-  ]
+  const allPapers = [...hfPapers, ...aiPapers, ...mlPapers]
 
   const posts_to_insert = allPapers
     .filter(p => p.title && p.abstract)
