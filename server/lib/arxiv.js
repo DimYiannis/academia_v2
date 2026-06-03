@@ -45,12 +45,21 @@ function mapEntry(entry, defaultTopic = 'ai') {
   }
 }
 
+async function arxivFetch(url, retries = 1) {
+  const res = await fetch(url)
+  if (res.status === 429 && retries > 0) {
+    await new Promise(r => setTimeout(r, 5000))
+    return arxivFetch(url, retries - 1)
+  }
+  if (!res.ok) throw new Error(`arXiv fetch failed: ${res.status}`)
+  return res
+}
+
 async function fetchPapers(topic = 'ai', start = 0) {
   const search_query = ARXIV_CATEGORIES[topic] || ARXIV_CATEGORIES.ai
   const url = `${ARXIV_BASE}?search_query=${encodeURIComponent(search_query)}&start=${start}&max_results=${RESULTS_PER_PAGE}&sortBy=submittedDate&sortOrder=descending`
 
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`arXiv fetch failed: ${res.status}`)
+  const res = await arxivFetch(url)
   const xml = await res.text()
 
   const parsed = parser.parse(xml)
@@ -63,8 +72,7 @@ async function fetchPapers(topic = 'ai', start = 0) {
 
 async function fetchPaperById(id) {
   const url = `${ARXIV_BASE}?id_list=${encodeURIComponent(id)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`arXiv fetch failed: ${res.status}`)
+  const res = await arxivFetch(url)
   const xml = await res.text()
 
   const parsed = parser.parse(xml)
