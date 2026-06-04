@@ -99,8 +99,9 @@ These were made deliberately — don't revert without a reason.
 ## To Do
 
 ### Medium priority
-- [ ] **Math topic empty** — arXiv 429'd my IP all session; re-run `cd server && node seed.js --arxiv-only` when arXiv cools down to fill math (+ more variety). ai=51, hw=8, cs=7, math=0.
+- [x] **All topics seeded with real papers** — ai=54, math=10, hw=8, cs=7 (total 88). All topics return real data; live arXiv when available, DB fallback when throttled.
 - [ ] **Semantic Scholar key** — get free key at semanticscholar.org/product/api, add `SEMANTIC_SCHOLAR_KEY` to `server/.env` for reliable high-citation seeding (currently 429s without key)
+- [ ] More category labels — `math.RT` and other arXiv subcats show raw codes (not in `CATEGORY_NAMES` map)
 - [ ] Dashboard sidebar mobile toggle — no responsive layout below ~1000px
 - [ ] `messages.vue` — dark theme only (no backend planned)
 - [ ] Connect button on user profile — UI only, no follow/connect system
