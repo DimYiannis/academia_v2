@@ -178,8 +178,14 @@
               <a v-if="i.pdf" :href="i.pdf" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">PDF</a>
 
               <template v-if="activeTab !== 'Saved'">
+                <button @click="likePaper(i)" :disabled="likeLoading"
+                  class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-colors disabled:cursor-progress" title="Like">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 8.25c0-2.485-2.099-4.5-4.687-4.5-1.936 0-3.598 1.126-4.313 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.098 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                  </svg>
+                </button>
                 <button @click="savePaper(i)" :disabled="bookmarkLoading"
-                  class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress" title="Save">
+                  class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress" title="Save">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                   </svg>
@@ -275,11 +281,21 @@
                 {{ paper.citedBy.toLocaleString() }}
               </span>
 
-              <!-- Save + Share -->
+              <!-- Like + Save + Share -->
+              <button
+                @click="likePaper(paper)"
+                :disabled="likeLoading"
+                class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-colors disabled:cursor-progress"
+                title="Like"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 8.25c0-2.485-2.099-4.5-4.687-4.5-1.936 0-3.598 1.126-4.313 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.098 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                </svg>
+              </button>
               <button
                 @click="savePaper(paper)"
                 :disabled="bookmarkLoading"
-                class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress"
+                class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress"
                 title="Save"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -732,6 +748,23 @@ export default {
         console.error("Error saving paper:", error);
       } finally {
         this.bookmarkLoading = false;
+        this.showTooltip = true;
+        setTimeout(() => { this.showTooltip = false; }, 5000);
+      }
+    },
+    async likePaper(p) {
+      try {
+        this.likeLoading = true;
+        const response = await axios.post(
+          `${API_BASE}/api/v1/likes`,
+          this.paperBody(p),
+          { withCredentials: true }
+        );
+        this.message = response.data.message;
+      } catch (error) {
+        console.error("Error liking paper:", error);
+      } finally {
+        this.likeLoading = false;
         this.showTooltip = true;
         setTimeout(() => { this.showTooltip = false; }, 5000);
       }
