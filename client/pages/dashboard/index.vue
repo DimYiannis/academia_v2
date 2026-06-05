@@ -615,9 +615,27 @@ export default {
       'q-fin.MF': 'Mathematical Finance', 'q-fin.PM': 'Portfolio Management',
       'q-fin.TR': 'Trading',              'q-fin.PR': 'Pricing',
       'q-bio.NC': 'Neuroscience',         'physics.comp-ph': 'Computational Physics',
+      'math.RT': 'Representation Theory', 'math.GR': 'Group Theory',
+      'math.PR': 'Probability',          'math.OC': 'Optimization & Control',
+      'math.AP': 'Analysis of PDEs',     'math.DG': 'Differential Geometry',
+      'math.LO': 'Logic',                'math.ST': 'Statistics Theory',
+      'cs.CG': 'Computational Geometry',  'cs.DM': 'Discrete Mathematics',
+      'cs.FL': 'Formal Languages',        'cs.LO': 'Logic in CS',
+      'cs.MA': 'Multiagent Systems',      'cs.HC': 'Human-Computer Interaction',
+      'cs.SD': 'Sound',                   'cs.MM': 'Multimedia',
+    };
+    // Prefix → friendly family name, used when an exact subcat isn't mapped
+    const CATEGORY_FAMILY = {
+      'math.': 'Mathematics', 'cs.': 'Computer Science', 'eess.': 'Engineering',
+      'stat.': 'Statistics', 'q-fin.': 'Quant Finance', 'q-bio.': 'Quant Biology',
+      'physics.': 'Physics', 'astro-ph': 'Astrophysics', 'cond-mat': 'Condensed Matter',
     };
     function categoryLabel(cat) {
-      return CATEGORY_NAMES[cat] || cat;
+      if (CATEGORY_NAMES[cat]) return CATEGORY_NAMES[cat];
+      for (const [prefix, name] of Object.entries(CATEGORY_FAMILY)) {
+        if (cat && cat.startsWith(prefix)) return name;
+      }
+      return cat;
     }
     function onThumbLoad(e) {
       if (e.target.naturalWidth <= 10) e.target.style.display = 'none';
