@@ -100,15 +100,30 @@
           {{ simNodes[selectedIdx].authors }}
         </p>
 
-        <!-- Abstract -->
-        <p v-if="simNodes[selectedIdx].abstract" class="text-xs text-gray-400 leading-relaxed mb-4 line-clamp-6">
-          {{ simNodes[selectedIdx].abstract }}
+        <!-- Paper / Note toggle -->
+        <div class="flex gap-1 p-0.5 bg-gray-800/60 rounded-lg mb-3 w-fit">
+          <button @click="panelTab = 'paper'" class="px-3 py-1 rounded-md text-xs font-medium transition-colors"
+            :class="panelTab === 'paper' ? 'bg-[#242426] text-white' : 'text-gray-400'">Paper</button>
+          <button @click="panelTab = 'note'" class="px-3 py-1 rounded-md text-xs font-medium transition-colors"
+            :class="panelTab === 'note' ? 'bg-[#242426] text-white' : 'text-gray-400'">Note</button>
+        </div>
+
+        <!-- Paper view: abstract -->
+        <p v-if="panelTab === 'paper'" class="text-xs text-gray-400 leading-relaxed mb-4 line-clamp-[10]">
+          {{ simNodes[selectedIdx].abstract || 'No abstract available.' }}
         </p>
+
+        <!-- Note view -->
+        <div v-else class="mb-4">
+          <p v-if="noteLoading" class="text-xs text-gray-600">Loading note…</p>
+          <p v-else-if="note" class="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap border-l-2 border-teal-700/60 pl-3">{{ note }}</p>
+          <p v-else class="text-xs text-gray-600 italic">No note for this paper yet. Add one from the feed.</p>
+        </div>
 
         <!-- Actions -->
         <div class="mt-auto flex flex-col gap-2">
           <NuxtLink
-            :to="'/article/' + (simNodes[selectedIdx].paper?.doi || simNodes[selectedIdx].paper?._id)"
+            :to="'/article/' + (simNodes[selectedIdx].paper?.arxivId || simNodes[selectedIdx].paper?.doi || simNodes[selectedIdx].paper?._id)"
             class="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-medium transition-colors"
             @click="selectedIdx = null"
           >
@@ -133,11 +148,35 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
 const props = defineProps<{ papers: any[]; height?: number }>()
 const height = props.height || 420
+const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 const svgEl = ref<SVGElement | null>(null)
 const hoveredIdx = ref<number | null>(null)
 const selectedIdx = ref<number | null>(null)
+const panelTab = ref<'paper' | 'note'>('paper')
+const note = ref('')
+const noteLoading = ref(false)
+
+// Fetch the user's note when a node is selected
+watch(selectedIdx, async (idx) => {
+  panelTab.value = 'paper'
+  note.value = ''
+  if (idx === null) return
+  const p = simNodes.value[idx]?.paper
+  const id = p?.arxivId || p?.doi || p?._id
+  if (!id) return
+  noteLoading.value = true
+  try {
+    const { data } = await axios.get(`${API_BASE}/api/v1/notes/${id}`, { withCredentials: true })
+    note.value = data.note?.content || ''
+  } catch (e) {
+    note.value = ''
+  } finally {
+    noteLoading.value = false
+  }
+})
 
 // Drag state
 const dragState = ref<{ idx: number; startX: number; startY: number; moved: boolean } | null>(null)

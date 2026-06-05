@@ -28,6 +28,7 @@ const postRouter = require("./routes/postRoutes");
 const sharedpostsRouter = require("./routes/sharedpostsRoutes");
 const bookmarksRouter = require("./routes/bookmarksRoutes");
 const likesRouter = require('./routes/likesRoutes');
+const notesRouter = require('./routes/notesRoutes');
 const paperRouter = require('./routes/paperRoutes');
 
 //middleware
@@ -96,6 +97,7 @@ app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/sharedposts", sharedpostsRouter);
 app.use("/api/v1/bookmarks", bookmarksRouter);
 app.use("/api/v1/likes", likesRouter)
+app.use("/api/v1/notes", notesRouter)
 app.use("/api/papers", paperRouter)
 
 app.use(notFoundMiddleware);

@@ -16,9 +16,6 @@
           <p v-if="user.info" class="text-xs text-gray-500 mt-0.5">{{ user.info }}</p>
         </div>
       </div>
-      <button @click="edit" class="px-3 py-1.5 rounded-lg border border-gray-700 text-xs text-gray-400 hover:border-gray-500 hover:text-white transition-colors">
-        Edit Profile
-      </button>
     </div>
 
     <!-- Pill tabs -->
@@ -31,9 +28,9 @@
         :class="activeTab === 'papers' ? 'bg-[#242426] text-white' : 'text-gray-400 hover:text-gray-200'">
         Favorites <span v-if="likedposts.length" class="ml-1 text-xs text-gray-600">{{ likedposts.length }}</span>
       </button>
-      <button @click="activeTab = 'shared'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        :class="activeTab === 'shared' ? 'bg-[#242426] text-white' : 'text-gray-400 hover:text-gray-200'">
-        Shared <span v-if="sharedposts.length" class="ml-1 text-xs text-gray-600">{{ sharedposts.length }}</span>
+      <button @click="activeTab = 'notes'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="activeTab === 'notes' ? 'bg-[#242426] text-white' : 'text-gray-400 hover:text-gray-200'">
+        Notes <span v-if="notes.length" class="ml-1 text-xs text-gray-600">{{ notes.length }}</span>
       </button>
     </div>
 
@@ -87,37 +84,32 @@
       </p>
     </div>
 
-    <!-- ── Shared tab ── -->
-    <div v-show="activeTab === 'shared'">
+    <!-- ── Notes tab ── -->
+    <div v-show="activeTab === 'notes'">
       <div
-        v-for="i of sharedposts"
-        :key="i._id"
+        v-for="n of notes"
+        :key="n._id"
         class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
       >
-        <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
-        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4 mb-2">
-          <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
-            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j.arxivId || j.doi)">{{ j.title }}</NuxtLink>
-          </h2>
-          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
-            <span v-if="j.authors">{{ j.authors }}</span>
-            <span v-if="j.date">{{ j.date }}</span>
-          </div>
-          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j.abstract }}</p>
+        <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
+          <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (n.postDetails.arxivId || n.postDetails.doi)">{{ n.postDetails.title }}</NuxtLink>
+        </h2>
+        <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-3">
+          <span v-if="n.postDetails.authors">{{ n.postDetails.authors }}</span>
+          <span v-if="n.postDetails.date">{{ n.postDetails.date }}</span>
         </div>
-        <button @click="deletepost(i._id)"
-          class="mt-1 px-3 py-1 text-xs rounded-lg border border-red-900/60 text-red-500 hover:bg-red-900/20 transition-colors">
-          Delete
+        <p class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap border-l-2 border-teal-700/60 pl-3">{{ n.content }}</p>
+        <button @click="deleteNote(n._id)"
+          class="mt-3 px-3 py-1 text-xs rounded-lg border border-red-900/60 text-red-500 hover:bg-red-900/20 transition-colors">
+          Delete note
         </button>
       </div>
-      <p v-if="!sharedposts.length" class="text-sm text-gray-600 py-10 text-center">No shared posts yet.</p>
+      <p v-if="!notes.length" class="text-sm text-gray-600 py-10 text-center">
+        No notes yet — add notes to papers from the feed.
+      </p>
     </div>
 
   </main>
-
-  <Teleport to="body">
-    <Edit :userr="userr" v-show="showedit" @close-modal="edit" />
-  </Teleport>
 </template>
 
 <script>
@@ -129,11 +121,9 @@ definePageMeta({
 export default {
   data() {
     return {
-      sharedposts: [],
+      notes: [],
       likedposts: [],
       loading: false,
-      showedit: false,
-      userr: '',
       activeTab: 'graph',
     };
   },
@@ -169,48 +159,28 @@ export default {
     },
   },
   mounted() {
-    this.getsharedposts();
+    this.getNotes();
     this.getlikedposts();
   },
   methods: {
-    async getsharedposts() {
+    async getNotes() {
       this.loading = true;
       try {
-        const response = await axios.get(
-          `${API_BASE}/api/v1/sharedposts/mysharedposts`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        this.sharedposts = response.data.sharedposts;
-        
-        console.log(this.userr);
-       // console.log(this.sharedposts);
+        const { data } = await axios.get(`${API_BASE}/api/v1/notes`, { withCredentials: true });
+        this.notes = (data.notes || []).filter(n => n.content && n.postDetails);
       } catch (error) {
-        console.error("Error fetching user information:", error);
-        console.error("Error response data:", error.response.data);
-        console.log("Response headers:", error.response.headers);
+        console.error("Error fetching notes:", error);
       } finally {
         this.loading = false;
       }
-      this.userr = this.user 
-      console.log(this.userr);
     },
-    async deletepost(postId) {
+    async deleteNote(noteId) {
       try {
-        await axios.delete(
-          `${API_BASE}/api/v1/sharedposts/${postId}`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        this.getsharedposts();
+        await axios.delete(`${API_BASE}/api/v1/notes/${noteId}`, { withCredentials: true });
+        this.getNotes();
       } catch (error) {
-        console.error("Error deleting shared post:", error);
+        console.error("Error deleting note:", error);
       }
-      this.user = userr;
     },
     async getlikedposts() {
       try {
@@ -236,9 +206,6 @@ export default {
       } catch (error) {
         console.error("Error deleting liked post from your likes:", error);
       }
-    },
-    edit() {
-      this.showedit = !this.showedit;
     },
     goToArticle(paper) {
       const id = paper?.doi || paper?._id

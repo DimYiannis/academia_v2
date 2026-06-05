@@ -117,8 +117,8 @@
         <div
           v-show="showTooltip"
           :class="{
-            'bg-red-900/30 border-red-800 text-red-400': message.toLowerCase().includes('removed'),
-            'bg-green-900/30 border-green-800 text-green-400': message.toLowerCase().includes('created'),
+            'bg-red-900/30 border-red-800 text-red-400': message.toLowerCase().includes('removed') || message.toLowerCase().includes('deleted'),
+            'bg-green-900/30 border-green-800 text-green-400': message.toLowerCase().includes('created') || message.toLowerCase().includes('saved'),
           }"
           class="fixed top-16 right-4 z-20 text-sm border rounded-lg px-4 py-2 shadow-sm"
         >
@@ -190,10 +190,10 @@
                     <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                   </svg>
                 </button>
-                <button @click="sharePaperOpen(i)"
-                  class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors" title="Share">
+                <button @click="openNote(i)"
+                  class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors" title="Add note">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                    <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
                   </svg>
                 </button>
               </template>
@@ -303,12 +303,12 @@
                 </svg>
               </button>
               <button
-                @click="sharePaperOpen(paper)"
+                @click="openNote(paper)"
                 class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors"
-                title="Share"
+                title="Add note"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                  <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
                 </svg>
               </button>
             </div>
@@ -425,14 +425,35 @@
 
   </div>
 
-  <Teleport v-if="user" to="body">
-    <sharepostmodal
-      v-show="showmodal"
-      @close-modal="modal"
-      :user="user"
-      :postId="postId"
-      @share-post="sharePost"
-    />
+  <!-- Note modal -->
+  <Teleport to="body">
+    <div
+      v-if="noteModal"
+      class="fixed inset-0 z-30 bg-black/50 flex items-center justify-center p-4"
+      @click.self="closeNote"
+    >
+      <div class="w-full max-w-lg bg-[#242426] border border-gray-700 rounded-2xl p-6">
+        <div class="flex items-start justify-between mb-1">
+          <p class="text-xs font-semibold text-teal-400 uppercase tracking-wider">My note</p>
+          <button @click="closeNote" class="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-gray-700/50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <h3 class="text-sm font-semibold text-white leading-snug mb-4">{{ notePaper?.title }}</h3>
+        <textarea
+          v-model="noteContent"
+          rows="6"
+          placeholder="Write your thoughts, summary, key takeaways…"
+          class="w-full bg-[#1c1c1e] border border-gray-700 rounded-xl p-3 text-sm text-gray-200 placeholder-gray-600 outline-none focus:border-teal-600 resize-none"
+        ></textarea>
+        <div class="flex items-center justify-end gap-2 mt-4">
+          <button @click="closeNote" class="px-4 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+          <button @click="saveNote" :disabled="noteSaving" class="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
+            {{ noteSaving ? 'Saving…' : 'Save note' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </Teleport>
 </template>
 
@@ -614,9 +635,10 @@ export default {
 
   data() {
     return {
-      showmodal: false,
-      postId: "",
-      sharePaperData: null,
+      noteModal: false,
+      notePaper: null,
+      noteContent: "",
+      noteSaving: false,
       input: "",
       likeLoading: false,
       bookmarkLoading: false,
@@ -712,24 +734,43 @@ export default {
         setTimeout(() => { this.showTooltip = false; }, 5000);
       }
     },
-    async sharePost(sharedPost) {
+    // Notes — open modal, load existing note for this paper
+    async openNote(p) {
+      this.notePaper = p;
+      this.noteContent = "";
+      this.noteModal = true;
       try {
-        const { postId, content } = sharedPost;
-        // If sharing an external paper, send its payload; else reference the post id
-        const body = this.sharePaperData
-          ? { ...this.sharePaperData, title: content }
-          : { post: postId, title: content };
-        await axios.post(
-          `${API_BASE}/api/v1/sharedposts`,
-          body,
-          { withCredentials: true }
-        );
-        this.sharePaperData = null;
-      } catch (error) {
-        console.error("Error sharing post:", error);
+        const id = p.id || p.arxivId || p._id;
+        const { data } = await axios.get(`${API_BASE}/api/v1/notes/${id}`, { withCredentials: true });
+        if (data.note) this.noteContent = data.note.content || "";
+      } catch (e) {
+        console.error("Error loading note:", e);
       }
     },
-    // Build a bookmark/share body from a feed paper (arXiv/HF) or DB post
+    async saveNote() {
+      try {
+        this.noteSaving = true;
+        await axios.post(
+          `${API_BASE}/api/v1/notes`,
+          { ...this.paperBody(this.notePaper), content: this.noteContent },
+          { withCredentials: true }
+        );
+        this.message = "Note saved";
+        this.noteModal = false;
+        this.notePaper = null;
+      } catch (error) {
+        console.error("Error saving note:", error);
+      } finally {
+        this.noteSaving = false;
+        this.showTooltip = true;
+        setTimeout(() => { this.showTooltip = false; }, 5000);
+      }
+    },
+    closeNote() {
+      this.noteModal = false;
+      this.notePaper = null;
+    },
+    // Build a bookmark/note body from a feed paper (arXiv/HF) or DB post
     paperBody(p) {
       if (p._id) return { post: p._id };
       return {
@@ -777,26 +818,6 @@ export default {
         this.showTooltip = true;
         setTimeout(() => { this.showTooltip = false; }, 5000);
       }
-    },
-    sharePaperOpen(p) {
-      this.sharePaperData = this.paperBody(p);
-      this.postId = "";
-      this.showmodal = true;
-    },
-    async getsinglepost(input) {
-      try {
-        const response = await axios.get(
-          `${API_BASE}/api/v1/posts/${input}`,
-          { withCredentials: true }
-        );
-        this.$emit("update-posts", [response.data.post]);
-      } catch (error) {
-        console.error("Error fetching single post:", error);
-      }
-    },
-    modal(post_Id) {
-      this.postId = post_Id;
-      this.showmodal = !this.showmodal;
     },
   },
 };
