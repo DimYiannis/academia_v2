@@ -142,7 +142,7 @@
               v-if="i.thumbnail"
               :src="i.thumbnail"
               :alt="i.title"
-              class="absolute top-0 right-0 h-full w-44 object-cover pointer-events-none"
+              class="absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
@@ -167,7 +167,7 @@
               </p>
               <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ i.abstract }}</p>
             </div>
-            <div class="mt-3 pt-3 border-t border-gray-700/40 flex items-center gap-3">
+            <div class="mt-3 pt-3 border-t border-gray-700/40 flex items-center gap-3 pr-44">
               <a v-if="i.id" :href="'https://arxiv.org/html/' + i.id" target="_blank" rel="noopener"
                 class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -223,7 +223,7 @@
               v-if="paper.thumbnail"
               :src="paper.thumbnail"
               :alt="paper.title"
-              class="absolute top-0 right-0 h-full w-44 object-cover pointer-events-none"
+              class="absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
@@ -663,7 +663,15 @@ export default {
         );
         this.savedPosts = (data.bookmarks || [])
           .map(b => b.postDetails)
-          .filter(Boolean);
+          .filter(Boolean)
+          .map(pd => ({
+            ...pd,
+            // normalize to card shape (saved postDetails have arxivId, not id/pdf/thumbnail)
+            id: pd.arxivId || pd._id,
+            pdf: pd.arxivId ? `https://arxiv.org/pdf/${pd.arxivId}` : null,
+            thumbnail: pd.arxivId ? `https://arxiv.org/html/${pd.arxivId}/x1.png` : null,
+            authors: pd.authors ? String(pd.authors).split(',').map(s => s.trim()) : [],
+          }));
       } catch (e) {
         console.error(e);
       } finally {
@@ -744,6 +752,7 @@ export default {
           { withCredentials: true }
         );
         this.message = response.data.message;
+        await this.fetchSaved(); // keep Saved tab current
       } catch (error) {
         console.error("Error saving paper:", error);
       } finally {
