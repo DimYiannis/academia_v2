@@ -125,11 +125,13 @@
           {{ message }}
         </div>
 
-        <!-- HuggingFace featured papers -->
-        <div v-if="displayedPosts && displayedPosts.length" class="mb-6">
+        <!-- HuggingFace featured (AI topic only — HF daily is all ML/AI) OR saved bookmarks (any topic) -->
+        <div v-if="(activeTab === 'Saved' || activeTopic === 'ai') && displayedPosts && displayedPosts.length" class="mb-6">
           <div class="flex items-center gap-2 mb-3">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Today on HuggingFace</p>
-            <span class="text-xs text-gray-600">· curated</span>
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              {{ activeTab === 'Saved' ? 'Saved papers' : 'Today on HuggingFace' }}
+            </p>
+            <span v-if="activeTab !== 'Saved'" class="text-xs text-gray-600">· curated</span>
           </div>
           <div
             v-for="(i, index) in displayedPosts.slice(0, 8)"
@@ -332,17 +334,22 @@
           </div>
         </template>
 
-        <!-- Live derived from paper categories -->
+        <!-- Live derived from paper categories — click to filter feed -->
         <ul v-else class="space-y-0.5">
           <li
             v-for="([cat, count], i) in trendingCategories"
             :key="cat"
-            class="flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer hover:bg-gray-800 transition-colors"
+            @click="categoryFilter = categoryFilter === cat ? null : cat"
+            class="flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer transition-colors"
+            :class="categoryFilter === cat ? 'bg-teal-900/40' : 'hover:bg-gray-800'"
           >
-            <span class="text-xs text-gray-200 truncate">{{ categoryLabel(cat) }}</span>
-            <span class="text-xs font-medium text-gray-400 ml-2 shrink-0">{{ i + 1 }}</span>
+            <span class="text-xs truncate" :class="categoryFilter === cat ? 'text-teal-300 font-medium' : 'text-gray-200'">{{ categoryLabel(cat) }}</span>
+            <span class="text-xs font-medium ml-2 shrink-0" :class="categoryFilter === cat ? 'text-teal-400' : 'text-gray-400'">{{ count }}</span>
           </li>
         </ul>
+        <button v-if="categoryFilter" @click="categoryFilter = null" class="mt-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+          ✕ Clear filter
+        </button>
       </div>
 
       <!-- Section 3: Top venues -->
@@ -391,6 +398,7 @@ export default {
     const sourceArxiv     = ref(true);
     const sourceCommunity = ref(true);
     const activeFilters   = reactive({ last30: false, hasCitations: false });
+    const categoryFilter  = ref(null);
 
     const topicData = {
       ai:   usePapers('ai'),
@@ -434,11 +442,18 @@ export default {
 
     // Lazy-load: only fetch the active topic. Fetch others when user switches to them.
     onMounted(() => topicData[activeTopic.value].ensureLoaded());
-    watch(activeTopic, (t) => topicData[t].ensureLoaded());
+    watch(activeTopic, (t) => {
+      topicData[t].ensureLoaded();
+      categoryFilter.value = null; // categories differ per topic
+    });
 
     const displayedPapers = computed(() => {
       if (!sourceArxiv.value || activeTab.value === 'Saved') return [];
       let result = papers.value.slice();
+
+      if (categoryFilter.value) {
+        result = result.filter(p => p.category === categoryFilter.value);
+      }
 
       const q = searchQuery.value.trim().toLowerCase();
       if (q) {
@@ -537,7 +552,7 @@ export default {
 
     return {
       activeTopic, activeTab, searchQuery,
-      sourceArxiv, sourceCommunity, activeFilters,
+      sourceArxiv, sourceCommunity, activeFilters, categoryFilter,
       topics, sources, filters, feedTabs, topicColor, venueColors,
       papers, papersPending, papersError, hasMore, loadMore,
       displayedPapers, isSourceActive, toggleSource, toggleFilter,
