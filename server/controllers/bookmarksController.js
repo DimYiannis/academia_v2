@@ -2,14 +2,17 @@ const Bookmarks = require("../models/Bookmarks");
 const Post = require("../models/Post");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const { checkPermissions } = require("../utils");
+const { checkPermissions, resolvePost } = require("../utils");
 
 const createbookmark = async (req, res) => {
-  const { post: postId } = req.body;
-
   try {
-    const existingbookmark = await Bookmarks.findOne({user: req.user.userId, post: postId});
-    console.log('Existing Bookmark:', existingbookmark);
+    // Resolve to a Post — existing _id, or upsert from an arXiv/HF paper payload
+    const dbPost = await resolvePost(req.body);
+    if (!dbPost) {
+      throw new CustomError.NotFoundError(`No post or paper provided`);
+    }
+
+    const existingbookmark = await Bookmarks.findOne({ user: req.user.userId, post: dbPost._id });
     if (existingbookmark) {
       await existingbookmark.remove();
 
@@ -17,18 +20,9 @@ const createbookmark = async (req, res) => {
         message: " Bookmark removed succesfully!",
       });
     } else {
-
-      // find the post
-    const dbPost = await Post.findOne({ _id: postId });
-
-    // check if post exists
-    if (!dbPost) {
-      throw new CustomError.NotFoundError(`No post with id : ${postId}`);
-    }
-
     // references to the user and the post
     const newBookmark = new Bookmarks({
-      user: req.user.userId, 
+      user: req.user.userId,
       post: dbPost._id,
     });
     await newBookmark.save();

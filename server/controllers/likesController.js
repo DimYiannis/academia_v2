@@ -2,15 +2,17 @@ const Like = require("../models/Likes");
 const Post = require("../models/Post");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const { checkPermissions } = require("../utils");
+const { checkPermissions, resolvePost } = require("../utils");
 
 const createlike = async (req, res) => {
-  const { post: postId } = req.body;
-
   try {
-    // Check if the user has already liked the post
-    const existingLike = await Like.findOne({ user: req.user.userId, post: postId });
-    console.log("Existing Like:", existingLike);
+    // Resolve to a Post — existing _id, or upsert from an arXiv/HF paper payload
+    const dbPost = await resolvePost(req.body);
+    if (!dbPost) {
+      throw new CustomError.NotFoundError(`No post or paper provided`);
+    }
+
+    const existingLike = await Like.findOne({ user: req.user.userId, post: dbPost._id });
     if (existingLike) {
       // User has already liked the post, so unlike it
       await existingLike.remove();
@@ -19,13 +21,6 @@ const createlike = async (req, res) => {
         message: "Like removed successfully!",
       });
     } else {
-      // User has not liked the post, so create a new like
-      const dbPost = await Post.findOne({ _id: postId });
-
-      if (!dbPost) {
-        throw new CustomError.NotFoundError(`No post with id : ${postId}`);
-      }
-
       const newLike = new Like({
         user: req.user.userId,
         post: dbPost._id,

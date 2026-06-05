@@ -2,15 +2,15 @@ const Sharedposts = require("../models/Sharedposts");
 const Post = require("../models/Post");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const { checkPermissions } = require("../utils");
+const { checkPermissions, resolvePost } = require("../utils");
 
 const createsharedpost = async (req, res) => {
-  const { title, post: postId } = req.body;
+  const { title } = req.body;
 
-  const dbPost = await Post.findOne({ _id: postId });
-
+  // Resolve to a Post — existing _id, or upsert from an arXiv/HF paper payload
+  const dbPost = await resolvePost(req.body);
   if (!dbPost) {
-    throw new CustomError.NotFoundError(`No post with id : ${postId}`);
+    throw new CustomError.NotFoundError(`No post or paper provided`);
   }
 
   const {

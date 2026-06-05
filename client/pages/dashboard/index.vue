@@ -176,6 +176,21 @@
                 Read
               </a>
               <a v-if="i.pdf" :href="i.pdf" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">PDF</a>
+
+              <template v-if="activeTab !== 'Saved'">
+                <button @click="savePaper(i)" :disabled="bookmarkLoading"
+                  class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress" title="Save">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                  </svg>
+                </button>
+                <button @click="sharePaperOpen(i)"
+                  class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors" title="Share">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                  </svg>
+                </button>
+              </template>
             </div>
           </div>
         </div>
@@ -253,12 +268,33 @@
                 Read
               </a>
               <a :href="paper.pdf" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">PDF</a>
-              <span v-if="paper.citedBy" class="flex items-center gap-1 text-xs text-gray-500 ml-auto">
+              <span v-if="paper.citedBy" class="flex items-center gap-1 text-xs text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
                 </svg>
                 {{ paper.citedBy.toLocaleString() }}
               </span>
+
+              <!-- Save + Share -->
+              <button
+                @click="savePaper(paper)"
+                :disabled="bookmarkLoading"
+                class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress"
+                title="Save"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                </svg>
+              </button>
+              <button
+                @click="sharePaperOpen(paper)"
+                class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors"
+                title="Share"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -564,6 +600,7 @@ export default {
     return {
       showmodal: false,
       postId: "",
+      sharePaperData: null,
       input: "",
       likeLoading: false,
       bookmarkLoading: false,
@@ -654,14 +691,55 @@ export default {
     async sharePost(sharedPost) {
       try {
         const { postId, content } = sharedPost;
+        // If sharing an external paper, send its payload; else reference the post id
+        const body = this.sharePaperData
+          ? { ...this.sharePaperData, title: content }
+          : { post: postId, title: content };
         await axios.post(
           `${API_BASE}/api/v1/sharedposts`,
-          { post: postId, title: content },
+          body,
           { withCredentials: true }
         );
+        this.sharePaperData = null;
       } catch (error) {
         console.error("Error sharing post:", error);
       }
+    },
+    // Build a bookmark/share body from a feed paper (arXiv/HF) or DB post
+    paperBody(p) {
+      if (p._id) return { post: p._id };
+      return {
+        arxivId: p.id || p.arxivId,
+        title: p.title,
+        authors: p.authors,
+        abstract: p.abstract,
+        category: p.category,
+        date: p.date,
+        venue: p.venue,
+        citedBy: p.citedBy,
+      };
+    },
+    async savePaper(p) {
+      try {
+        this.bookmarkLoading = true;
+        const response = await axios.post(
+          `${API_BASE}/api/v1/bookmarks`,
+          this.paperBody(p),
+          { withCredentials: true }
+        );
+        this.message = response.data.message;
+      } catch (error) {
+        console.error("Error saving paper:", error);
+      } finally {
+        this.bookmarkLoading = false;
+        this.showTooltip = true;
+        setTimeout(() => { this.showTooltip = false; }, 5000);
+      }
+    },
+    sharePaperOpen(p) {
+      this.sharePaperData = this.paperBody(p);
+      this.postId = "";
+      this.showmodal = true;
     },
     async getsinglepost(input) {
       try {
