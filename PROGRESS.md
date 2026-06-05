@@ -19,6 +19,11 @@ These were made deliberately — don't revert without a reason.
 - **Papers With Code removed entirely** — PwC API now returns HTML (dead). Removed source toggle, code badges, per-paper lookup.
 - **`postDetails` carries `arxivId` + `category`** — across likes/bookmarks/sharedposts projections, so favorites/graph article links resolve and graph nodes color by topic.
 - **Feed tabs = sort modes** — Latest (date desc), Most Cited (citedBy desc), Trending (citedBy + upvotes×5, recent-boosted), Saved (bookmarks). Sidebar Filter By: Last 30 days, Has citations.
+- **Save/Like/Note any paper via arxivId upsert** — `resolvePost` util: bookmark/like/note accept `{post:id}` or `{arxivId,...paper}`; upserts one Post per arxivId so external papers can be saved/liked/annotated.
+- **Notes replace Share** — users cannot share papers. Instead they write personal notes per paper (`Note` model, one per user+paper, `/api/v1/notes`). Knowledge-graph node panel has a Paper/Note toggle. Sharedposts backend left mounted but unused; `sharepostmodal.vue` orphaned.
+- **No edit-profile** — removed Edit Profile button + modal from Profile. Avatars are always initials (no image upload surfaced).
+- **Hot topics clickable** — right sidebar categories filter the feed by category; HF "Today on HuggingFace" section only shows on AI topic.
+- **Card thumbnail stops above action row** (`bottom-12`) so Like/Save/Note icons never overlap it.
 - **Paper thumbnails from `arxiv.org/html/{id}/x1.png`** — zero extra requests; browser fetches directly. Papers with external figure files show thumbnails; others fall back gracefully via `@error`.
 - **`Read` button links to `arxiv.org/html/{id}`** — HTML version opens in browser. `PDF` is secondary link for direct download.
 - **HF featured papers cached 1hr** — changes slowly; arXiv papers cached 5min.
@@ -49,6 +54,8 @@ These were made deliberately — don't revert without a reason.
 - [x] postDetails projections carry arxivId + category (likes/bookmarks/shares); batched `$in` + `.lean()` (no N+1)
 - [x] `getUsersLikes` returns `[]` not 404 on empty
 - [x] Removed Papers With Code (dead API)
+- [x] Notes: `Note` model + `/api/v1/notes` CRUD (upsert by arxivId, one per user+paper)
+- [x] `resolvePost` util — save/like/note resolve `{post:id}` or upsert from `{arxivId,...paper}`
 - [x] Fixed `server/.env` JWT_LIFETIME newline corruption; OPENALEX_EMAIL in `.env`
 
 ### Frontend
@@ -74,11 +81,14 @@ These were made deliberately — don't revert without a reason.
 - [x] Bookmarks page — dark theme, delete bookmark
 - [x] Shared posts page — dark theme
 - [x] Profile page — Knowledge Graph / Favorites / Shared tabs; compact header (initials avatar, no images)
-- [x] Knowledge graph (`PaperGraph.vue`) — force-directed, drag nodes, click for info panel, topic-colored, research-area pills
+- [x] Knowledge graph (`PaperGraph.vue`) — force-directed, drag nodes, click → Paper/Note toggle panel, topic-colored, research-area pills
 - [x] "Graph" nav link in navbar → Profile
+- [x] Like / Save / Note buttons on arXiv + HF cards (work on external papers via arxivId)
+- [x] Note modal — write/edit personal note per paper; Profile Notes tab (list/delete)
 - [x] User public profile page (`user/[_id].vue`) — gradient banner, initials avatar, pill tabs
 - [x] All API URLs use `import.meta.dev` — dev hits `localhost:5000`, prod hits Render
 - [x] All profile pages guard null `user` prop during layout fetch
+- [x] Removed Share + Edit-Profile UI
 
 ### Design
 - [x] Dark theme — `#1c1c1e` bg, `#242426` card surfaces
@@ -105,7 +115,7 @@ These were made deliberately — don't revert without a reason.
 - [ ] Dashboard sidebar mobile toggle — no responsive layout below ~1000px
 - [ ] `messages.vue` — dark theme only (no backend planned)
 - [ ] Connect button on user profile — UI only, no follow/connect system
-- [ ] Notifications tab in Profile — no backend
+- [ ] Dead code cleanup: `sharepostmodal.vue` orphaned, sharedposts routes unused (kept mounted, safe to remove later)
 - [ ] Paper thumbnails: ~50% of arXiv papers use base64 inline figures, not `x1.png`. Backend scraping endpoint needed for full coverage.
 
 ### Low priority
