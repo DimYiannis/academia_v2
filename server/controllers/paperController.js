@@ -107,17 +107,18 @@ const getPaper = async (req, res, next) => {
     const cached = cache.get(key)
     if (cached) return res.json(cached)
 
-    // If paper is already in a topic feed cache, it's fully enriched — return as-is.
-    const topics = ['ai', 'math', 'hw', 'cs']
-    for (const topic of topics) {
-      for (let start = 0; start <= 30; start += 10) {
-        const feed = cache.get(`papers:${topic}:${start}`)
-        const found = feed?.papers?.find(p => p.id === id)
-        if (found) {
-          const payload = { paper: found }
-          cache.set(key, payload)
-          return res.json(payload)
-        }
+    // If paper is already in a feed cache (topics or HF featured), it's enriched — return as-is.
+    const cacheKeys = ['papers:featured']
+    for (const topic of ['ai', 'math', 'hw', 'cs']) {
+      for (let start = 0; start <= 30; start += 10) cacheKeys.push(`papers:${topic}:${start}`)
+    }
+    for (const ck of cacheKeys) {
+      const feed = cache.get(ck)
+      const found = feed?.papers?.find(p => p.id === id)
+      if (found) {
+        const payload = { paper: found }
+        cache.set(key, payload)
+        return res.json(payload)
       }
     }
 

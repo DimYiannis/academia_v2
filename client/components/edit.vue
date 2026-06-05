@@ -37,7 +37,7 @@
               class="w-full h-[250px] grid place-items-center border-2 mt-10 mobile:mt-0"
               :style="{
                 backgroundImage: this.userr.backgroundImg
-                  ? `url(${API_BASE}` + userr.backgroundImg + ')'
+                  ? `url(${apiBase}` + userr.backgroundImg + ')'
                   : 'none',
                 backgroundColor: userr.backgroundImg ? '' : '#B0A8B9',
                 backgroundPosition: 'center',
@@ -78,7 +78,7 @@
                 class="absolute -top-24 left-2 rounded-full w-16 h-28 ml-3 border-2"
                 :style="{
                   backgroundImage: userr.profileImg
-                    ? `url(${API_BASE}` + userr.profileImg + ')'
+                    ? `url(${apiBase}` + userr.profileImg + ')'
                     : 'none',
                   backgroundColor: userr.profileImg ? '' : '#B0A8B9',
                   backgroundPosition: 'center',
@@ -208,7 +208,11 @@ export default {
       required: true,
     },
   },
-  computed: {},
+  computed: {
+    apiBase() {
+      return API_BASE;
+    },
+  },
   methods: {
     closemodal() {
       this.$emit("close-modal");
@@ -313,7 +317,7 @@ export default {
         console.log(this.profilePic);
 
         const response = await axios.post(
-          "${API_BASE}/api/v1/users/uploadprofimage",
+          `${API_BASE}/api/v1/users/uploadprofimage`,
           { image: this.profilePic },
           {
             withCredentials: true,

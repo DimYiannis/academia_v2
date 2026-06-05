@@ -32,7 +32,7 @@
             class="rounded-full w-10 h-10 mt-2"
             :style="{
               backgroundImage: user?.profileImg
-                ? `url(${API_BASE}${user.profileImg})`
+                ? `url(${apiBase}${user.profileImg})`
                 : 'none',
               backgroundColor: user?.backgroundImage ? '' : '#B0A8B9',
               backgroundPosition: 'center',
@@ -75,6 +75,11 @@ export default {
     postId: {
       type: String,
       required: true,
+    },
+  },
+  computed: {
+    apiBase() {
+      return API_BASE;
     },
   },
   methods: {
