@@ -1,9 +1,9 @@
 <template>
-  <!-- 3-column CSS grid: always visible, no breakpoint gating -->
-  <div class="grid min-h-[calc(100vh-52px)] bg-[#1c1c1e]" style="grid-template-columns: 180px 1fr 200px">
+  <!-- Responsive grid: 1col (mobile) → 2col (laptop) → 3col (desktop) -->
+  <div class="grid min-h-[calc(100vh-52px)] bg-[#1c1c1e] grid-cols-1 laptop:grid-cols-[180px_1fr] desktop:grid-cols-[180px_1fr_200px]">
 
-    <!-- ── Col 1: Left nav ─────────────────────────────────── -->
-    <aside class="flex flex-col border-r border-gray-800 py-6 px-3 overflow-y-auto bg-[#1c1c1e] sticky top-0 h-[calc(100vh-52px)]">
+    <!-- ── Col 1: Left nav (hidden below laptop) ───────────── -->
+    <aside class="hidden laptop:flex flex-col border-r border-gray-800 py-6 px-3 overflow-y-auto bg-[#1c1c1e] sticky top-0 h-[calc(100vh-52px)]">
 
       <!-- TOPICS -->
       <div class="mb-6">
@@ -82,24 +82,35 @@
     </aside>
 
     <!-- ── Col 2: Center feed ──────────────────────────────── -->
-    <main class="min-w-0 px-6 py-6 overflow-x-hidden">
+    <main class="min-w-0 px-4 tablet:px-6 py-6 overflow-x-hidden">
+
+      <!-- Mobile topic selector (left sidebar hidden below laptop) -->
+      <div class="laptop:hidden -mx-4 px-4 mb-4 flex gap-2 overflow-x-auto pb-1">
+        <button
+          v-for="topic in topics"
+          :key="topic.id"
+          @click="activeTopic = topic.id"
+          class="px-3 py-1.5 rounded-lg text-sm whitespace-nowrap shrink-0 transition-colors"
+          :class="activeTopic === topic.id ? 'bg-teal-900/40 text-teal-300 font-medium' : 'bg-gray-800 text-gray-400'"
+        >{{ topic.label }}</button>
+      </div>
 
       <!-- Page heading + feed tabs -->
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
         <h1 class="text-base font-semibold text-gray-200">
           {{ topics.find(t => t.id === activeTopic)?.label }} papers
         </h1>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 overflow-x-auto">
           <button
             v-for="tab in feedTabs"
             :key="tab"
             @click="activeTab = tab"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm transition-colors"
+            class="flex items-center gap-1.5 px-2.5 tablet:px-3 py-1.5 rounded-lg border text-sm whitespace-nowrap shrink-0 transition-colors"
             :class="activeTab === tab
               ? 'border-gray-500 text-white bg-gray-800'
               : 'border-gray-700 text-gray-400 hover:border-gray-600 hover:text-gray-300'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 hidden tablet:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" />
             </svg>
             {{ tab }}
@@ -142,13 +153,13 @@
               v-if="i.thumbnail"
               :src="i.thumbnail"
               :alt="i.title"
-              class="absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
+              class="hidden tablet:block absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
               @load="onThumbLoad" @error="$event.target.style.display='none'"
             />
-            <div class="relative pr-44">
+            <div class="relative tablet:pr-44">
               <div class="flex items-center gap-2 mb-2 flex-wrap">
                 <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-900/40 text-orange-300 shrink-0">HuggingFace</span>
                 <span v-if="i.date" class="text-xs text-gray-500">{{ new Date(i.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
@@ -167,7 +178,7 @@
               </p>
               <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ i.abstract }}</p>
             </div>
-            <div class="mt-3 pt-3 border-t border-gray-700/40 flex items-center gap-3 pr-44">
+            <div class="mt-3 pt-3 border-t border-gray-700/40 flex items-center gap-3 tablet:pr-44">
               <a v-if="i.id" :href="'https://arxiv.org/html/' + i.id" target="_blank" rel="noopener"
                 class="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -223,14 +234,14 @@
               v-if="paper.thumbnail"
               :src="paper.thumbnail"
               :alt="paper.title"
-              class="absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
+              class="hidden tablet:block absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
               @load="onThumbLoad" @error="$event.target.style.display='none'"
             />
 
-            <div class="relative pr-44">
+            <div class="relative tablet:pr-44">
               <div class="flex items-center gap-2 mb-2 flex-wrap">
                 <span
                   class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
@@ -261,7 +272,7 @@
               <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ paper.abstract }}</p>
             </div>
 
-            <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-700/40 pr-44">
+            <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-700/40 tablet:pr-44">
               <a
                 :href="'https://arxiv.org/html/' + paper.id"
                 target="_blank"
@@ -334,8 +345,8 @@
       </template>
     </main>
 
-    <!-- ── Col 3: Right sidebar ────────────────────────────── -->
-    <aside class="flex flex-col border-l border-gray-800 py-6 px-4 overflow-y-auto bg-[#1c1c1e] sticky top-0 h-[calc(100vh-52px)]">
+    <!-- ── Col 3: Right sidebar (hidden below desktop) ─────── -->
+    <aside class="hidden desktop:flex flex-col border-l border-gray-800 py-6 px-4 overflow-y-auto bg-[#1c1c1e] sticky top-0 h-[calc(100vh-52px)]">
 
       <!-- Section 1: Live sources -->
       <div class="mb-7">
