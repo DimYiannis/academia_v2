@@ -112,7 +112,7 @@ These were made deliberately — don't revert without a reason.
 - [x] **All topics seeded with real papers** — ai=54, math=10, hw=8, cs=7 (total 88). All topics return real data; live arXiv when available, DB fallback when throttled.
 - [ ] **Semantic Scholar key** — get free key at semanticscholar.org/product/api, add `SEMANTIC_SCHOLAR_KEY` to `server/.env` for reliable high-citation seeding (currently 429s without key)
 - [ ] More category labels — `math.RT` and other arXiv subcats show raw codes (not in `CATEGORY_NAMES` map)
-- [ ] Dashboard sidebar mobile toggle — no responsive layout below ~1000px
+- [x] Responsive dashboard — 1col mobile / 2col laptop(1024+) / 3col desktop(1280+); mobile topic pills replace hidden sidebar; navbar collapses; cards drop thumbnail on phones. Verified no overflow at 390/800px.
 - [ ] `messages.vue` — dark theme only (no backend planned)
 - [ ] Connect button on user profile — UI only, no follow/connect system
 - [ ] Dead code cleanup: `sharepostmodal.vue` orphaned, sharedposts routes unused (kept mounted, safe to remove later)
