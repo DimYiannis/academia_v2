@@ -115,7 +115,7 @@ These were made deliberately — don't revert without a reason.
 - [x] Responsive dashboard — 1col mobile / 2col laptop(1024+) / 3col desktop(1280+); mobile topic pills replace hidden sidebar; navbar collapses; cards drop thumbnail on phones. Verified no overflow at 390/800px.
 - [ ] `messages.vue` — dark theme only (no backend planned)
 - [ ] Connect button on user profile — UI only, no follow/connect system
-- [ ] Dead code cleanup: `sharepostmodal.vue` orphaned, sharedposts routes unused (kept mounted, safe to remove later)
+- [x] Removed Explore + entire sharedposts feature (page, routes, controller, model, Post `shares` virtual, getUserPosts) — share is fully gone, replaced by Notes
 - [ ] Paper thumbnails: ~50% of arXiv papers use base64 inline figures, not `x1.png`. Backend scraping endpoint needed for full coverage.
 
 ### Low priority
