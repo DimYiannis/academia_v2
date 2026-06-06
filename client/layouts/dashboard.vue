@@ -27,11 +27,6 @@
           active-class="bg-white/10 !text-white border-white/60"
         >Saved</NuxtLink>
         <NuxtLink
-          to="/dashboard/sharedposts"
-          class="px-2.5 tablet:px-4 py-1.5 rounded-lg border border-white/40 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap shrink-0"
-          active-class="bg-white/10 !text-white border-white/60"
-        >Explore</NuxtLink>
-        <NuxtLink
           to="/dashboard/Profile"
           class="flex items-center gap-1.5 px-2.5 tablet:px-4 py-1.5 rounded-lg border border-white/40 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap shrink-0"
           active-class="bg-white/10 !text-white border-white/60"

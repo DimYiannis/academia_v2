@@ -23,49 +23,14 @@
       <h1 class="text-xl font-bold text-white capitalize">{{ user.name }}</h1>
       <p v-if="user.info" class="text-sm text-gray-400 mt-1">{{ user.info }}</p>
       <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
-        <span>{{ sharedposts.length }} shared</span>
         <span>{{ likedposts.length }} favorites</span>
       </div>
     </div>
 
-    <!-- Pill tabs -->
-    <div class="flex gap-1 p-1 bg-gray-800/60 rounded-xl mb-5 w-fit">
-      <button
-        @click="sharedPosts"
-        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        :class="showSharedPosts ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-      >Shared Posts</button>
-      <button
-        @click="likes"
-        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        :class="showlikes ? 'bg-[#242426] text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-      >Favorites</button>
-    </div>
-
-    <!-- Shared Posts -->
-    <div v-show="showSharedPosts">
-      <div
-        v-for="i of sharedposts"
-        :key="i._id"
-        class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors"
-      >
-        <p v-if="i.title" class="text-sm text-gray-300 mb-3 italic">"{{ i.title }}"</p>
-        <div v-for="j in i.sharedpostdetails" :key="j.doi" class="border border-gray-700/60 rounded-xl p-4">
-          <h2 class="text-[15px] font-semibold text-white leading-snug mb-1">
-            <NuxtLink class="hover:text-teal-400 transition-colors" :to="'/article/' + (j.arxivId || j.doi)">{{ j.title }}</NuxtLink>
-          </h2>
-          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500 mb-2">
-            <span v-if="j.authors">{{ j.authors }}</span>
-            <span v-if="j.date">{{ j.date }}</span>
-          </div>
-          <p class="text-sm text-gray-400 line-clamp-2 leading-relaxed">{{ j.abstract }}</p>
-        </div>
-      </div>
-      <p v-if="!sharedposts.length" class="text-sm text-gray-600 py-8 text-center">No shared posts yet.</p>
-    </div>
+    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Favorites</p>
 
     <!-- Favorites -->
-    <div v-show="showlikes">
+    <div>
       <div
         v-for="i of likedposts"
         :key="i._id"
@@ -99,9 +64,6 @@ export default {
   data() {
     return {
       user: [],
-      sharedposts: [],
-      showlikes: false,
-      showSharedPosts: true,
       likedposts: [],
       loading: false,
     };
@@ -115,9 +77,7 @@ export default {
     },
   },
   mounted() {
-    // Invoke when the component is mounted
     this.getuser();
-    this.getsharedposts();
     this.getlikedposts();
   },
   methods: {
@@ -134,27 +94,6 @@ export default {
         //console.log(this.user);
       } catch (error) {
         console.error("Error fetching user's information:", error);
-      }
-    },
-    async getsharedposts() {
-      this.loading = true;
-      const userId = this.$route.params._id;
-      try {
-        const response = await axios.get(
-          `${API_BASE}/api/v1/users/${userId}/posts`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        this.sharedposts = response.data.sharedposts;
-        //console.log(this.sharedposts);
-      } catch (error) {
-        console.error("Error fetching user information:", error);
-        console.error("Error response data:", error.response.data);
-        console.log("Response headers:", error.response.headers);
-      } finally {
-        this.loading = false;
       }
     },
     async getlikedposts() {
@@ -174,14 +113,6 @@ export default {
         console.error("Error response data:", error.response.data);
         console.log("Response headers:", error.response.headers);
       }
-    },
-    likes() {
-      this.showlikes = true;
-      this.showSharedPosts = false;
-    },
-    sharedPosts() {
-      this.showlikes = false;
-      this.showSharedPosts = true;
     },
   },
 };

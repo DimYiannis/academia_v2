@@ -10,7 +10,6 @@ const {
   showCurrentUser,
   updateUser,
   updateUserPassword,
-  getUserPosts,
   uploadImageprof,
   uploadImageback,
 } = require('../controllers/userController');
@@ -24,7 +23,6 @@ router.route('/updateUser').patch(authenticateUser, updateUser);
 router.route('/updateUserPassword').patch(authenticateUser, updateUserPassword);
 
 router.route('/:id').get(authenticateUser, getSingleUser,);
-router.route('/:id/posts').get(authenticateUser, getUserPosts,);
 
 router.route('/uploadprofimage').post(authenticateUser, uploadImageprof);
 router.route('/uploadbackimage').post(authenticateUser, uploadImageback);

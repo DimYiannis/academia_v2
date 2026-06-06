@@ -3,7 +3,6 @@ const connectDB = require('./db/connect')
 const Post = require('./models/Post')
 const Likes = require('./models/Likes')
 const Bookmarks = require('./models/Bookmarks')
-const Sharedposts = require('./models/Sharedposts')
 const { fetchFeaturedPapers } = require('./lib/paperswithcode')
 const { fetchPapers } = require('./lib/arxiv')
 const { fetchSSPapers } = require('./lib/semanticscholar')
@@ -16,12 +15,11 @@ const seed = async () => {
 
   if (!arxivOnly) {
     // Full reset: clear everything and re-seed HF + arXiv
-    const [posts, likes, bookmarks, shares] = await Promise.all([
-      Post.countDocuments(), Likes.countDocuments(),
-      Bookmarks.countDocuments(), Sharedposts.countDocuments(),
+    const [posts, likes, bookmarks] = await Promise.all([
+      Post.countDocuments(), Likes.countDocuments(), Bookmarks.countDocuments(),
     ])
-    console.log(`Deleting: ${posts} posts, ${likes} likes, ${bookmarks} bookmarks, ${shares} shared posts`)
-    await Promise.all([Post.deleteMany({}), Likes.deleteMany({}), Bookmarks.deleteMany({}), Sharedposts.deleteMany({})])
+    console.log(`Deleting: ${posts} posts, ${likes} likes, ${bookmarks} bookmarks`)
+    await Promise.all([Post.deleteMany({}), Likes.deleteMany({}), Bookmarks.deleteMany({})])
   } else {
     console.log('--arxiv-only: skipping deletion, appending arXiv papers only')
   }

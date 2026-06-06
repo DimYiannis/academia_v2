@@ -25,7 +25,6 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const postRouter = require("./routes/postRoutes");
-const sharedpostsRouter = require("./routes/sharedpostsRoutes");
 const bookmarksRouter = require("./routes/bookmarksRoutes");
 const likesRouter = require('./routes/likesRoutes');
 const notesRouter = require('./routes/notesRoutes');
@@ -94,7 +93,6 @@ app.get("/api/v1/keep-alive", (req, res) => {
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/posts", postRouter);
-app.use("/api/v1/sharedposts", sharedpostsRouter);
 app.use("/api/v1/bookmarks", bookmarksRouter);
 app.use("/api/v1/likes", likesRouter)
 app.use("/api/v1/notes", notesRouter)
