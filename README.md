@@ -1,76 +1,117 @@
-# Academia Mock App
+# Academia v2
 
-Welcome to Academia,the social media platform where you research, share and connect! 🚀
+Discover, organize, and annotate real research papers. Academia aggregates live papers from **arXiv**, **HuggingFace Daily Papers**, and **OpenAlex**, then lets you like, save, and take private notes — visualized as a personal knowledge graph.
 
+🔗 Live: https://academiav2.netlify.app
 
 <img width="1316" alt="Academia" src="https://github.com/DimYiannis/academia_v2/assets/107484245/2afc226c-cf6f-46ed-9cf6-28d7f148cf2e">
 
-
-## Overview
-
-Academia is a full-stack mock app developed with Nuxt.js, Tailwind, and Node.js. Academia provides a platform for users to create, explore, update, and delete scientific posts. The backend is implemented using Node.js and Express to expose RESTful endpoints, while the frontend is built with Nuxt.js and Tailwind CSS.
-
+---
 
 ## Features
 
-- **Mock Scientific Posts:** Built with Mockaroo
+- **Real paper data** — live arXiv feed by topic, HuggingFace daily curated ML papers, OpenAlex citation counts & venues.
+- **Topics** — AI & ML, Mathematics, Hardware, CS Theory. Each shows topic-relevant papers.
+- **Feed modes** — Latest, Most Cited, Trending, Saved.
+- **Like / Save / Note** any paper — works on external papers via arXiv-ID upsert.
+- **Notes** — write private annotations per paper (no public sharing).
+- **Knowledge graph** — force-directed graph of your liked papers; drag nodes, click to read the abstract or your note. Nodes colored by topic, edges link shared topics/authors.
+- **Search & filters** — title/author search, category filter (hot topics), last-30-days, has-citations.
+- **Resilient pipeline** — timeout-bounded arXiv fetch with a circuit breaker and MongoDB fallback; the feed never hard-fails when an upstream is throttled.
+- **Responsive** — mobile / tablet / desktop layouts.
+- **Auth** — JWT cookie auth (register / login / demo account).
 
-- **Full Stack Magic:** Powered by Nuxt.js, Tailwind, and Node.js, Academia combines frontend elegance with backend efficiency.
+---
 
+## Tech stack
 
-## Getting Started
+| Layer | Tech |
+|---|---|
+| Frontend | Nuxt 3 (Vue 3), Tailwind CSS |
+| Backend | Express, MongoDB (Mongoose) |
+| Data | arXiv API · HuggingFace Daily Papers · OpenAlex · (Semantic Scholar optional) |
+| Caching | node-cache (in-memory) |
+
+---
+
+## Architecture
+
+```
+client/                 # Nuxt 3 frontend
+  composables/          # usePapers (feed), useSearch
+  components/           # PaperGraph (knowledge graph), edit, LoadSpinner
+  layouts/dashboard.vue # authed shell (navbar, responsive grid)
+  pages/dashboard/      # feed (index), bookmarks, Profile, user/[_id]
+  pages/article/[doi]   # single paper detail
+
+server/                 # Express + MongoDB
+  lib/                  # arxiv, openalex, paperswithcode (HF), semanticscholar, cache
+  controllers/          # papers, notes, likes, bookmarks, auth, user
+  routes/  models/  utils/  middleware/
+  seed.js               # seed DB with real papers
+```
+
+Paper data flows through Express only (never called from the browser). The unified `Paper` shape is consistent across arXiv / HF / OpenAlex sources.
+
+---
+
+## Getting started
 
 ### Prerequisites
+- Node.js + npm
+- A MongoDB connection string
 
-Make sure you have the following installed:
+### Environment
 
-- [Node.js](https://nodejs.org/)
-- [NPM](https://www.npmjs.com/)
+```bash
+# server/.env
+MONGO_URL=mongodb+srv://...
+JWT_SECRET=your_secret
+JWT_LIFETIME=1d
+OPENALEX_EMAIL=you@example.com        # polite-pool access (optional)
+# SEMANTIC_SCHOLAR_KEY=...            # optional, higher rate limits
+```
 
-### Installation
+The frontend auto-targets `http://localhost:5000` in dev and the production API otherwise (via `import.meta.dev`) — no client env needed for local work.
 
-1. **Clone the repository:**
-    ```bash
-    git clone https://github.com/your-username/academia-mock-app.git
-    ```
+### Install & run
 
-2. **Navigate to the project directory:**
-    ```bash
-    cd academia
-    ```
-3. **Navigate to the client/server folder:**
-   ```bash
-   cd client/server
-   ```
+```bash
+# backend
+cd server
+npm install
+npm start                # http://localhost:5000
 
-4. **Install dependencies:**
-    ```bash
-    npm install
-    ```
+# frontend (separate terminal)
+cd client
+npm install
+npm run dev              # http://localhost:3000
+```
 
-### Running the App
+### Seed real papers
 
-1. **Start the frontend (Nuxt.js):**
-    ```bash
-    npm run dev
-    ```
+```bash
+cd server
+node seed.js             # full reset: HF daily + arXiv (all topics) + Semantic Scholar
+node seed.js --arxiv-only   # append arXiv papers without wiping existing data
+```
 
-2. **Start the backend (Node.js):**
-    ```bash
-    npm start
-    ```
+Papers are deduped by arXiv ID. arXiv rate-limits aggressively — re-run `--arxiv-only` if a topic comes back empty.
 
-## Mock Data
+---
 
-Academia comes with pre-populated mock data. 
+## API (overview)
 
-## Tech Stack
+```
+GET  /api/papers?topic=ai&start=0   # topic feed (arXiv + enrichment, cached, DB fallback)
+GET  /api/papers/featured           # HuggingFace daily papers
+GET  /api/papers/:id                # single paper
 
-- **Frontend:**
-  - [Nuxt.js](https://nuxtjs.org/) - The Intuitive Vue Framework
-  - [Tailwind CSS](https://tailwindcss.com/) - A Utility-First CSS Framework
+POST /api/v1/auth/login | register | GET logout
+GET  /api/v1/posts                  # community / seeded papers
+POST/GET/DELETE /api/v1/likes
+POST/GET/DELETE /api/v1/bookmarks
+POST/GET/DELETE /api/v1/notes       # personal notes (one per user per paper)
+```
 
-- **Backend:**
-  - [Node.js](https://nodejs.org/) - JavaScript Runtime
-
-
+Likes / bookmarks / notes accept either a Mongo post id or an arXiv-paper payload — external papers are upserted into MongoDB on first interaction.
