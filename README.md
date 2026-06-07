@@ -1,6 +1,6 @@
 # Academia v2
 
-Discover, organize, and annotate real research papers. Academia aggregates live papers from **arXiv**, **HuggingFace Daily Papers**, and **OpenAlex**, then lets you like, save, and take private notes — visualized as a personal knowledge graph.
+**Your daily AI research feed.** Academia tracks the latest in AI/ML — pulling live papers from **arXiv**, **HuggingFace Daily Papers**, and **OpenAlex**. Like, save, and take private notes on what matters, then explore it all as a personal knowledge graph.
 
 🔗 Live: https://academiav2.netlify.app
 
@@ -10,12 +10,12 @@ Discover, organize, and annotate real research papers. Academia aggregates live 
 
 ## Features
 
-- **Real paper data** — live arXiv feed by topic, HuggingFace daily curated ML papers, OpenAlex citation counts & venues.
-- **Topics** — AI & ML, Mathematics, Hardware, CS Theory. Each shows topic-relevant papers.
+- **Live AI research** — daily curated ML papers from HuggingFace, latest arXiv submissions, OpenAlex citation counts & venues.
+- **Topics** — AI & ML (default), plus Mathematics, Hardware, CS Theory. Each shows topic-relevant papers.
 - **Feed modes** — Latest, Most Cited, Trending, Saved.
 - **Like / Save / Note** any paper — works on external papers via arXiv-ID upsert.
 - **Notes** — write private annotations per paper (no public sharing).
-- **Knowledge graph** — force-directed graph of your liked papers; drag nodes, click to read the abstract or your note. Nodes colored by topic, edges link shared topics/authors.
+- **Knowledge graph** — force-directed map of the AI papers you've liked; drag nodes, click to read the abstract or your note. Nodes colored by topic, edges link shared topics/authors.
 - **Search & filters** — title/author search, category filter (hot topics), last-30-days, has-citations.
 - **Resilient pipeline** — timeout-bounded arXiv fetch with a circuit breaker and MongoDB fallback; the feed never hard-fails when an upstream is throttled.
 - **Responsive** — mobile / tablet / desktop layouts.
