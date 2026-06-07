@@ -2,8 +2,9 @@
 .DS_Store
 **/.DS_Store
 
-# Claude
+# Claude / internal
 CLAUDE.md
+PROGRESS.md
 
 # Node
 node_modules/
