@@ -153,7 +153,7 @@
               v-if="i.thumbnail"
               :src="i.thumbnail"
               :alt="i.title"
-              class="hidden tablet:block absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
+              class="hidden tablet:block absolute top-0 right-0 bottom-0 w-44 object-cover pointer-events-none rounded-r-2xl"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
@@ -234,7 +234,7 @@
               v-if="paper.thumbnail"
               :src="paper.thumbnail"
               :alt="paper.title"
-              class="hidden tablet:block absolute top-0 right-0 bottom-12 w-44 object-cover pointer-events-none rounded-tr-2xl"
+              class="hidden tablet:block absolute top-0 right-0 bottom-0 w-44 object-cover pointer-events-none rounded-r-2xl"
               style="mask-image: linear-gradient(to right, transparent, black 50%); -webkit-mask-image: linear-gradient(to right, transparent, black 50%)"
               
               loading="lazy"
