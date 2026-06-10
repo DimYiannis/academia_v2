@@ -125,7 +125,7 @@
 
         <!-- View -->
         <template v-else-if="!noteEditing">
-          <p v-if="note" class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap border-l-2 border-teal-700/60 pl-3">{{ note }}</p>
+          <div v-if="note" class="text-sm text-gray-300 leading-relaxed border-l-2 border-teal-700/60 pl-3" v-html="renderNote(note)"></div>
           <button
             v-else
             @click="startEditNote"
@@ -146,6 +146,7 @@
             placeholder="Your thoughts, summary, key takeaways…"
             class="w-full bg-[#1c1c1e] border border-gray-700 rounded-xl p-3 text-sm text-gray-200 placeholder-gray-600 outline-none focus:border-teal-600 resize-none"
           ></textarea>
+          <p class="text-xs text-gray-600 mt-1">Supports **bold**, *italic*, `code`, - lists</p>
           <div class="flex items-center justify-end gap-2 mt-2">
             <button @click="noteEditing = false" class="px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
             <button @click="saveNote" :disabled="noteSaving"
@@ -160,6 +161,23 @@
       <div v-if="post.paper" class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5">
         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Full text</p>
         <p class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{{ post.paper }}</p>
+      </div>
+
+      <!-- Related papers -->
+      <div v-if="related.length" class="mt-6">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Related papers</p>
+        <NuxtLink
+          v-for="r in related"
+          :key="r.id"
+          :to="'/article/' + r.id"
+          class="block bg-[#242426] border border-gray-700/60 rounded-2xl p-4 mb-2 hover:border-gray-600 hover:-translate-y-0.5 transition-all duration-200"
+        >
+          <p class="text-sm font-semibold text-white leading-snug mb-1">{{ r.title }}</p>
+          <div class="flex flex-wrap gap-x-3 text-xs text-gray-500">
+            <span>{{ r.category }}</span>
+            <span v-if="r.authors?.length">{{ r.authors.slice(0, 3).join(', ') }}</span>
+          </div>
+        </NuxtLink>
       </div>
 
     </template>
@@ -244,6 +262,26 @@ async function saveNote() {
   }
 }
 
+// ── Related papers (same category / shared author from topic feed) ──
+const related = ref<any[]>([])
+async function fetchRelated() {
+  const p = post.value
+  if (!p?.topic) return
+  try {
+    const data = await $fetch<{ papers: any[] }>(`${API_BASE}/api/papers`, { params: { topic: p.topic, start: 0 } } as any)
+    const myAuthors = (Array.isArray(p.authors) ? p.authors : []).map((a: string) => a.toLowerCase())
+    related.value = (data.papers || [])
+      .filter(r => r.id !== p.id)
+      .map(r => ({
+        ...r,
+        score: (r.category === p.category ? 1 : 0) +
+               ((r.authors || []).some((a: string) => myAuthors.includes(a.toLowerCase())) ? 2 : 0),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+  } catch { /* non-critical */ }
+}
+
 onMounted(async () => {
   fetchNote()
   try {
@@ -259,5 +297,6 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+  fetchRelated()
 })
 </script>

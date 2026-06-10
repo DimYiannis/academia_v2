@@ -47,10 +47,10 @@
         </span>
       </div>
 
-      <PaperGraph :papers="likedposts" :height="420" @select="goToArticle" />
+      <PaperGraph :papers="likedposts" :height="420" :noted-keys="noteKeys" @select="goToArticle" />
 
       <p class="text-xs text-gray-600 mt-3 text-center">
-        Nodes = liked papers · Edges = shared topic or author · Click to open
+        Nodes = liked papers · Amber dot = has note · Scroll to zoom, drag background to pan
       </p>
     </div>
 
@@ -104,7 +104,7 @@
           <span v-if="n.postDetails.authors">{{ n.postDetails.authors }}</span>
           <span v-if="n.postDetails.date">{{ n.postDetails.date }}</span>
         </div>
-        <p class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap border-l-2 border-teal-700/60 pl-3">{{ n.content }}</p>
+        <div class="text-sm text-gray-300 leading-relaxed border-l-2 border-teal-700/60 pl-3" v-html="renderNote(n.content)"></div>
         <button @click="deleteNote(n._id)"
           class="mt-3 px-3 py-1 text-xs rounded-lg border border-red-900/60 text-red-500 hover:bg-red-900/20 transition-colors">
           Delete note
@@ -126,6 +126,7 @@
 
 <script>
 import axios from "axios";
+import { renderNote } from "~/composables/useNoteRender";
 const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 definePageMeta({
   layout: 'dashboard'
@@ -143,6 +144,9 @@ export default {
     user: { type: Object, required: true },
   },
   computed: {
+    noteKeys() {
+      return this.notes.map(n => n.postDetails?.arxivId || String(n.post)).filter(Boolean);
+    },
     initials() {
       if (!this.user?.name) return '?'
       const parts = this.user.name.trim().split(' ')
@@ -175,6 +179,7 @@ export default {
     this.getlikedposts();
   },
   methods: {
+    renderNote,
     async getNotes() {
       this.loading = true;
       try {

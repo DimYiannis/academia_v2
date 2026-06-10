@@ -16,7 +16,8 @@
       <p class="text-xs text-gray-600">Like papers to build your graph</p>
     </div>
 
-    <svg v-else ref="svgEl" class="w-full h-full" style="cursor: grab">
+    <svg v-else ref="svgEl" class="w-full h-full" style="cursor: grab"
+      @wheel.prevent="onWheel" @mousedown="startPan">
       <defs>
         <radialGradient v-for="c in colorList" :key="c.id" :id="'glow-' + c.id" cx="50%" cy="50%" r="50%">
           <stop offset="0%" :stop-color="c.color" stop-opacity="0.7"/>
@@ -24,51 +25,66 @@
         </radialGradient>
       </defs>
 
-      <!-- Edges -->
-      <line
-        v-for="(edge, i) in edges" :key="'e'+i"
-        :x1="simNodes[edge.source]?.x" :y1="simNodes[edge.source]?.y"
-        :x2="simNodes[edge.target]?.x" :y2="simNodes[edge.target]?.y"
-        :stroke="selectedIdx === edge.source || selectedIdx === edge.target ? '#ffffff' : '#ffffff'"
-        :stroke-opacity="selectedIdx === edge.source || selectedIdx === edge.target ? 0.2 : 0.06"
-        stroke-width="1"
-      />
-
-      <!-- Glow halos -->
-      <circle
-        v-for="(node, i) in simNodes" :key="'halo'+i"
-        :cx="node.x" :cy="node.y"
-        :r="selectedIdx === i ? 32 : hoveredIdx === i ? 26 : 18"
-        :fill="`url(#glow-${node.colorId})`"
-        style="pointer-events:none; transition: r 0.15s"
-      />
-
-      <!-- Nodes -->
-      <circle
-        v-for="(node, i) in simNodes" :key="'n'+i"
-        :cx="node.x" :cy="node.y"
-        :r="selectedIdx === i ? 10 : hoveredIdx === i ? 8 : 6"
-        :fill="node.color"
-        :fill-opacity="selectedIdx === i || hoveredIdx === i ? 1 : 0.8"
-        :stroke="selectedIdx === i ? '#ffffff' : 'none'"
-        stroke-width="1.5"
-        style="cursor: grab; transition: r 0.12s"
-        @mousedown.stop="startDrag(i, $event)"
-      />
-
-      <!-- Hover label (only when not selected) -->
-      <g v-if="hoveredIdx !== null && selectedIdx === null && simNodes[hoveredIdx]" style="pointer-events:none">
-        <rect
-          :x="simNodes[hoveredIdx].x + 12" :y="simNodes[hoveredIdx].y - 14"
-          :width="220" height="22" rx="4"
-          fill="#1c1c1e" fill-opacity="0.95" stroke="#374151" stroke-width="0.5"
+      <g :transform="`translate(${tx},${ty}) scale(${scale})`">
+        <!-- Edges -->
+        <line
+          v-for="(edge, i) in edges" :key="'e'+i"
+          :x1="simNodes[edge.source]?.x" :y1="simNodes[edge.source]?.y"
+          :x2="simNodes[edge.target]?.x" :y2="simNodes[edge.target]?.y"
+          stroke="#ffffff"
+          :stroke-opacity="selectedIdx === edge.source || selectedIdx === edge.target ? 0.2 : 0.06"
+          stroke-width="1"
         />
-        <text :x="simNodes[hoveredIdx].x + 18" :y="simNodes[hoveredIdx].y + 2"
-          font-size="10" fill="#e5e7eb" font-family="system-ui,sans-serif">
-          {{ truncate(simNodes[hoveredIdx].label, 30) }}
-        </text>
+
+        <!-- Glow halos -->
+        <circle
+          v-for="(node, i) in simNodes" :key="'halo'+i"
+          :cx="node.x" :cy="node.y"
+          :r="selectedIdx === i ? 32 : hoveredIdx === i ? 26 : 18"
+          :fill="`url(#glow-${node.colorId})`"
+          style="pointer-events:none; transition: r 0.15s"
+        />
+
+        <!-- Nodes -->
+        <circle
+          v-for="(node, i) in simNodes" :key="'n'+i"
+          :cx="node.x" :cy="node.y"
+          :r="selectedIdx === i ? 10 : hoveredIdx === i ? 8 : 6"
+          :fill="node.color"
+          :fill-opacity="selectedIdx === i || hoveredIdx === i ? 1 : 0.8"
+          :stroke="selectedIdx === i ? '#ffffff' : 'none'"
+          stroke-width="1.5"
+          style="cursor: grab; transition: r 0.12s"
+          @mousedown.stop="startDrag(i, $event)"
+        />
+
+        <!-- Note badges — papers you've annotated -->
+        <g v-for="(node, i) in simNodes" :key="'nb'+i" style="pointer-events:none">
+          <circle v-if="node.noted" :cx="node.x + 7" :cy="node.y - 7" r="4" fill="#1c1c1e" />
+          <circle v-if="node.noted" :cx="node.x + 7" :cy="node.y - 7" r="2.5" fill="#fbbf24" />
+        </g>
+
+        <!-- Hover label (only when not selected) -->
+        <g v-if="hoveredIdx !== null && selectedIdx === null && simNodes[hoveredIdx]" style="pointer-events:none">
+          <rect
+            :x="simNodes[hoveredIdx].x + 12" :y="simNodes[hoveredIdx].y - 14"
+            :width="220" height="22" rx="4"
+            fill="#1c1c1e" fill-opacity="0.95" stroke="#374151" stroke-width="0.5"
+          />
+          <text :x="simNodes[hoveredIdx].x + 18" :y="simNodes[hoveredIdx].y + 2"
+            font-size="10" fill="#e5e7eb" font-family="system-ui,sans-serif">
+            {{ truncate(simNodes[hoveredIdx].label, 30) }}
+          </text>
+        </g>
       </g>
     </svg>
+
+    <!-- Zoom controls -->
+    <div v-if="nodes.length" class="absolute top-3 right-3 flex flex-col gap-1" :class="selectedIdx !== null ? 'right-[19rem]' : ''">
+      <button @click="zoomBy(1.25)" class="w-7 h-7 rounded-lg bg-gray-800/80 text-gray-300 hover:text-white text-sm font-bold">+</button>
+      <button @click="zoomBy(0.8)" class="w-7 h-7 rounded-lg bg-gray-800/80 text-gray-300 hover:text-white text-sm font-bold">−</button>
+      <button @click="resetView" class="w-7 h-7 rounded-lg bg-gray-800/80 text-gray-400 hover:text-white text-[10px]">1:1</button>
+    </div>
 
     <!-- Info panel — shown when node is clicked -->
     <Transition name="slide">
@@ -116,7 +132,7 @@
         <!-- Note view -->
         <div v-else class="mb-4">
           <p v-if="noteLoading" class="text-xs text-gray-600">Loading note…</p>
-          <p v-else-if="note" class="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap border-l-2 border-teal-700/60 pl-3">{{ note }}</p>
+          <div v-else-if="note" class="text-xs text-gray-300 leading-relaxed border-l-2 border-teal-700/60 pl-3" v-html="renderNote(note)"></div>
           <p v-else class="text-xs text-gray-600 italic">No note for this paper yet. Add one from the feed.</p>
         </div>
 
@@ -149,7 +165,7 @@
 
 <script setup lang="ts">
 import axios from 'axios'
-const props = defineProps<{ papers: any[]; height?: number }>()
+const props = defineProps<{ papers: any[]; height?: number; notedKeys?: string[] }>()
 const height = props.height || 420
 const API_BASE = import.meta.dev ? 'http://localhost:5000' : 'https://academiav2-backend.onrender.com'
 const svgEl = ref<SVGElement | null>(null)
@@ -181,6 +197,38 @@ watch(selectedIdx, async (idx) => {
 // Drag state
 const dragState = ref<{ idx: number; startX: number; startY: number; moved: boolean } | null>(null)
 
+// ── View transform (zoom / pan) ──────────────────────────
+const scale = ref(1)
+const tx = ref(0)
+const ty = ref(0)
+const panState = ref<{ startX: number; startY: number; ox: number; oy: number } | null>(null)
+
+function toWorld(x: number, y: number) {
+  return { x: (x - tx.value) / scale.value, y: (y - ty.value) / scale.value }
+}
+function onWheel(e: WheelEvent) {
+  const { x: mx, y: my } = getSVGCoords(e)
+  const factor = e.deltaY < 0 ? 1.1 : 0.9
+  const next = Math.min(3, Math.max(0.4, scale.value * factor))
+  const k = next / scale.value
+  tx.value = mx - (mx - tx.value) * k
+  ty.value = my - (my - ty.value) * k
+  scale.value = next
+}
+function zoomBy(factor: number) {
+  const w = svgEl.value?.clientWidth || 700
+  const cx = w / 2, cy = height / 2
+  const next = Math.min(3, Math.max(0.4, scale.value * factor))
+  const k = next / scale.value
+  tx.value = cx - (cx - tx.value) * k
+  ty.value = cy - (cy - ty.value) * k
+  scale.value = next
+}
+function resetView() { scale.value = 1; tx.value = 0; ty.value = 0 }
+function startPan(e: MouseEvent) {
+  panState.value = { startX: e.clientX, startY: e.clientY, ox: tx.value, oy: ty.value }
+}
+
 const TOPIC_COLORS: Record<string, { color: string; label: string; id: string }> = {
   'cs.AI': { color: '#14b8a6', label: 'AI', id: 'teal' },
   'cs.LG': { color: '#06b6d4', label: 'ML', id: 'cyan' },
@@ -210,8 +258,10 @@ const nodes = computed(() =>
     .filter(p => p?.title)
     .map((p, i) => {
       const meta = getTopicMeta(p)
+      const key = p.arxivId || p.id || p._id
       return {
         id: i, label: p.title,
+        noted: !!key && (props.notedKeys || []).includes(key),
         authors: Array.isArray(p.authors) ? p.authors.join(', ') : (p.authors || ''),
         abstract: p.abstract || '',
         categoryLabel: meta.label,
@@ -246,7 +296,7 @@ const areas = computed(() => {
 })
 
 // Simulation
-interface SimNode { x: number; y: number; vx: number; vy: number; pinned: boolean; label: string; color: string; colorId: string; authors: string; abstract: string; categoryLabel: string; paper: any }
+interface SimNode { x: number; y: number; vx: number; vy: number; pinned: boolean; noted: boolean; label: string; color: string; colorId: string; authors: string; abstract: string; categoryLabel: string; paper: any }
 const simNodes = ref<SimNode[]>([])
 let animFrame: number | null = null
 let alpha = 1
@@ -258,7 +308,7 @@ watch(() => nodes.value, (newNodes) => {
   simNodes.value = newNodes.map(n => ({
     x: w / 2 + (Math.random() - 0.5) * w * 0.5,
     y: h / 2 + (Math.random() - 0.5) * h * 0.5,
-    vx: 0, vy: 0, pinned: false,
+    vx: 0, vy: 0, pinned: false, noted: n.noted,
     label: n.label, color: n.color, colorId: n.colorId,
     authors: n.authors, abstract: n.abstract,
     categoryLabel: n.categoryLabel, paper: n.paper,
@@ -326,21 +376,28 @@ function startDrag(idx: number, e: MouseEvent) {
 }
 
 function onMouseMove(e: MouseEvent) {
-  const { x, y } = getSVGCoords(e)
+  const { x: sx, y: sy } = getSVGCoords(e)
+  const { x, y } = toWorld(sx, sy)
 
   if (dragState.value) {
     const dx = e.clientX - dragState.value.startX
     const dy = e.clientY - dragState.value.startY
     if (Math.sqrt(dx*dx + dy*dy) > 4) dragState.value.moved = true
     const n = simNodes.value[dragState.value.idx]
-    n.x = Math.max(16, Math.min((svgEl.value?.clientWidth || 700) - 16, x))
-    n.y = Math.max(16, Math.min(height - 16, y))
+    n.x = x
+    n.y = y
     return
   }
 
-  // Hover detection
+  if (panState.value) {
+    tx.value = panState.value.ox + (e.clientX - panState.value.startX)
+    ty.value = panState.value.oy + (e.clientY - panState.value.startY)
+    return
+  }
+
+  // Hover detection (world coords; radius scales with zoom)
   let closest: number | null = null
-  let minD = 18
+  let minD = 18 / scale.value
   simNodes.value.forEach((n, i) => {
     const d = Math.sqrt((n.x - x)**2 + (n.y - y)**2)
     if (d < minD) { minD = d; closest = i }
@@ -349,6 +406,7 @@ function onMouseMove(e: MouseEvent) {
 }
 
 function onMouseUp(e: MouseEvent) {
+  panState.value = null
   if (!dragState.value) return
   const { idx, moved } = dragState.value
   simNodes.value[idx].pinned = false
@@ -362,6 +420,7 @@ function onMouseUp(e: MouseEvent) {
 
 function onMouseLeave() {
   hoveredIdx.value = null
+  panState.value = null
   if (dragState.value) {
     simNodes.value[dragState.value.idx].pinned = false
     dragState.value = null

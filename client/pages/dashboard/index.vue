@@ -471,6 +471,7 @@
           placeholder="Write your thoughts, summary, key takeaways…"
           class="w-full bg-[#1c1c1e] border border-gray-700 rounded-xl p-3 text-sm text-gray-200 placeholder-gray-600 outline-none focus:border-teal-600 resize-none"
         ></textarea>
+        <p class="text-xs text-gray-600 mt-1.5">Supports **bold**, *italic*, `code`, - lists</p>
         <div class="flex items-center justify-end gap-2 mt-4">
           <button @click="closeNote" class="px-4 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
           <button @click="saveNote" :disabled="noteSaving" class="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
