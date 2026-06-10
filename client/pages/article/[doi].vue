@@ -110,6 +110,52 @@
         </div>
       </div>
 
+      <!-- My note — read → annotate inline -->
+      <div class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold text-teal-400 uppercase tracking-wider">My note</p>
+          <button
+            v-if="!noteEditing && note"
+            @click="startEditNote"
+            class="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >Edit</button>
+        </div>
+
+        <p v-if="noteLoading" class="text-xs text-gray-600">Loading…</p>
+
+        <!-- View -->
+        <template v-else-if="!noteEditing">
+          <p v-if="note" class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap border-l-2 border-teal-700/60 pl-3">{{ note }}</p>
+          <button
+            v-else
+            @click="startEditNote"
+            class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-teal-400 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+            </svg>
+            Add a note about this paper…
+          </button>
+        </template>
+
+        <!-- Edit -->
+        <template v-else>
+          <textarea
+            v-model="noteDraft"
+            rows="5"
+            placeholder="Your thoughts, summary, key takeaways…"
+            class="w-full bg-[#1c1c1e] border border-gray-700 rounded-xl p-3 text-sm text-gray-200 placeholder-gray-600 outline-none focus:border-teal-600 resize-none"
+          ></textarea>
+          <div class="flex items-center justify-end gap-2 mt-2">
+            <button @click="noteEditing = false" class="px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
+            <button @click="saveNote" :disabled="noteSaving"
+              class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-medium transition-colors disabled:opacity-50">
+              {{ noteSaving ? 'Saving…' : 'Save note' }}
+            </button>
+          </div>
+        </template>
+      </div>
+
       <!-- Full paper text (user posts only) -->
       <div v-if="post.paper" class="bg-[#242426] border border-gray-700/60 rounded-2xl p-5">
         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Full text</p>
@@ -156,7 +202,50 @@ function formatDate(d: string) {
   catch { return d }
 }
 
+// ── Personal note ────────────────────────────────────────
+const note = ref('')
+const noteDraft = ref('')
+const noteLoading = ref(true)
+const noteSaving = ref(false)
+const noteEditing = ref(false)
+
+function startEditNote() {
+  noteDraft.value = note.value
+  noteEditing.value = true
+}
+
+async function fetchNote() {
+  try {
+    const data = await $fetch<{ note: any }>(`${API_BASE}/api/v1/notes/${encodeURIComponent(rawId)}`, { credentials: 'include' } as any)
+    note.value = data.note?.content || ''
+  } catch { /* not logged in or no note */ }
+  finally { noteLoading.value = false }
+}
+
+async function saveNote() {
+  noteSaving.value = true
+  try {
+    const p = post.value || {}
+    const body = isArxivId(rawId)
+      ? {
+          arxivId: rawId,
+          title: p.title, authors: p.authors, abstract: p.abstract,
+          category: p.category, date: p.date, venue: p.venue, citedBy: p.citedBy,
+          content: noteDraft.value,
+        }
+      : { post: rawId, content: noteDraft.value }
+    await $fetch(`${API_BASE}/api/v1/notes`, { method: 'POST', body, credentials: 'include' } as any)
+    note.value = noteDraft.value
+    noteEditing.value = false
+  } catch (e) {
+    console.error('Error saving note:', e)
+  } finally {
+    noteSaving.value = false
+  }
+}
+
 onMounted(async () => {
+  fetchNote()
   try {
     if (isArxivId(rawId)) {
       const data = await $fetch<{ paper: any }>(`${API_BASE}/api/papers/${encodeURIComponent(rawId)}`)

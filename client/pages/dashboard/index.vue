@@ -190,19 +190,25 @@
 
               <template v-if="activeTab !== 'Saved'">
                 <button @click="likePaper(i)" :disabled="likeLoading"
-                  class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-colors disabled:cursor-progress" title="Like">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  class="ml-auto p-1.5 rounded-lg transition-colors disabled:cursor-progress"
+                  :class="isLiked(i) ? 'text-red-400 like-pop' : 'text-gray-500 hover:text-red-400 hover:bg-red-900/20'"
+                  :title="isLiked(i) ? 'Unlike' : 'Like'">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" :fill="isLiked(i) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 8.25c0-2.485-2.099-4.5-4.687-4.5-1.936 0-3.598 1.126-4.313 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.098 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                   </svg>
                 </button>
                 <button @click="savePaper(i)" :disabled="bookmarkLoading"
-                  class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress" title="Save">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  class="p-1.5 rounded-lg transition-colors disabled:cursor-progress"
+                  :class="isSaved(i) ? 'text-teal-400' : 'text-gray-500 hover:text-teal-400 hover:bg-teal-900/20'"
+                  :title="isSaved(i) ? 'Remove from saved' : 'Save'">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" :fill="isSaved(i) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                   </svg>
                 </button>
                 <button @click="openNote(i)"
-                  class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors" title="Add note">
+                  class="p-1.5 rounded-lg transition-colors"
+                  :class="hasNote(i) ? 'text-teal-400' : 'text-gray-500 hover:text-teal-400 hover:bg-teal-900/20'"
+                  :title="hasNote(i) ? 'Edit note' : 'Add note'">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
                   </svg>
@@ -292,31 +298,34 @@
                 {{ paper.citedBy.toLocaleString() }}
               </span>
 
-              <!-- Like + Save + Share -->
+              <!-- Like + Save + Note -->
               <button
                 @click="likePaper(paper)"
                 :disabled="likeLoading"
-                class="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-colors disabled:cursor-progress"
-                title="Like"
+                class="ml-auto p-1.5 rounded-lg transition-colors disabled:cursor-progress"
+                :class="isLiked(paper) ? 'text-red-400 like-pop' : 'text-gray-500 hover:text-red-400 hover:bg-red-900/20'"
+                :title="isLiked(paper) ? 'Unlike' : 'Like'"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" :fill="isLiked(paper) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 8.25c0-2.485-2.099-4.5-4.687-4.5-1.936 0-3.598 1.126-4.313 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.098 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                 </svg>
               </button>
               <button
                 @click="savePaper(paper)"
                 :disabled="bookmarkLoading"
-                class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors disabled:cursor-progress"
-                title="Save"
+                class="p-1.5 rounded-lg transition-colors disabled:cursor-progress"
+                :class="isSaved(paper) ? 'text-teal-400' : 'text-gray-500 hover:text-teal-400 hover:bg-teal-900/20'"
+                :title="isSaved(paper) ? 'Remove from saved' : 'Save'"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" :fill="isSaved(paper) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                 </svg>
               </button>
               <button
                 @click="openNote(paper)"
-                class="p-1.5 rounded-lg text-gray-500 hover:text-teal-400 hover:bg-teal-900/20 transition-colors"
-                title="Add note"
+                class="p-1.5 rounded-lg transition-colors"
+                :class="hasNote(paper) ? 'text-teal-400' : 'text-gray-500 hover:text-teal-400 hover:bg-teal-900/20'"
+                :title="hasNote(paper) ? 'Edit note' : 'Add note'"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
@@ -675,6 +684,9 @@ export default {
       showTooltip: false,
       savedPosts: [],
       savedLoading: false,
+      likedIds: [],   // arxivIds + post _ids the user has liked
+      savedIds: [],   // same for bookmarks
+      notedIds: [],   // papers with a note
     };
   },
 
@@ -704,7 +716,36 @@ export default {
     },
   },
 
+  mounted() {
+    this.fetchMyActivity();
+  },
+
   methods: {
+    // Identity key for a feed paper or DB post
+    paperKey(p) {
+      return p.arxivId || p.id || p._id;
+    },
+    isLiked(p) { return this.likedIds.includes(this.paperKey(p)); },
+    isSaved(p) { return this.savedIds.includes(this.paperKey(p)); },
+    hasNote(p) { return this.notedIds.includes(this.paperKey(p)); },
+
+    // Load the user's likes/bookmarks/notes once so card icons reflect state
+    async fetchMyActivity() {
+      const keyOf = (pd, fallbackId) => pd?.arxivId || fallbackId;
+      try {
+        const [likes, bookmarks, notes] = await Promise.all([
+          axios.get(`${API_BASE}/api/v1/likes`, { withCredentials: true }),
+          axios.get(`${API_BASE}/api/v1/bookmarks`, { withCredentials: true }),
+          axios.get(`${API_BASE}/api/v1/notes`, { withCredentials: true }),
+        ]);
+        this.likedIds = (likes.data.likes || []).map(l => keyOf(l.postDetails, String(l.post))).filter(Boolean);
+        this.savedIds = (bookmarks.data.bookmarks || []).map(b => keyOf(b.postDetails, String(b.post))).filter(Boolean);
+        this.notedIds = (notes.data.notes || []).filter(n => n.content).map(n => keyOf(n.postDetails, String(n.post))).filter(Boolean);
+      } catch (e) {
+        console.error("Error loading activity:", e);
+      }
+    },
+
     async fetchSaved() {
       this.savedLoading = true;
       try {
@@ -785,6 +826,9 @@ export default {
           { withCredentials: true }
         );
         this.message = "Note saved";
+        const nk = this.paperKey(this.notePaper);
+        if (this.noteContent.trim() && !this.notedIds.includes(nk)) this.notedIds.push(nk);
+        if (!this.noteContent.trim()) this.notedIds = this.notedIds.filter(k => k !== nk);
         this.noteModal = false;
         this.notePaper = null;
       } catch (error) {
@@ -822,6 +866,13 @@ export default {
           { withCredentials: true }
         );
         this.message = response.data.message;
+        // toggle local saved state
+        const sk = this.paperKey(p);
+        if (response.data.message.toLowerCase().includes('removed')) {
+          this.savedIds = this.savedIds.filter(k => k !== sk);
+        } else if (!this.savedIds.includes(sk)) {
+          this.savedIds.push(sk);
+        }
         await this.fetchSaved(); // keep Saved tab current
       } catch (error) {
         console.error("Error saving paper:", error);
@@ -840,6 +891,13 @@ export default {
           { withCredentials: true }
         );
         this.message = response.data.message;
+        // toggle local liked state
+        const lk = this.paperKey(p);
+        if (response.data.message.toLowerCase().includes('removed')) {
+          this.likedIds = this.likedIds.filter(k => k !== lk);
+        } else if (!this.likedIds.includes(lk)) {
+          this.likedIds.push(lk);
+        }
       } catch (error) {
         console.error("Error liking paper:", error);
       } finally {
@@ -851,3 +909,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+@keyframes like-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.like-pop svg { animation: like-pop 0.3s ease; }
+</style>

@@ -1,44 +1,51 @@
 <template>
-  <div class="min-h-screen flex flex-col tablet:flex-row">
+  <div class="min-h-screen flex flex-col tablet:flex-row bg-[#1c1c1e]">
     <!-- Left: branding panel -->
-    <div class="hidden tablet:flex flex-col justify-between bg-[#14b8a6] text-white px-12 py-12 tablet:w-2/5">
-      <a href="/" class="text-xl font-bold tracking-tight">Academia</a>
+    <div class="hidden tablet:flex flex-col justify-between bg-gradient-to-br from-teal-900/60 via-[#1c1c1e] to-[#111113] border-r border-gray-800 text-white px-12 py-12 tablet:w-2/5">
+      <a href="/" class="flex items-center gap-2.5 text-xl font-bold tracking-tight">
+        <span class="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+        </span>
+        Academia
+      </a>
 
       <div>
         <h2 class="text-3xl font-bold leading-snug mb-4">
           New to Academia?
         </h2>
-        <p class="text-blue-100 mb-8 leading-relaxed">
-          Discover daily arXiv papers across AI, maths and hardware. See citation counts, share insights, follow researchers.
+        <p class="text-gray-400 mb-8 leading-relaxed">
+          Your daily AI research feed. Live papers from arXiv and HuggingFace, citation counts, private notes and a personal knowledge graph.
         </p>
         <NuxtLink
           to="/register"
-          class="inline-block px-6 py-3 bg-white text-[#14b8a6] rounded-xl text-sm font-medium hover:bg-teal-50 transition-colors"
+          class="inline-block px-6 py-3 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-500 transition-colors"
         >
           Create account
         </NuxtLink>
       </div>
 
-      <p class="text-blue-200 text-sm">
-        arXiv · OpenAlex · open access
+      <p class="text-gray-600 text-sm">
+        arXiv · HuggingFace · OpenAlex
       </p>
     </div>
 
     <!-- Right: login form -->
-    <div class="flex-1 flex flex-col justify-center px-8 tablet:px-16 py-16 bg-white">
+    <div class="flex-1 flex flex-col justify-center px-8 tablet:px-16 py-16">
       <!-- Mobile header -->
-      <a href="/" class="tablet:hidden text-xl font-bold text-[#14b8a6] mb-12">Academia</a>
+      <a href="/" class="tablet:hidden text-xl font-bold text-teal-400 mb-12">Academia</a>
 
       <div class="max-w-sm w-full mx-auto">
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
+        <h1 class="text-2xl font-bold text-white mb-1">Welcome back</h1>
         <p class="text-sm text-gray-500 mb-8">
           No account?
-          <NuxtLink to="/register" class="text-[#14b8a6] font-medium">Sign up</NuxtLink>
+          <NuxtLink to="/register" class="text-teal-400 font-medium hover:text-teal-300">Sign up</NuxtLink>
         </p>
 
         <div
           v-show="showError"
-          class="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm"
+          class="mb-5 px-4 py-3 rounded-lg bg-red-900/30 border border-red-800 text-red-400 text-sm"
           role="alert"
         >
           {{ errormsg }}
@@ -46,35 +53,35 @@
 
         <form class="space-y-4" @submit.prevent="login">
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
             <input
               id="email"
               type="email"
               required
               v-model="email"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
+              class="w-full px-3 py-2 bg-[#242426] border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
             <div class="flex justify-between mb-1">
-              <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-              <a href="#" class="text-sm text-[#14b8a6]">Forgot?</a>
+              <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+              <a href="#" class="text-sm text-teal-400">Forgot?</a>
             </div>
             <input
               id="password"
               type="password"
               required
               v-model="password"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
+              class="w-full px-3 py-2 bg-[#242426] border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            class="w-full py-2.5 bg-[#14b8a6] text-white rounded-lg text-sm font-medium hover:bg-teal-600 transition-colors flex items-center justify-center gap-2 mt-2"
+            class="w-full py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-500 transition-colors flex items-center justify-center gap-2 mt-2"
           >
             <svg
               v-if="loading"
@@ -91,7 +98,7 @@
           <button
             type="button"
             @click="demoLogin"
-            class="w-full py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm hover:border-gray-300 transition-colors"
+            class="w-full py-2.5 border border-gray-700 text-gray-400 rounded-lg text-sm hover:border-gray-500 hover:text-gray-200 transition-colors"
           >
             Use demo account
           </button>
