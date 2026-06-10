@@ -119,22 +119,25 @@
       </div>
 
       <!-- Loading posts -->
-      <div v-if="loading" class="flex justify-center py-16">
-        <LoadSpinner />
+      <div v-if="loading">
+        <SkeletonCard v-for="n in 3" :key="n" />
       </div>
 
       <template v-else>
         <!-- Toast -->
-        <div
-          v-show="showTooltip"
-          :class="{
-            'bg-red-900/30 border-red-800 text-red-400': message.toLowerCase().includes('removed') || message.toLowerCase().includes('deleted'),
-            'bg-green-900/30 border-green-800 text-green-400': message.toLowerCase().includes('created') || message.toLowerCase().includes('saved'),
-          }"
-          class="fixed top-16 right-4 z-20 text-sm border rounded-lg px-4 py-2 shadow-sm"
-        >
-          {{ message }}
-        </div>
+        <Transition name="toast">
+          <div
+            v-if="showTooltip"
+            :class="isRemovalMsg
+              ? 'bg-[#2a1c1e] border-red-800/60 text-red-300'
+              : 'bg-[#1c2a26] border-teal-700/60 text-teal-200'"
+            class="fixed top-16 right-4 z-30 flex items-center gap-2.5 text-sm border rounded-xl px-4 py-2.5 shadow-xl shadow-black/40 backdrop-blur"
+          >
+            <svg v-if="!isRemovalMsg" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-teal-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            {{ message }}
+          </div>
+        </Transition>
 
         <!-- HuggingFace featured (AI topic only — HF daily is all ML/AI) OR saved bookmarks (any topic) -->
         <div v-if="(activeTab === 'Saved' || activeTopic === 'ai') && displayedPosts && displayedPosts.length" class="mb-6">
@@ -147,7 +150,7 @@
           <div
             v-for="(i, index) in displayedPosts.slice(0, 8)"
             :key="index"
-            class="relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
+            class="relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30 transition-all duration-200 overflow-hidden"
           >
             <img
               v-if="i.thumbnail"
@@ -224,7 +227,7 @@
             {{ activeTab === 'Trending' ? 'Trending papers' : activeTab === 'Most Cited' ? 'Most cited papers' : 'Latest papers' }}
           </p>
 
-          <LoadSpinner v-if="papersPending && papers.length === 0" />
+          <template v-if="papersPending && papers.length === 0"><SkeletonCard v-for="n in 3" :key="'sk'+n" /></template>
 
           <p v-else-if="displayedPapers.length === 0" class="text-sm text-gray-500 py-8 text-center">
             {{ papers.length > 0 ? 'No papers match current filters.' : 'No papers available for this topic right now.' }}
@@ -233,7 +236,7 @@
           <div
             v-for="paper in displayedPapers"
             :key="paper.id"
-            class="relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 transition-colors overflow-hidden"
+            class="relative bg-[#242426] border border-gray-700/60 rounded-2xl p-5 mb-3 hover:border-gray-600 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30 transition-all duration-200 overflow-hidden"
           >
             <!-- Thumbnail — fades in on hover -->
             <img
@@ -338,14 +341,16 @@
             Failed to load papers.
           </p>
 
-          <div v-if="hasMore" class="flex justify-center py-8">
+          <!-- Infinite scroll sentinel — auto-loads next page; button kept as fallback -->
+          <div v-if="hasMore" ref="loadMoreSentinel" class="flex justify-center py-8">
             <button
               @click="loadMore"
               :disabled="papersPending"
-              class="flex items-center gap-2 px-5 py-2 rounded-lg border border-gray-700 text-sm text-gray-400 hover:border-gray-400 hover:border-gray-500 hover:text-gray-200 transition-colors disabled:opacity-40 disabled:cursor-progress"
+              class="flex items-center gap-2 px-5 py-2 rounded-lg border border-gray-700 text-sm text-gray-400 hover:border-gray-500 hover:text-gray-200 transition-colors disabled:opacity-40 disabled:cursor-progress"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
+              <svg v-if="papersPending" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
               </svg>
               {{ papersPending ? 'Loading…' : 'Load more' }}
             </button>
@@ -533,6 +538,20 @@ export default {
       topicData[activeTopic.value].loadMore();
     }
 
+    // Infinite scroll: auto-load next page when sentinel becomes visible
+    const loadMoreSentinel = ref(null);
+    let io = null;
+    onMounted(() => {
+      io = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting) loadMore();
+      }, { rootMargin: '400px' });
+      watch(loadMoreSentinel, (el, prev) => {
+        if (prev) io.unobserve(prev);
+        if (el) io.observe(el);
+      }, { immediate: true, flush: 'post' });
+    });
+    onUnmounted(() => io?.disconnect());
+
     // Lazy-load: only fetch the active topic. Fetch others when user switches to them.
     onMounted(() => topicData[activeTopic.value].ensureLoaded());
     watch(activeTopic, (t) => {
@@ -668,6 +687,7 @@ export default {
       papers, papersPending, papersError, hasMore, loadMore,
       displayedPapers, isSourceActive, toggleSource, toggleFilter,
       trendingCategories, topVenues, categoryLabel, onThumbLoad,
+      loadMoreSentinel,
     };
   },
 
@@ -697,6 +717,10 @@ export default {
   },
 
   computed: {
+    isRemovalMsg() {
+      const m = (this.message || '').toLowerCase();
+      return m.includes('removed') || m.includes('deleted');
+    },
     displayedPosts() {
       if (this.activeTab === 'Saved') return this.savedPosts;
       if (!this.sourceCommunity) return [];
@@ -917,4 +941,7 @@ export default {
   100% { transform: scale(1); }
 }
 .like-pop svg { animation: like-pop 0.3s ease; }
+
+.toast-enter-active, .toast-leave-active { transition: all 0.25s ease; }
+.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(16px); }
 </style>

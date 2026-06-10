@@ -27,7 +27,11 @@ export default {
 
       lgdesk: "1600px",
     },
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+      },
+    },
   },
   plugins: [require("tailwind-scrollbar") ({ nocompatible: true })],
 };

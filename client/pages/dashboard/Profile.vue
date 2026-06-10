@@ -79,9 +79,15 @@
           <p class="text-sm text-gray-400 line-clamp-3 leading-relaxed">{{ j?.abstract }}</p>
         </div>
       </div>
-      <p v-if="!likedposts.length" class="text-sm text-gray-600 py-10 text-center">
-        Like papers from the feed to add them here.
-      </p>
+      <div v-if="!likedposts.length" class="flex flex-col items-center gap-3 py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M21 8.25c0-2.485-2.099-4.5-4.687-4.5-1.936 0-3.598 1.126-4.313 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.098 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+        </svg>
+        <p class="text-sm text-gray-600">No favorites yet.</p>
+        <NuxtLink to="/dashboard" class="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-medium transition-colors">
+          Browse AI papers →
+        </NuxtLink>
+      </div>
     </div>
 
     <!-- ── Notes tab ── -->
@@ -104,9 +110,15 @@
           Delete note
         </button>
       </div>
-      <p v-if="!notes.length" class="text-sm text-gray-600 py-10 text-center">
-        No notes yet — add notes to papers from the feed.
-      </p>
+      <div v-if="!notes.length" class="flex flex-col items-center gap-3 py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+        </svg>
+        <p class="text-sm text-gray-600">No notes yet.</p>
+        <NuxtLink to="/dashboard" class="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-medium transition-colors">
+          Annotate a paper →
+        </NuxtLink>
+      </div>
     </div>
 
   </main>
